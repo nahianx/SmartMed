@@ -48,9 +48,12 @@ app.use((err: Error, _req: Request, res: Response) => {
   res.status(500).json({ error: 'Internal server error' })
 })
 
-app.listen(PORT, () => {
-  console.log(`🚀 SmartMed API server running on port ${PORT}`)
-  console.log(`📍 Health check: http://localhost:${PORT}/health`)
-})
+// Only start the server when not running tests
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`🚀 SmartMed API server running on port ${PORT}`)
+    console.log(`📍 Health check: http://localhost:${PORT}/health`)
+  })
+}
 
 export default app

@@ -73,3 +73,13 @@ import { Button, Card, Input, Modal } from '@smartmed/ui'
 ## Styling
 
 Components use Tailwind CSS classes. Make sure Tailwind is configured in your consuming application.
+
+## Tests
+
+Run Jest tests for this UI library:
+
+```bash
+npm run test
+# or from the monorepo root
+npm run test --workspace @smartmed/ui
+```

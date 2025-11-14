@@ -48,3 +48,13 @@ if (config.features.enableVideoCall) {
 Configuration reads from environment variables:
 
 - `API_URL` - Override API URL
+
+## Tests
+
+Run Jest tests for this package:
+
+```bash
+npm run test
+# or from the monorepo root
+npm run test --workspace @smartmed/config
+```

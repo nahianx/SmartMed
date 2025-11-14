@@ -62,3 +62,8 @@ src/
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 - `npm run typecheck` - Run TypeScript type checking
+
+## Tests
+
+- `npm run test` - Run Jest tests for this app
+- From the monorepo root: `npm run test --workspace @smartmed/web`

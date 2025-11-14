@@ -52,3 +52,13 @@ const patient: Patient = {
 ## Type Safety
 
 All types are fully typed with TypeScript for maximum type safety across the monorepo.
+
+## Tests
+
+Run Jest tests for this package:
+
+```bash
+npm run test
+# or from the monorepo root
+npm run test --workspace @smartmed/types
+```

@@ -103,6 +103,8 @@ Run tests across all packages:
 npm run test
 ```
 
+This runs Jest in each workspace that defines a `test` script (currently web, api, config, types, and ui).
+
 ### Lint
 
 Lint all packages:
