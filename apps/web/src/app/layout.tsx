@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { AppToaster } from '../components/ui/toaster'
+import { Providers } from '../components/providers'
 
 export const metadata: Metadata = {
   title: 'SmartMed - Healthcare Management System',
@@ -15,8 +16,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
-        <AppToaster />
+        <Providers>
+          {children}
+          <AppToaster />
+        </Providers>
       </body>
     </html>
   )
