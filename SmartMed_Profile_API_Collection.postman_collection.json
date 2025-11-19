@@ -1,0 +1,597 @@
+{
+  "info": {
+    "name": "SmartMed Profile Management API",
+    "description": "Complete API testing collection for SmartMed Profile Management feature",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:1080/api",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "POST Login - Doctor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Login successful\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set(\"authToken\", response.data.token);",
+                  "    pm.environment.set(\"userId\", response.data.user.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"doctor@smartmed.com\",\n  \"password\": \"doctor123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "POST Login - Patient",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Login successful\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set(\"patientToken\", response.data.token);",
+                  "    pm.environment.set(\"patientUserId\", response.data.user.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"patient@smartmed.com\",\n  \"password\": \"patient123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "POST Register - Doctor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"doctor@smartmed.com\",\n  \"password\": \"doctor123\",\n  \"role\": \"DOCTOR\",\n  \"fullName\": \"Dr. John Smith\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "POST Register - Patient",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"patient@smartmed.com\",\n  \"password\": \"patient123\",\n  \"role\": \"PATIENT\",\n  \"fullName\": \"Jane Doe\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏥 Health Check",
+      "item": [
+        {
+          "name": "GET Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Health check successful\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.status).to.eql('ok');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:1080/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "1080",
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👤 Profile Management",
+      "item": [
+        {
+          "name": "GET Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Profile retrieved successfully\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    pm.expect(response.data).to.have.property('id');",
+                  "    pm.expect(response.data).to.have.property('email');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "PUT Update Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Profile updated successfully\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Dr. John Smith Updated\",\n  \"phoneNumber\": \"+1234567890\",\n  \"addressLine1\": \"123 Medical Street\",\n  \"city\": \"Healthcare City\",\n  \"region\": \"Medical District\",\n  \"postalCode\": \"12345\",\n  \"country\": \"USA\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "POST Upload Profile Photo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "DELETE Remove Profile Photo",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "photo"]
+            }
+          }
+        },
+        {
+          "name": "PUT Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"doctor123\",\n  \"newPassword\": \"newpassword456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/password",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "password"]
+            }
+          }
+        },
+        {
+          "name": "POST Toggle MFA",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"enabled\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/mfa",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "mfa"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👨‍⚕️ Doctor Endpoints",
+      "item": [
+        {
+          "name": "GET Doctor Search (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Doctor search successful\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    pm.expect(response.data).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/doctor/search?query=cardiology&specialization=cardiology",
+              "host": ["{{baseUrl}}"],
+              "path": ["doctor", "search"],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "cardiology"
+                },
+                {
+                  "key": "specialization",
+                  "value": "cardiology"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET Doctor Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/doctor/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["doctor", "profile"]
+            }
+          }
+        },
+        {
+          "name": "GET Doctor Availability",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/doctor/availability",
+              "host": ["{{baseUrl}}"],
+              "path": ["doctor", "availability"]
+            }
+          }
+        },
+        {
+          "name": "PUT Update Doctor Availability",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"availability\": [\n    {\n      \"dayOfWeek\": 1,\n      \"startTime\": \"09:00\",\n      \"endTime\": \"17:00\",\n      \"hasBreak\": true,\n      \"breakStart\": \"12:00\",\n      \"breakEnd\": \"13:00\",\n      \"isAvailable\": true\n    },\n    {\n      \"dayOfWeek\": 2,\n      \"startTime\": \"08:00\",\n      \"endTime\": \"16:00\",\n      \"hasBreak\": false,\n      \"isAvailable\": true\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/doctor/availability",
+              "host": ["{{baseUrl}}"],
+              "path": ["doctor", "availability"]
+            }
+          }
+        },
+        {
+          "name": "PUT Update Clinic Info",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Heart Care Clinic\",\n  \"address\": \"123 Medical Plaza, Healthcare City\",\n  \"phone\": \"+1234567890\",\n  \"consultationFee\": 150\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/doctor/clinic",
+              "host": ["{{baseUrl}}"],
+              "path": ["doctor", "clinic"]
+            }
+          }
+        },
+        {
+          "name": "GET Specializations List",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/doctor/specializations/list",
+              "host": ["{{baseUrl}}"],
+              "path": ["doctor", "specializations", "list"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👩‍🦱 Patient Endpoints",
+      "item": [
+        {
+          "name": "GET Patient Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patientToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/patient/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["patient", "profile"]
+            }
+          }
+        },
+        {
+          "name": "GET Preferred Doctors",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patientToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/patient/preferred-doctors",
+              "host": ["{{baseUrl}}"],
+              "path": ["patient", "preferred-doctors"]
+            }
+          }
+        },
+        {
+          "name": "POST Add Preferred Doctor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patientToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/patient/preferred-doctors/{{doctorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["patient", "preferred-doctors", "{{doctorId}}"]
+            }
+          }
+        },
+        {
+          "name": "DELETE Remove Preferred Doctor",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patientToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/patient/preferred-doctors/{{doctorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["patient", "preferred-doctors", "{{doctorId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
