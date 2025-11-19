@@ -2,6 +2,16 @@
 
 A modern, scalable healthcare management system built with a monorepo architecture using Turbo.
 
+## 📚 Documentation
+
+**📋 [Complete Documentation](./docs/README.md)** - All guides, setup instructions, and API documentation
+
+### Quick Links
+- **🏥 [Profile Management Feature](./docs/profile-management/README.md)** - Complete profile system documentation
+- **🔧 [API Setup Guide](./docs/api/backend-setup.md)** - Backend configuration and testing
+- **👨‍💻 [Developer Migration Guide](./docs/profile-management/migration-guide.md)** - Setup and development guide
+- **🧪 [Postman API Collection](./postman/profile-management-api.postman_collection.json)** - 21 endpoints ready for testing
+
 ## 📋 Project Overview
 
 SmartMed is a comprehensive healthcare management platform designed to streamline patient care, doctor consultations, and medical record management. The system provides:

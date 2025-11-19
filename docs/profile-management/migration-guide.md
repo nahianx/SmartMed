@@ -3,7 +3,7 @@
 ## Quick Start for Developers
 
 ### Prerequisites
-1. Ensure the backend API is running on `http://localhost:3001`
+1. Ensure the backend API is running on `http://localhost:1080`
 2. Install dependencies: `npm install` in the root directory
 3. Start the development server: `npm run dev`
 
