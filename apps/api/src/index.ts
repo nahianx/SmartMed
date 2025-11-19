@@ -9,6 +9,8 @@ import patientRoutes from './routes/patient.routes'
 import doctorRoutes from './routes/doctor.routes'
 import appointmentRoutes from './routes/appointment.routes'
 import authRoutes from './routes/auth.routes'
+import profileRoutes from './routes/profile.routes'
+import { authMiddleware } from './middleware/auth'
 
 dotenv.config()
 
@@ -21,6 +23,7 @@ app.use(cors())
 app.use(morgan('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(authMiddleware)
 
 // Health check
 app.get('/health', (_req: Request, res: Response) => {
@@ -33,8 +36,10 @@ app.get('/health', (_req: Request, res: Response) => {
 
 // API Routes
 app.use('/api/auth', authRoutes)
-app.use('/api/patients', patientRoutes)
-app.use('/api/doctors', doctorRoutes)
+app.use('/api/profile', profileRoutes)
+app.use('/api/patient', patientRoutes)
+app.use('/api/doctor', doctorRoutes)
+app.use('/api/doctors', doctorRoutes) // for /api/doctors/search
 app.use('/api/appointments', appointmentRoutes)
 
 // 404 handler

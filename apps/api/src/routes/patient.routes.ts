@@ -1,60 +1,79 @@
-import { Router, Request, Response } from 'express'
+import { Router, Response } from 'express'
+import { requireAuth, requireRole, AuthenticatedRequest } from '../middleware/auth'
+import { UserRole } from '@smartmed/types'
+import {
+  addPreferredDoctor,
+  getPatientProfileByUserId,
+  getPreferredDoctors,
+  removePreferredDoctor,
+} from '../services/patient.service'
 
 const router = Router()
 
-// Get all patients
-router.get('/', async (_req: Request, res: Response) => {
-  try {
-    // TODO: Fetch from database
-    res.json({ patients: [] })
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch patients' })
-  }
-})
+router.get(
+  '/profile',
+  requireAuth,
+  requireRole(UserRole.PATIENT),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const patient = await getPatientProfileByUserId(req.user!.id)
+      res.json({ patient })
+    } catch (error: any) {
+      res
+        .status(error.status || 500)
+        .json({ error: error.message || 'Failed to load patient profile' })
+    }
+  },
+)
 
-// Get patient by ID
-router.get('/:id', async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params
-    // TODO: Fetch patient from database
-    res.json({ patient: { id } })
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch patient' })
-  }
-})
+router.get(
+  '/preferred-doctors',
+  requireAuth,
+  requireRole(UserRole.PATIENT),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const preferred = await getPreferredDoctors(req.user!.id)
+      res.json({ preferred })
+    } catch (error: any) {
+      res
+        .status(error.status || 500)
+        .json({ error: error.message || 'Failed to load preferred doctors' })
+    }
+  },
+)
 
-// Create patient
-router.post('/', async (req: Request, res: Response) => {
-  try {
-    const patientData = req.body
-    // TODO: Save to database
-    res.status(201).json({ message: 'Patient created', patient: patientData })
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to create patient' })
-  }
-})
+router.post(
+  '/preferred-doctors/:doctorId',
+  requireAuth,
+  requireRole(UserRole.PATIENT),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { doctorId } = req.params
+      await addPreferredDoctor(req.user!.id, doctorId)
+      res.status(201).json({ message: 'Preferred doctor added' })
+    } catch (error: any) {
+      res
+        .status(error.status || 500)
+        .json({ error: error.message || 'Failed to add preferred doctor' })
+    }
+  },
+)
 
-// Update patient
-router.put('/:id', async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params
-    const patientData = req.body
-    // TODO: Update in database
-    res.json({ message: 'Patient updated', patient: { id, ...patientData } })
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to update patient' })
-  }
-})
-
-// Delete patient
-router.delete('/:id', async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params
-    // TODO: Delete from database
-    res.json({ message: 'Patient deleted', id })
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to delete patient' })
-  }
-})
+router.delete(
+  '/preferred-doctors/:doctorId',
+  requireAuth,
+  requireRole(UserRole.PATIENT),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { doctorId } = req.params
+      await removePreferredDoctor(req.user!.id, doctorId)
+      res.json({ message: 'Preferred doctor removed' })
+    } catch (error: any) {
+      res
+        .status(error.status || 500)
+        .json({ error: error.message || 'Failed to remove preferred doctor' })
+    }
+  },
+)
 
 export default router

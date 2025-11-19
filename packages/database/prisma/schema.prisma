@@ -37,6 +37,20 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Common profile fields
+  fullName       String?
+  phoneNumber    String?
+  dateOfBirth    DateTime?
+  gender         Gender?
+  addressLine1   String?
+  addressLine2   String?
+  city           String?
+  region         String?
+  postalCode     String?
+  country        String?
+  profilePhotoUrl String?
+  isMfaEnabled   Boolean @default(false)
+
   patient Patient?
   doctor  Doctor?
 
@@ -59,9 +73,10 @@ model Patient {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  appointments  Appointment[]
-  prescriptions Prescription[]
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments     Appointment[]
+  prescriptions    Prescription[]
+  preferredDoctors PreferredDoctor[]
 
   @@map("patients")
 }
@@ -82,9 +97,15 @@ model Doctor {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  appointments  Appointment[]
-  prescriptions Prescription[]
+  // Relations
+  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments   Appointment[]
+  prescriptions  Prescription[]
+  clinicId       String?
+  clinic         Clinic?             @relation(fields: [clinicId], references: [id])
+  specializations DoctorSpecialization[]
+  availabilities  DoctorAvailability[]
+  preferredBy     PreferredDoctor[]
 
   @@map("doctors")
 }
@@ -124,4 +145,72 @@ model Prescription {
   doctor      Doctor      @relation(fields: [doctorId], references: [id])
 
   @@map("prescriptions")
+}
+
+model Clinic {
+  id               String   @id @default(uuid())
+  name             String
+  address          String
+  phone            String
+  consultationFee  Float
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  doctors          Doctor[]
+
+  @@map("clinics")
+}
+
+model Specialization {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  doctors   DoctorSpecialization[]
+
+  @@map("specializations")
+}
+
+model DoctorSpecialization {
+  id               String   @id @default(uuid())
+  doctorId         String
+  specializationId String
+
+  doctor         Doctor         @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  specialization Specialization @relation(fields: [specializationId], references: [id], onDelete: Cascade)
+
+  @@unique([doctorId, specializationId])
+  @@map("doctor_specializations")
+}
+
+model DoctorAvailability {
+  id          String   @id @default(uuid())
+  doctorId    String
+  dayOfWeek   Int      // 0 = Sunday, 6 = Saturday
+  startTime   String   // HH:MM 24h format
+  endTime     String   // HH:MM 24h format
+  hasBreak    Boolean  @default(false)
+  breakStart  String?
+  breakEnd    String?
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@map("doctor_availability")
+}
+
+model PreferredDoctor {
+  id        String   @id @default(uuid())
+  patientId String
+  doctorId  String
+  createdAt DateTime @default(now())
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor  Doctor  @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@unique([patientId, doctorId], name: "patientId_doctorId")
+  @@map("preferred_doctors")
 }

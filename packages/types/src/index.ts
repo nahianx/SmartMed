@@ -13,6 +13,19 @@ export interface User {
   role: UserRole
   createdAt: Date
   updatedAt: Date
+  // Common profile fields
+  fullName?: string
+  phoneNumber?: string
+  dateOfBirth?: Date
+  gender?: 'MALE' | 'FEMALE' | 'OTHER'
+  addressLine1?: string
+  addressLine2?: string
+  city?: string
+  region?: string
+  postalCode?: string
+  country?: string
+  profilePhotoUrl?: string
+  isMfaEnabled?: boolean
 }
 
 // Patient types
@@ -49,6 +62,45 @@ export interface Doctor {
   availableTimeSlots: TimeSlot[]
   createdAt: Date
   updatedAt: Date
+  clinicId?: string
+}
+
+export interface Clinic {
+  id: string
+  name: string
+  address: string
+  phone: string
+  consultationFee: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Specialization {
+  id: string
+  name: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface DoctorAvailability {
+  id: string
+  doctorId: string
+  dayOfWeek: number // 0-6
+  startTime: string
+  endTime: string
+  hasBreak: boolean
+  breakStart?: string
+  breakEnd?: string
+  isAvailable: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface PreferredDoctor {
+  id: string
+  patientId: string
+  doctorId: string
+  createdAt: Date
 }
 
 export interface TimeSlot {
