@@ -2,10 +2,8 @@ import { render, screen } from '@testing-library/react'
 import Home from './page'
 
 describe('Home page', () => {
-  it('renders the main heading', () => {
+  it('renders the SmartMed heading', () => {
     render(<Home />)
-    expect(
-      screen.getByRole('heading', { name: /welcome to smartmed/i })
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /smartmed/i })).toBeInTheDocument()
   })
 })

@@ -4,11 +4,20 @@ import helmet from 'helmet'
 import morgan from 'morgan'
 import dotenv from 'dotenv'
 
+// Import middleware
+import { authStub } from './middleware/auth_stub'
+
+// Scheduler
+import { startReminderScheduler } from './scheduler/reminder_scheduler'
+
 // Import routes
 import patientRoutes from './routes/patient.routes'
 import doctorRoutes from './routes/doctor.routes'
 import appointmentRoutes from './routes/appointment.routes'
 import authRoutes from './routes/auth.routes'
+import timelineRoutes from './routes/timeline.routes'
+import reportRoutes from './routes/report.routes'
+import notificationRoutes from './routes/notification.routes'
 
 dotenv.config()
 
@@ -21,6 +30,7 @@ app.use(cors())
 app.use(morgan('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(authStub)
 
 // Health check
 app.get('/health', (_req: Request, res: Response) => {
@@ -36,6 +46,9 @@ app.use('/api/auth', authRoutes)
 app.use('/api/patients', patientRoutes)
 app.use('/api/doctors', doctorRoutes)
 app.use('/api/appointments', appointmentRoutes)
+app.use('/api/timeline', timelineRoutes)
+app.use('/api/reports', reportRoutes)
+app.use('/api/notifications', notificationRoutes)
 
 // 404 handler
 app.use((_req: Request, res: Response) => {
@@ -54,6 +67,9 @@ if (process.env.NODE_ENV !== 'test') {
     console.log(`🚀 SmartMed API server running on port ${PORT}`)
     console.log(`📍 Health check: http://localhost:${PORT}/health`)
   })
+
+  // Start background reminder scheduler
+  startReminderScheduler()
 }
 
 export default app

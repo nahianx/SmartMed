@@ -1,5 +1,10 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ErrorProvider } from '@/components/error/error_provider'
+import React from 'react'
+
+const queryClient = new QueryClient()
 
 export const metadata: Metadata = {
   title: 'SmartMed - Healthcare Management System',
@@ -13,7 +18,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <QueryClientProvider client={queryClient}>
+          <ErrorProvider>
+            {children}
+          </ErrorProvider>
+        </QueryClientProvider>
+      </body>
     </html>
   )
 }
