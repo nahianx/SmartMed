@@ -1,0 +1,702 @@
+{
+  "info": {
+    "name": "SmartMed API - Timeline Feature",
+    "description": "Complete API collection for testing SmartMed's Past Activity Timeline feature and related endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "smartmed-api-v1"
+  },
+  "item": [
+    {
+      "name": "🏥 Health Check",
+      "item": [
+        {
+          "name": "Health Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "Login - Patient",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{patient_email}}\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login - Doctor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{doctor_email}}\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register New User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"PATIENT\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📊 Timeline API (Main Feature)",
+      "item": [
+        {
+          "name": "Get All Activities",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-email",
+                "value": "{{patient_email}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/timeline",
+              "host": ["{{base_url}}"],
+              "path": ["api", "timeline"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Timeline - Date Range Filter",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-email",
+                "value": "{{patient_email}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/timeline?from=2024-11-01&to=2024-11-20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "timeline"],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2024-11-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2024-11-20"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Timeline - Type Filter (Appointments Only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-email",
+                "value": "{{patient_email}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/timeline?types=appointment",
+              "host": ["{{base_url}}"],
+              "path": ["api", "timeline"],
+              "query": [
+                {
+                  "key": "types",
+                  "value": "appointment"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Timeline - Multiple Types",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-email",
+                "value": "{{patient_email}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/timeline?types=appointment,prescription",
+              "host": ["{{base_url}}"],
+              "path": ["api", "timeline"],
+              "query": [
+                {
+                  "key": "types",
+                  "value": "appointment,prescription"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Timeline - Status Filter",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-email",
+                "value": "{{patient_email}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/timeline?statuses=completed",
+              "host": ["{{base_url}}"],
+              "path": ["api", "timeline"],
+              "query": [
+                {
+                  "key": "statuses",
+                  "value": "completed"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Timeline - Search Filter",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-email",
+                "value": "{{patient_email}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/timeline?search=blood pressure",
+              "host": ["{{base_url}}"],
+              "path": ["api", "timeline"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "blood pressure"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Timeline - Complex Filter",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-email",
+                "value": "{{patient_email}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/timeline?from=2024-11-01&types=appointment,prescription&statuses=completed&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "timeline"],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2024-11-01"
+                },
+                {
+                  "key": "types",
+                  "value": "appointment,prescription"
+                },
+                {
+                  "key": "statuses",
+                  "value": "completed"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Timeline - Doctor View",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-email",
+                "value": "{{doctor_email}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/timeline",
+              "host": ["{{base_url}}"],
+              "path": ["api", "timeline"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "👤 Patient Management",
+      "item": [
+        {
+          "name": "Get All Patients",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-email",
+                "value": "{{doctor_email}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/patients",
+              "host": ["{{base_url}}"],
+              "path": ["api", "patients"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current Patient Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-email",
+                "value": "{{patient_email}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/patients/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "patients", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Patient by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-email",
+                "value": "{{doctor_email}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/patients/{{patient_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "patients", "{{patient_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "👩‍⚕️ Doctor Management",
+      "item": [
+        {
+          "name": "Get All Doctors",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/doctors",
+              "host": ["{{base_url}}"],
+              "path": ["api", "doctors"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Doctor by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/doctors/{{doctor_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "doctors", "{{doctor_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📅 Appointment Management",
+      "item": [
+        {
+          "name": "Get All Appointments - Patient View",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-email",
+                "value": "{{patient_email}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/appointments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "appointments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Appointments - Doctor View",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-email",
+                "value": "{{doctor_email}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/appointments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "appointments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Appointment by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-email",
+                "value": "{{patient_email}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/appointments/appointment-1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "appointments", "appointment-1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create New Appointment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-user-email",
+                "value": "{{patient_email}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patient_id}}\",\n  \"doctorId\": \"{{doctor_id}}\",\n  \"dateTime\": \"2024-11-25T10:00:00Z\",\n  \"duration\": 30,\n  \"reason\": \"Follow-up consultation\",\n  \"notes\": \"Discussing lab results and treatment plan\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/appointments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "appointments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Appointment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-user-email",
+                "value": "{{patient_email}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dateTime\": \"2024-11-25T11:00:00Z\",\n  \"notes\": \"Updated appointment time due to schedule conflict\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/appointments/appointment-1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "appointments", "appointment-1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Appointment",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-user-email",
+                "value": "{{patient_email}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/appointments/appointment-1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "appointments", "appointment-1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📄 Report Management",
+      "item": [
+        {
+          "name": "Get Report Metadata",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-email",
+                "value": "{{patient_email}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reports/report-1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "report-1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Download Report (Inline)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-email",
+                "value": "{{patient_email}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reports/report-1/download",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "report-1", "download"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Download Report (Attachment)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-email",
+                "value": "{{patient_email}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reports/report-1/download?disposition=attachment",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "report-1", "download"],
+              "query": [
+                {
+                  "key": "disposition",
+                  "value": "attachment"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload New Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-user-email",
+                "value": "{{doctor_email}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patient_id}}\",\n  \"doctorId\": \"{{doctor_id}}\",\n  \"appointmentId\": \"appointment-1\",\n  \"notes\": \"Blood test results - all values within normal range\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reports",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🔔 Notification Management",
+      "item": [
+        {
+          "name": "Get All Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-email",
+                "value": "{{patient_email}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/notifications",
+              "host": ["{{base_url}}"],
+              "path": ["api", "notifications"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-user-email",
+                "value": "{{patient_email}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/notifications/notif-1/read",
+              "host": ["{{base_url}}"],
+              "path": ["api", "notifications", "notif-1", "read"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:4000",
+      "type": "string"
+    },
+    {
+      "key": "patient_email",
+      "value": "patient@example.com",
+      "type": "string"
+    },
+    {
+      "key": "doctor_email",
+      "value": "doctor@example.com",
+      "type": "string"
+    },
+    {
+      "key": "patient_id",
+      "value": "patient-1",
+      "type": "string"
+    },
+    {
+      "key": "doctor_id",
+      "value": "doctor-1",
+      "type": "string"
+    }
+  ]
+}
