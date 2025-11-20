@@ -5,10 +5,13 @@ import { prisma, UserRole } from '@smartmed/database'
 import { User } from '@smartmed/types'
 
 const router = Router()
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me'
+
+function getJwtSecret() {
+  return process.env.JWT_SECRET || 'dev-secret-change-me'
+}
 
 function signToken(user: User) {
-  return jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, {
+  return jwt.sign({ id: user.id, role: user.role }, getJwtSecret(), {
     expiresIn: '7d',
   })
 }

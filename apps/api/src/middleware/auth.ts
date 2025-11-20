@@ -2,7 +2,9 @@ import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import { UserRole } from '@smartmed/types'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me'
+function getJwtSecret() {
+  return process.env.JWT_SECRET || 'dev-secret-change-me'
+}
 
 export interface AuthUser {
   id: string
@@ -18,20 +20,29 @@ export function authMiddleware(
   _res: Response,
   next: NextFunction,
 ) {
-  const authHeader = req.headers['authorization'] || req.headers['Authorization']
+  const rawHeader = (req.headers['authorization'] || req.headers['Authorization']) as string | string[] | undefined
+  const authHeader = Array.isArray(rawHeader) ? rawHeader[0] : rawHeader
+
   if (!authHeader || typeof authHeader !== 'string') {
     return next()
   }
 
-  const [, token] = authHeader.split(' ')
+  // Accept both "Bearer <token>" and "<token>" formats
+  let token = authHeader.trim()
+  if (token.toLowerCase().startsWith('bearer ')) {
+    token = token.slice(7).trim()
+  }
+
   if (!token) {
     return next()
   }
 
   try {
-    const payload = jwt.verify(token, JWT_SECRET) as AuthUser
+    const payload = jwt.verify(token, getJwtSecret()) as AuthUser
+    console.log('AUTH MIDDLEWARE - verified payload:', payload)
     req.user = { id: payload.id, role: payload.role }
-  } catch {
+  } catch (err) {
+    console.error('AUTH MIDDLEWARE - JWT verify error:', (err as Error).message)
     // ignore invalid tokens; routes can still enforce requireAuth
   }
 

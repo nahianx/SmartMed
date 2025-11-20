@@ -38,11 +38,16 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:1080/api",
+      "value": "http://localhost:1079/api",
       "type": "string"
     },
     {
       "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "patientToken",
       "value": "",
       "type": "string"
     }
@@ -61,8 +66,13 @@
                   "pm.test(\"Login successful\", function () {",
                   "    pm.response.to.have.status(200);",
                   "    const response = pm.response.json();",
-                  "    pm.environment.set(\"authToken\", response.data.token);",
-                  "    pm.environment.set(\"userId\", response.data.user.id);",
+                  "    const token = response.token;",
+                  "    const userId = response.user && response.user.id;",
+                  "    pm.expect(token, 'token should be present').to.be.a('string');",
+                  "    pm.environment.set(\"authToken\", token);",
+                  "    pm.environment.set(\"userId\", userId);",
+                  "    pm.collectionVariables.set(\"authToken\", token);",
+                  "    pm.collectionVariables.set(\"userId\", userId);",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -98,8 +108,13 @@
                   "pm.test(\"Login successful\", function () {",
                   "    pm.response.to.have.status(200);",
                   "    const response = pm.response.json();",
-                  "    pm.environment.set(\"patientToken\", response.data.token);",
-                  "    pm.environment.set(\"patientUserId\", response.data.user.id);",
+                  "    const token = response.token;",
+                  "    const userId = response.user && response.user.id;",
+                  "    pm.expect(token, 'token should be present').to.be.a('string');",
+                  "    pm.environment.set(\"patientToken\", token);",
+                  "    pm.environment.set(\"patientUserId\", userId);",
+                  "    pm.collectionVariables.set(\"patientToken\", token);",
+                  "    pm.collectionVariables.set(\"patientUserId\", userId);",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -193,10 +208,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:1080/health",
+              "raw": "http://localhost:1079/health",
               "protocol": "http",
               "host": ["localhost"],
-              "port": "1080",
+              "port": "1079",
               "path": ["health"]
             }
           }

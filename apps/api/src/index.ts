@@ -1,8 +1,8 @@
+import './config/env'
 import express, { Application, Request, Response } from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
-import dotenv from 'dotenv'
 
 // Import routes
 import patientRoutes from './routes/patient.routes'
@@ -11,8 +11,6 @@ import appointmentRoutes from './routes/appointment.routes'
 import authRoutes from './routes/auth.routes'
 import profileRoutes from './routes/profile.routes'
 import { authMiddleware } from './middleware/auth'
-
-dotenv.config()
 
 const app: Application = express()
 const PORT = process.env.PORT || 4000

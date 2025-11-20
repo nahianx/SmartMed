@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from 'axios'
 import { ApiResponse, User, Doctor, Patient, DoctorAvailability, PreferredDoctor, Specialization } from '@smartmed/types'
 
 // Configure axios instance
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1080/api'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1079/api'
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
