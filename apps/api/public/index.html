@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartMed API Testing Console</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2c5aa0; border-bottom: 3px solid #2c5aa0; padding-bottom: 10px; }
+        h2 { color: #34495e; margin-top: 30px; }
+        .endpoint {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+        .get { background: #28a745; color: white; }
+        .post { background: #007bff; color: white; }
+        .put { background: #ffc107; color: black; }
+        .delete { background: #dc3545; color: white; }
+        .url { font-family: monospace; background: #e9ecef; padding: 2px 6px; border-radius: 3px; }
+        .test-btn {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .test-btn:hover { background: #138496; }
+        .result {
+            background: #f1f3f4;
+            border-left: 4px solid #17a2b8;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            display: none;
+        }
+        .success { border-left-color: #28a745; }
+        .error { border-left-color: #dc3545; }
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .status { font-weight: bold; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏥 SmartMed API Testing Console</h1>
+        <p><strong>Server:</strong> <span class="url">http://localhost:1080</span></p>
+        <p><strong>Status:</strong> <span id="server-status">Testing...</span></p>
+
+        <div class="note">
+            <strong>📝 Testing Notes:</strong>
+            <ul>
+                <li>Use the <code>x-user-email</code> header to simulate different users</li>
+                <li>Database connection errors are expected (PostgreSQL not configured)</li>
+                <li>File uploads require multipart/form-data content type</li>
+                <li>Some endpoints require valid UUIDs for full functionality</li>
+            </ul>
+        </div>
+
+        <h2>🏥 Health Check</h2>
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="url">/health</span>
+            <button class="test-btn" onclick="testEndpoint('GET', '/health')">Test</button>
+            <div class="result" id="result-health"></div>
+        </div>
+
+        <h2>🔐 Authentication</h2>
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="url">/api/auth/login</span>
+            <button class="test-btn" onclick="testLogin()">Test Login</button>
+            <div class="result" id="result-login"></div>
+        </div>
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="url">/api/auth/register</span>
+            <button class="test-btn" onclick="testRegister()">Test Register</button>
+            <div class="result" id="result-register"></div>
+        </div>
+
+        <h2>👤 Patient Routes</h2>
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="url">/api/patients</span>
+            <button class="test-btn" onclick="testEndpoint('GET', '/api/patients', {'x-user-email': 'admin@example.com'})">Test (Admin)</button>
+            <div class="result" id="result-patients"></div>
+        </div>
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="url">/api/patients/me</span>
+            <button class="test-btn" onclick="testEndpoint('GET', '/api/patients/me', {'x-user-email': 'patient@example.com'})">Test Patient Profile</button>
+            <div class="result" id="result-patient-me"></div>
+        </div>
+
+        <h2>👩‍⚕️ Doctor Routes</h2>
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="url">/api/doctors</span>
+            <button class="test-btn" onclick="testEndpoint('GET', '/api/doctors')">Test Get All</button>
+            <div class="result" id="result-doctors"></div>
+        </div>
+        <div class="endpoint">
+            <span class="method post">POST</span>
+            <span class="url">/api/doctors</span>
+            <button class="test-btn" onclick="testCreateDoctor()">Test Create</button>
+            <div class="result" id="result-create-doctor"></div>
+        </div>
+
+        <h2>📅 Appointment Routes</h2>
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="url">/api/appointments</span>
+            <button class="test-btn" onclick="testEndpoint('GET', '/api/appointments', {'x-user-email': 'patient@example.com'})">Test Get Appointments</button>
+            <div class="result" id="result-appointments"></div>
+        </div>
+
+        <h2>📋 Timeline Routes</h2>
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="url">/api/timeline</span>
+            <button class="test-btn" onclick="testEndpoint('GET', '/api/timeline?limit=5', {'x-user-email': 'patient@example.com'})">Test Timeline</button>
+            <div class="result" id="result-timeline"></div>
+        </div>
+
+        <h2>🔔 Notifications</h2>
+        <div class="endpoint">
+            <span class="method get">GET</span>
+            <span class="url">/api/notifications</span>
+            <button class="test-btn" onclick="testEndpoint('GET', '/api/notifications', {'x-user-email': 'patient@example.com'})">Test Notifications</button>
+            <div class="result" id="result-notifications"></div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:1080';
+
+        // Test server status on load
+        window.onload = function() {
+            testEndpoint('GET', '/health').then(() => {
+                document.getElementById('server-status').innerHTML = '✅ Server Running';
+                document.getElementById('server-status').style.color = 'green';
+            }).catch(() => {
+                document.getElementById('server-status').innerHTML = '❌ Server Not Running';
+                document.getElementById('server-status').style.color = 'red';
+            });
+        };
+
+        async function testEndpoint(method, endpoint, headers = {}, body = null) {
+            const resultId = 'result-' + endpoint.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            const resultElement = document.getElementById(resultId) || 
+                                  document.getElementById('result-' + endpoint.split('/').pop().split('?')[0]);
+            
+            if (resultElement) {
+                resultElement.style.display = 'block';
+                resultElement.className = 'result';
+                resultElement.textContent = 'Testing...';
+            }
+
+            try {
+                const response = await fetch(BASE_URL + endpoint, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...headers
+                    },
+                    body: body ? JSON.stringify(body) : undefined
+                });
+
+                const data = await response.json();
+                
+                if (resultElement) {
+                    resultElement.className = response.ok ? 'result success' : 'result error';
+                    resultElement.textContent = 
+                        `Status: ${response.status} ${response.statusText}\n` +
+                        `Response:\n${JSON.stringify(data, null, 2)}`;
+                }
+                
+                return { response, data };
+            } catch (error) {
+                if (resultElement) {
+                    resultElement.className = 'result error';
+                    resultElement.textContent = `Error: ${error.message}`;
+                }
+                throw error;
+            }
+        }
+
+        function testLogin() {
+            testEndpoint('POST', '/api/auth/login', {}, {
+                email: 'user@example.com',
+                password: 'password123'
+            });
+        }
+
+        function testRegister() {
+            testEndpoint('POST', '/api/auth/register', {}, {
+                email: 'newuser@example.com',
+                password: 'password123',
+                role: 'PATIENT'
+            });
+        }
+
+        function testCreateDoctor() {
+            testEndpoint('POST', '/api/doctors', {}, {
+                firstName: 'Jane',
+                lastName: 'Smith',
+                specialization: 'Cardiology',
+                licenseNumber: 'DOC123456'
+            });
+        }
+    </script>
+</body>
+</html>

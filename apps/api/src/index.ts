@@ -3,6 +3,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
 import dotenv from 'dotenv'
+import path from 'path'
 
 // Import middleware
 import { authStub } from './middleware/auth_stub'
@@ -31,6 +32,9 @@ app.use(morgan('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(authStub)
+
+// Serve static files from public directory
+app.use(express.static(path.join(__dirname, '../public')))
 
 // Health check
 app.get('/health', (_req: Request, res: Response) => {
