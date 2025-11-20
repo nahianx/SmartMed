@@ -23,7 +23,7 @@ import notificationRoutes from './routes/notification.routes'
 dotenv.config()
 
 const app: Application = express()
-const PORT = process.env.PORT || 4000
+const PORT = process.env.PORT || 1080
 
 // Middleware
 app.use(helmet())

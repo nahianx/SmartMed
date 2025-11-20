@@ -46,3 +46,11 @@ prisma/migrations
 # Misc
 *.pem
 .vercel
+
+# TypeScript build info
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# Compiled JS from TS packages
+packages/*/src/**/*.js
+packages/*/src/**/*.d.ts

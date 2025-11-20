@@ -38,14 +38,14 @@ npm run build
 npm run start
 ```
 
-The API will be available at http://localhost:4000
+The API will be available at http://localhost:1080
 
 ## Environment Variables
 
 Copy `.env.example` to `.env` and configure:
 
 ```
-PORT=4000
+PORT=1080
 NODE_ENV=development
 DATABASE_URL="postgresql://user:password@localhost:5432/smartmed"
 JWT_SECRET="your-secret-key-change-in-production"

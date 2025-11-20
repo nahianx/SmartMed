@@ -63,7 +63,7 @@ cp apps/api/.env.example apps/api/.env
 **For Web (`apps/web/.env.local`):**
 
 ```bash
-echo "API_URL=http://localhost:4000" > apps/web/.env.local
+echo "API_URL=http://localhost:1080" > apps/web/.env.local
 ```
 
 4. Set up the database:
@@ -85,7 +85,7 @@ npm run dev
 This will start:
 
 - Web app: http://localhost:3000
-- API server: http://localhost:4000
+- API server: http://localhost:1080
 
 ### Build
 
@@ -226,7 +226,7 @@ SmartMed/
 ### API (.env)
 
 ```
-PORT=4000
+PORT=1080
 NODE_ENV=development
 DATABASE_URL="postgresql://user:password@localhost:5432/smartmed"
 JWT_SECRET="your-secret-key"
@@ -235,7 +235,7 @@ JWT_SECRET="your-secret-key"
 ### Web (.env.local)
 
 ```
-API_URL=http://localhost:4000
+API_URL=http://localhost:1080
 ```
 
 ## 🤝 Contributing

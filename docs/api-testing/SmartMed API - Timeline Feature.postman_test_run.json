@@ -1,0 +1,660 @@
+{
+	"id": "73535f98-c8be-44e5-9def-698db8e73669",
+	"name": "SmartMed API - Timeline Feature",
+	"timestamp": "2025-11-20T21:15:12.032Z",
+	"collection_id": "47575801-be99402b-8722-4633-b857-07e7ea8c0c90",
+	"folder_id": 0,
+	"environment_id": "0",
+	"totalPass": 0,
+	"delay": 0,
+	"persist": true,
+	"status": "finished",
+	"startedAt": "2025-11-20T21:15:07.734Z",
+	"totalFail": 0,
+	"results": [
+		{
+			"id": "2fbb7d26-d953-4a25-85fc-c21eba2c0662",
+			"name": "Health Status",
+			"url": "http://localhost:1080/health",
+			"time": 131,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				131
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "de8ddf40-78e3-4c21-822b-7d604d6d7b82",
+			"name": "Login - Patient",
+			"url": "http://localhost:1080/api/auth/login",
+			"time": 300,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				300
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "6663eb8d-d343-4c40-8cc7-840a6cbdb1a7",
+			"name": "Login - Doctor",
+			"url": "http://localhost:1080/api/auth/login",
+			"time": 27,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				27
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "69d2dfac-804c-43db-aa71-a556f285965f",
+			"name": "Register New User",
+			"url": "http://localhost:1080/api/auth/register",
+			"time": 15,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				15
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "72a9844f-f5b0-4938-8651-398192f359c9",
+			"name": "Get All Activities",
+			"url": "http://localhost:1080/api/timeline",
+			"time": 69,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				69
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "77d69c5f-f4e1-4f92-b6d2-ba28e8e00f2c",
+			"name": "Get Timeline - Date Range Filter",
+			"url": "http://localhost:1080/api/timeline?from=2024-11-01&to=2024-11-20",
+			"time": 18,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				18
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "dc97c203-16de-470a-aa02-8d188e39263b",
+			"name": "Get Timeline - Type Filter (Appointments Only)",
+			"url": "http://localhost:1080/api/timeline?types=appointment",
+			"time": 19,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				19
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "fb4990c4-3c24-4005-b29a-02f7f1702a05",
+			"name": "Get Timeline - Multiple Types",
+			"url": "http://localhost:1080/api/timeline?types=appointment,prescription",
+			"time": 20,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				20
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "6af8b3e5-3833-4b3d-b1da-bf878061dab7",
+			"name": "Get Timeline - Status Filter",
+			"url": "http://localhost:1080/api/timeline?statuses=completed",
+			"time": 16,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				16
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "4b616c95-6f62-4bda-b090-322126c11a18",
+			"name": "Get Timeline - Search Filter",
+			"url": "http://localhost:1080/api/timeline?search=blood pressure",
+			"time": 19,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				19
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "becc6fc2-3cef-42b4-acf3-c641f5e07e6f",
+			"name": "Get Timeline - Complex Filter",
+			"url": "http://localhost:1080/api/timeline?from=2024-11-01&types=appointment,prescription&statuses=completed&limit=10",
+			"time": 15,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				15
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "118bad4e-3351-4764-81ee-8991b7595bd7",
+			"name": "Get Timeline - Doctor View",
+			"url": "http://localhost:1080/api/timeline",
+			"time": 12,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				12
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "2adaca51-32d8-42d1-abb7-500cb49a84a0",
+			"name": "Get All Patients",
+			"url": "http://localhost:1080/api/patients",
+			"time": 14,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				14
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "81891063-4000-4a68-af63-e9d67705039c",
+			"name": "Get Current Patient Profile",
+			"url": "http://localhost:1080/api/patients/me",
+			"time": 8,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				8
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "0a4b8b9f-02e0-4aa1-8567-15af27634fc9",
+			"name": "Get Patient by ID",
+			"url": "http://localhost:1080/api/patients/patient-1",
+			"time": 11,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				11
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "2330c93a-8b99-4e80-989a-efe6cf6d46bf",
+			"name": "Get All Doctors",
+			"url": "http://localhost:1080/api/doctors",
+			"time": 7,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				7
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "4d97fa3e-11a6-498b-af77-3eae554274da",
+			"name": "Get Doctor by ID",
+			"url": "http://localhost:1080/api/doctors/doctor-1",
+			"time": 7,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				7
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "6dfa0d56-4b95-40f4-8fcb-9281b8062a92",
+			"name": "Get All Appointments - Patient View",
+			"url": "http://localhost:1080/api/appointments",
+			"time": 13,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				13
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "e3f2a067-ca4e-43cc-86f5-dab352d89e0f",
+			"name": "Get All Appointments - Doctor View",
+			"url": "http://localhost:1080/api/appointments",
+			"time": 10,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				10
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "5b05da53-41a1-4e58-b066-fa261f31bb9d",
+			"name": "Get Appointment by ID",
+			"url": "http://localhost:1080/api/appointments/",
+			"time": 9,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				9
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "8a5cd16e-9647-46d9-91e7-6e8befe7c98d",
+			"name": "Create New Appointment",
+			"url": "http://localhost:1080/api/appointments",
+			"time": 17,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				17
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "4cc4762f-a16d-4127-a1f5-a41ae80d1c3a",
+			"name": "Update Appointment",
+			"url": "http://localhost:1080/api/appointments/",
+			"time": 10,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				10
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "e17dc75c-0792-4fb2-93fd-20b96594283d",
+			"name": "Cancel Appointment",
+			"url": "http://localhost:1080/api/appointments/",
+			"time": 7,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				7
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "373e3f48-5edb-4336-afda-c009265db29e",
+			"name": "Get Report Metadata",
+			"url": "http://localhost:1080/api/reports/",
+			"time": 10,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				10
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "b109108a-7d03-48bd-9c3d-a131633333a5",
+			"name": "Download Report (Inline)",
+			"url": "http://localhost:1080/api/reports//download",
+			"time": 15,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				15
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "074c5e96-19fe-4c8f-a18a-366ae384c362",
+			"name": "Download Report (Attachment)",
+			"url": "http://localhost:1080/api/reports//download?disposition=attachment",
+			"time": 10,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				10
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "547f34de-5a78-429c-9e3d-52b0b0369864",
+			"name": "Upload New Report",
+			"url": "http://localhost:1080/api/reports",
+			"time": 26,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				26
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "a5979936-513a-451b-803a-8d75c673174b",
+			"name": "Get All Notifications",
+			"url": "http://localhost:1080/api/notifications",
+			"time": 9,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				9
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "3d8fd1db-efbc-4d75-b0f9-cb9b3c7cbbd6",
+			"name": "Mark Notification as Read",
+			"url": "http://localhost:1080/api/notifications//read",
+			"time": 9,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				9
+			],
+			"allTests": [
+				{}
+			]
+		}
+	],
+	"count": 1,
+	"totalTime": 853,
+	"collection": {
+		"requests": [
+			{
+				"id": "2fbb7d26-d953-4a25-85fc-c21eba2c0662",
+				"method": "GET"
+			},
+			{
+				"id": "de8ddf40-78e3-4c21-822b-7d604d6d7b82",
+				"method": "POST"
+			},
+			{
+				"id": "6663eb8d-d343-4c40-8cc7-840a6cbdb1a7",
+				"method": "POST"
+			},
+			{
+				"id": "69d2dfac-804c-43db-aa71-a556f285965f",
+				"method": "POST"
+			},
+			{
+				"id": "72a9844f-f5b0-4938-8651-398192f359c9",
+				"method": "GET"
+			},
+			{
+				"id": "77d69c5f-f4e1-4f92-b6d2-ba28e8e00f2c",
+				"method": "GET"
+			},
+			{
+				"id": "dc97c203-16de-470a-aa02-8d188e39263b",
+				"method": "GET"
+			},
+			{
+				"id": "fb4990c4-3c24-4005-b29a-02f7f1702a05",
+				"method": "GET"
+			},
+			{
+				"id": "6af8b3e5-3833-4b3d-b1da-bf878061dab7",
+				"method": "GET"
+			},
+			{
+				"id": "4b616c95-6f62-4bda-b090-322126c11a18",
+				"method": "GET"
+			},
+			{
+				"id": "becc6fc2-3cef-42b4-acf3-c641f5e07e6f",
+				"method": "GET"
+			},
+			{
+				"id": "118bad4e-3351-4764-81ee-8991b7595bd7",
+				"method": "GET"
+			},
+			{
+				"id": "2adaca51-32d8-42d1-abb7-500cb49a84a0",
+				"method": "GET"
+			},
+			{
+				"id": "81891063-4000-4a68-af63-e9d67705039c",
+				"method": "GET"
+			},
+			{
+				"id": "0a4b8b9f-02e0-4aa1-8567-15af27634fc9",
+				"method": "GET"
+			},
+			{
+				"id": "2330c93a-8b99-4e80-989a-efe6cf6d46bf",
+				"method": "GET"
+			},
+			{
+				"id": "4d97fa3e-11a6-498b-af77-3eae554274da",
+				"method": "GET"
+			},
+			{
+				"id": "6dfa0d56-4b95-40f4-8fcb-9281b8062a92",
+				"method": "GET"
+			},
+			{
+				"id": "e3f2a067-ca4e-43cc-86f5-dab352d89e0f",
+				"method": "GET"
+			},
+			{
+				"id": "5b05da53-41a1-4e58-b066-fa261f31bb9d",
+				"method": "GET"
+			},
+			{
+				"id": "8a5cd16e-9647-46d9-91e7-6e8befe7c98d",
+				"method": "POST"
+			},
+			{
+				"id": "4cc4762f-a16d-4127-a1f5-a41ae80d1c3a",
+				"method": "PUT"
+			},
+			{
+				"id": "e17dc75c-0792-4fb2-93fd-20b96594283d",
+				"method": "DELETE"
+			},
+			{
+				"id": "373e3f48-5edb-4336-afda-c009265db29e",
+				"method": "GET"
+			},
+			{
+				"id": "b109108a-7d03-48bd-9c3d-a131633333a5",
+				"method": "GET"
+			},
+			{
+				"id": "074c5e96-19fe-4c8f-a18a-366ae384c362",
+				"method": "GET"
+			},
+			{
+				"id": "547f34de-5a78-429c-9e3d-52b0b0369864",
+				"method": "POST"
+			},
+			{
+				"id": "a5979936-513a-451b-803a-8d75c673174b",
+				"method": "GET"
+			},
+			{
+				"id": "3d8fd1db-efbc-4d75-b0f9-cb9b3c7cbbd6",
+				"method": "POST"
+			}
+		]
+	}
+}

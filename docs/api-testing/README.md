@@ -30,11 +30,11 @@ cd /home/ahanaf/SmartMed
 node mock-api-server.js
 ```
 
-The server will start at: `http://localhost:4000`
+The server will start at: `http://localhost:1080`
 
 ### 3. Verify Health Check
 
-Send a GET request to: `http://localhost:4000/health`
+Send a GET request to: `http://localhost:1080/health`
 
 Expected response:
 ```json
@@ -51,7 +51,7 @@ Expected response:
 
 | Variable | Value | Description |
 |----------|-------|-------------|
-| `base_url` | `http://localhost:4000` | API server base URL |
+| `base_url` | `http://localhost:1080` | API server base URL |
 | `patient_email` | `patient@example.com` | Test patient user |
 | `doctor_email` | `doctor@example.com` | Test doctor user |
 | `patient_id` | `patient-1` | Test patient ID |
@@ -218,7 +218,7 @@ x-user-email: doctor@example.com   # For doctor access
 
 **1. Connection Refused**
 ```
-Error: connect ECONNREFUSED 127.0.0.1:4000
+Error: connect ECONNREFUSED 127.0.0.1:1080
 ```
 **Solution**: Ensure the mock API server is running (`node mock-api-server.js`)
 
