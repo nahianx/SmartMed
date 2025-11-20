@@ -254,3 +254,33 @@ SmartMed/
 - [ ] Dark mode
 - [ ] Email notifications
 - [ ] SMS reminders
+
+## Authentication & Authorization Architecture (Overview)
+
+- Frontend (`apps/web`)
+  - Next.js 14 app router.
+  - Auth pages under `/auth/*` and dashboards under `/dashboard/*`.
+  - `AuthContext` manages current user, access token, and redirects.
+  - Axios `apiClient` attaches JWT access tokens and sends cookies for refresh.
+
+- Backend (`apps/api`)
+  - Express.js with `/api/auth` and `/api/dashboard` routes.
+  - `AuthService` handles registration, login, logout, refresh, email verification, and password reset.
+  - `OAuthService` + `OAuthController` implement Google Sign-In.
+  - `TokenService` issues/rotates access and refresh tokens.
+  - Middleware: `authenticate`, `requireRole`, `rateLimiter`, Zod validation, and centralized `errorHandler`.
+
+- Database (`packages/database` with Prisma + PostgreSQL)
+  - `User` model extended with:
+    - `fullName`, `passwordHash`, `authProvider`, `googleId`, `emailVerified`, `isActive`, `lastLogin`.
+  - Additional auth tables:
+    - `UserSession` – refresh tokens + device/IP metadata.
+    - `PasswordReset` – password reset tokens with expiry and `used` flag.
+    - `EmailVerification` – email verification tokens and status.
+
+- Token & Session Flow
+  1. User authenticates via email/password or Google.
+  2. API returns access token (JWT) and sets refresh token cookie.
+  3. Frontend stores access token and uses it in `Authorization` headers.
+  4. When access token expires, frontend calls `/api/auth/refresh` to obtain a new one.
+  5. Logout and password reset revoke refresh tokens via `UserSession` records.

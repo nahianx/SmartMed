@@ -29,18 +29,72 @@ enum AppointmentStatus {
   NO_SHOW
 }
 
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  role      UserRole
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+}
 
-  patient Patient?
-  doctor  Doctor?
+model User {
+  id            String       @id @default(uuid())
+  email         String       @unique
+  passwordHash  String?
+  fullName      String
+  role          UserRole
+  authProvider  AuthProvider @default(LOCAL)
+  googleId      String?      @unique
+  emailVerified Boolean      @default(false)
+  isActive      Boolean      @default(true)
+  lastLogin     DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  patient       Patient?
+  doctor        Doctor?
+  sessions      UserSession[]
+  passwordResets      PasswordReset[]
+  emailVerifications  EmailVerification[]
 
   @@map("users")
+}
+
+model UserSession {
+  id           String   @id @default(uuid())
+  userId       String
+  refreshToken String   @unique
+  deviceInfo   Json
+  ipAddress    String
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_sessions")
+}
+
+model PasswordReset {
+  id         String   @id @default(uuid())
+  userId     String
+  resetToken String   @unique
+  expiresAt  DateTime
+  used       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_resets")
+}
+
+model EmailVerification {
+  id                String   @id @default(uuid())
+  userId            String
+  verificationToken String   @unique
+  expiresAt         DateTime
+  verified          Boolean  @default(false)
+  createdAt         DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("email_verifications")
 }
 
 model Patient {

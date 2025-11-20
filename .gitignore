@@ -46,3 +46,6 @@ prisma/migrations
 # Misc
 *.pem
 .vercel
+
+# Large media files
+Standard recording 1.mp3
