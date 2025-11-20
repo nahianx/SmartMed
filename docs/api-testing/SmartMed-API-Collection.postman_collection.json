@@ -333,7 +333,21 @@
               "path": ["api", "patients", "me"]
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.patient && body.patient.id) {",
+                  "  pm.collectionVariables.set('patient_id', body.patient.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Get Patient by ID",
@@ -436,9 +450,9 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/appointments/appointment-1",
+              "raw": "{{base_url}}/api/appointments/{{appointment_id}}",
               "host": ["{{base_url}}"],
-              "path": ["api", "appointments", "appointment-1"]
+              "path": ["api", "appointments", "{{appointment_id}}"]
             }
           },
           "response": []
@@ -467,7 +481,21 @@
               "path": ["api", "appointments"]
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.appointment && body.appointment.id) {",
+                  "  pm.collectionVariables.set('appointment_id', body.appointment.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Update Appointment",
@@ -488,9 +516,9 @@
               "raw": "{\n  \"dateTime\": \"2024-11-25T11:00:00Z\",\n  \"notes\": \"Updated appointment time due to schedule conflict\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/appointments/appointment-1",
+              "raw": "{{base_url}}/api/appointments/{{appointment_id}}",
               "host": ["{{base_url}}"],
-              "path": ["api", "appointments", "appointment-1"]
+              "path": ["api", "appointments", "{{appointment_id}}"]
             }
           },
           "response": []
@@ -506,9 +534,9 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/appointments/appointment-1",
+              "raw": "{{base_url}}/api/appointments/{{appointment_id}}",
               "host": ["{{base_url}}"],
-              "path": ["api", "appointments", "appointment-1"]
+              "path": ["api", "appointments", "{{appointment_id}}"]
             }
           },
           "response": []
@@ -529,9 +557,9 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/reports/report-1",
+              "raw": "{{base_url}}/api/reports/{{report_id}}",
               "host": ["{{base_url}}"],
-              "path": ["api", "reports", "report-1"]
+              "path": ["api", "reports", "{{report_id}}"]
             }
           },
           "response": []
@@ -547,9 +575,9 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/reports/report-1/download",
+              "raw": "{{base_url}}/api/reports/{{report_id}}/download",
               "host": ["{{base_url}}"],
-              "path": ["api", "reports", "report-1", "download"]
+              "path": ["api", "reports", "{{report_id}}", "download"]
             }
           },
           "response": []
@@ -565,9 +593,9 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/reports/report-1/download?disposition=attachment",
+              "raw": "{{base_url}}/api/reports/{{report_id}}/download?disposition=attachment",
               "host": ["{{base_url}}"],
-              "path": ["api", "reports", "report-1", "download"],
+              "path": ["api", "reports", "{{report_id}}", "download"],
               "query": [
                 {
                   "key": "disposition",
@@ -584,17 +612,39 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "x-user-email",
                 "value": "{{doctor_email}}"
               }
             ],
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"patientId\": \"{{patient_id}}\",\n  \"doctorId\": \"{{doctor_id}}\",\n  \"appointmentId\": \"appointment-1\",\n  \"notes\": \"Blood test results - all values within normal range\"\n}"
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "patientId",
+                  "value": "{{patient_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "doctorId",
+                  "value": "{{doctor_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "appointmentId",
+                  "value": "{{appointment_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "notes",
+                  "value": "Blood test results - all values within normal range",
+                  "type": "text"
+                }
+              ]
             },
             "url": {
               "raw": "{{base_url}}/api/reports",
@@ -602,7 +652,21 @@
               "path": ["api", "reports"]
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.id) {",
+                  "  pm.collectionVariables.set('report_id', body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
@@ -625,7 +689,21 @@
               "path": ["api", "notifications"]
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (Array.isArray(body.items) && body.items.length > 0) {",
+                  "  pm.collectionVariables.set('notification_id', body.items[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Mark Notification as Read",
@@ -642,9 +720,9 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/notifications/notif-1/read",
+              "raw": "{{base_url}}/api/notifications/{{notification_id}}/read",
               "host": ["{{base_url}}"],
-              "path": ["api", "notifications", "notif-1", "read"]
+              "path": ["api", "notifications", "{{notification_id}}", "read"]
             }
           },
           "response": []
@@ -675,7 +753,7 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "http://localhost:4000",
+      "value": "http://localhost:1080",
       "type": "string"
     },
     {
@@ -696,6 +774,21 @@
     {
       "key": "doctor_id",
       "value": "doctor-1",
+      "type": "string"
+    },
+    {
+      "key": "appointment_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "report_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "notification_id",
+      "value": "",
       "type": "string"
     }
   ]

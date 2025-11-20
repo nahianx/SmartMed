@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -68,7 +68,7 @@ model Patient {
   address          String
   emergencyContact String?
   bloodGroup       String?
-  allergies        String? // JSON string for SQLite compatibility
+  allergies        Json? // Array of allergy objects
   medicalHistory   String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
@@ -93,7 +93,7 @@ model Doctor {
   phoneNumber        String
   licenseNumber      String   @unique
   consultationFee    Float
-  availableDays      String // JSON string for SQLite compatibility
+  availableDays      Json // Array of available days
   availableTimeSlots Json
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
@@ -179,7 +179,7 @@ model Activity {
   reportId       String?
   title          String
   subtitle       String?
-  tags           String // JSON string for SQLite compatibility
+  tags           Json // Array of tag strings
   status         AppointmentStatus?
   notes          String?
   vitals         Json?

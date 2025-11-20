@@ -24,7 +24,7 @@ cp .env.example .env
 Edit `apps/api/.env`:
 
 ```env
-PORT=4000
+PORT=1080
 NODE_ENV=development
 DATABASE_URL="postgresql://username:password@localhost:5432/smartmed"
 JWT_SECRET="your-super-secret-jwt-key-change-this"
@@ -34,7 +34,7 @@ JWT_SECRET="your-super-secret-jwt-key-change-this"
 
 ```bash
 cd apps/web
-echo "API_URL=http://localhost:4000" > .env.local
+echo "API_URL=http://localhost:1080" > .env.local
 ```
 
 ### 3. Set Up Database
@@ -65,12 +65,12 @@ npm run dev
 This will start:
 
 - ✅ Web app on http://localhost:3000
-- ✅ API server on http://localhost:4000
+- ✅ API server on http://localhost:1080
 
 ## Verify Installation
 
 1. **Check API Health:**
-   Open http://localhost:4000/health in your browser
+   Open http://localhost:1080/health in your browser
 
 2. **Check Web App:**
    Open http://localhost:3000 in your browser
