@@ -38,8 +38,9 @@ router.post('/register', async (req: Request, res: Response) => {
       })
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10)
+    // Hash password with configurable salt rounds (default 10)
+    const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '10', 10)
+    const hashedPassword = await bcrypt.hash(password, saltRounds)
 
     // Create user
     const user = await prisma.user.create({

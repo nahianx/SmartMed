@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { emailSchema } from './common.schemas'
+import { UserRole } from '@smartmed/types'
 
 // Password validation schema
 export const passwordSchema = z.string()
@@ -9,8 +10,8 @@ export const passwordSchema = z.string()
   .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
   .regex(/[0-9]/, 'Password must contain at least one number')
 
-// User role validation
-export const userRoleSchema = z.enum(['ADMIN', 'DOCTOR', 'PATIENT', 'NURSE'], {
+// User role validation using the shared UserRole enum
+export const userRoleSchema = z.nativeEnum(UserRole, {
   errorMap: () => ({ message: 'Role must be one of: ADMIN, DOCTOR, PATIENT, NURSE' })
 })
 
