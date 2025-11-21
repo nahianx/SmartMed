@@ -507,35 +507,7 @@
           },
           "response": []
         },
-        {
-          "name": "Resend Verification Email",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{accessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "X-CSRF-Token",
-                "value": "{{csrfToken}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/auth/resend-verification",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "auth", "resend-verification"]
-            },
-            "description": "Resend verification email for authenticated user"
-          },
-          "response": []
-        }
+        
       ]
     },
     {
@@ -558,9 +530,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/users/me",
+              "raw": "{{baseUrl}}/api/auth/me",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "users", "me"]
+              "path": ["api", "auth", "me"]
             },
             "description": "Get current authenticated user profile"
           },
@@ -595,9 +567,9 @@
               "raw": "{\n  \"fullName\": \"Dr. Updated Name\",\n  \"phone\": \"+1234567890\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/users/me",
+              "raw": "{{baseUrl}}/api/auth/me",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "users", "me"]
+              "path": ["api", "auth", "me"]
             },
             "description": "Update current user profile"
           },
@@ -606,23 +578,20 @@
         {
           "name": "Check Email Availability",
           "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"test.availability@smartmed.com\"\n}"
-            },
+            "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/users/check-email",
+              "raw": "{{baseUrl}}/api/auth/check-email?email=test.availability@smartmed.com",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "users", "check-email"]
+              "path": ["api", "auth", "check-email"],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "test.availability@smartmed.com"
+                }
+              ]
             },
-            "description": "Check if email is available for registration"
+            "description": "Check if email is available for registration (use query param ?)"
           },
           "response": []
         }
@@ -682,140 +651,7 @@
         }
       ]
     },
-    {
-      "name": "Admin",
-      "description": "Admin-only endpoints for user management",
-      "item": [
-        {
-          "name": "Get All Users (Admin)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{accessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/admin/users?page=1&limit=10&role=DOCTOR",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "admin", "users"],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                },
-                {
-                  "key": "role",
-                  "value": "DOCTOR"
-                }
-              ]
-            },
-            "description": "Get paginated list of users (requires ADMIN role)"
-          },
-          "response": []
-        },
-        {
-          "name": "Get User by ID (Admin)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{accessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/admin/users/{{doctorId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "admin", "users", "{{doctorId}}"]
-            },
-            "description": "Get specific user by ID (requires ADMIN role)"
-          },
-          "response": []
-        },
-        {
-          "name": "Update User (Admin)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{accessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "X-CSRF-Token",
-                "value": "{{csrfToken}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"emailVerified\": true,\n  \"role\": \"DOCTOR\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/admin/users/{{doctorId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "admin", "users", "{{doctorId}}"]
-            },
-            "description": "Update user properties (requires ADMIN role)"
-          },
-          "response": []
-        },
-        {
-          "name": "Delete User (Admin)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{accessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "X-CSRF-Token",
-                "value": "{{csrfToken}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/admin/users/{{doctorId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "admin", "users", "{{doctorId}}"]
-            },
-            "description": "Delete user account (requires ADMIN role)"
-          },
-          "response": []
-        }
-      ]
-    },
+    
     {
       "name": "Error Testing",
       "description": "Test error handling and edge cases",
