@@ -1,4 +1,8 @@
+import { jest } from '@jest/globals'
+// Ensure integration tests use the real database implementation (not the manual mock)
+jest.unmock('@smartmed/database')
 import request from 'supertest'
+import { prisma } from '@smartmed/database'
 import app from './index'
 
 // NOTE: These tests assume a test database and prisma schema are properly configured.
@@ -7,6 +11,16 @@ describe('Auth integration', () => {
   const doctorEmail = 'doctor.test@example.com'
   const patientEmail = 'patient.test@example.com'
   const password = 'Aa1!test!'
+
+  beforeAll(async () => {
+    // Clean up any existing test users to ensure idempotent runs
+    await prisma.user.deleteMany({ where: { email: { in: [doctorEmail, patientEmail] } } })
+  })
+
+  afterAll(async () => {
+    // Remove test users created during the suite
+    await prisma.user.deleteMany({ where: { email: { in: [doctorEmail, patientEmail] } } })
+  })
 
   it('registers a new doctor and logs in', async () => {
     const registerRes = await request(app).post('/api/auth/register/doctor').send({

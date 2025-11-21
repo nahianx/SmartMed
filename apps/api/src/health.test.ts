@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals'
+jest.unmock('@smartmed/database')
 import request from 'supertest'
 import app from './index'
 

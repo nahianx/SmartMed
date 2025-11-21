@@ -55,6 +55,8 @@ export class AuthService {
       },
     })
 
+    // (no-op) user should contain created record
+
     const verificationToken = crypto.randomBytes(32).toString('hex')
     const verification = await prisma.emailVerification.create({
       data: {

@@ -18,7 +18,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:3001",
+      "value": "http://localhost:1375",
       "type": "string"
     },
     {
@@ -146,9 +146,9 @@
               "raw": "{\n  \"email\": \"doctor.{{$randomLastName}}@smartmed.com\",\n  \"password\": \"SecurePass123!\",\n  \"fullName\": \"Dr. {{$randomFirstName}} {{$randomLastName}}\",\n  \"role\": \"DOCTOR\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/auth/register",
+              "raw": "{{baseUrl}}/api/auth/register/doctor",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "auth", "register"]
+              "path": ["api", "auth", "register", "doctor"]
             },
             "description": "Register a new doctor account"
           },
@@ -188,9 +188,9 @@
               "raw": "{\n  \"email\": \"patient.{{$randomLastName}}@smartmed.com\",\n  \"password\": \"SecurePass123!\",\n  \"fullName\": \"{{$randomFirstName}} {{$randomLastName}}\",\n  \"role\": \"PATIENT\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/auth/register",
+              "raw": "{{baseUrl}}/api/auth/register/patient",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "auth", "register"]
+              "path": ["api", "auth", "register", "patient"]
             },
             "description": "Register a new patient account"
           },
@@ -866,9 +866,9 @@
               "raw": "{\n  \"email\": \"doctor.test@smartmed.com\",\n  \"password\": \"SecurePass123!\",\n  \"fullName\": \"Duplicate Doctor\",\n  \"role\": \"DOCTOR\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/auth/register",
+              "raw": "{{baseUrl}}/api/auth/register/doctor",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "auth", "register"]
+              "path": ["api", "auth", "register", "doctor"]
             },
             "description": "Test registration with existing email"
           },
@@ -958,7 +958,32 @@
         "type": "text/javascript",
         "exec": [
           "// Global pre-request script",
-          "console.log('Making request to:', pm.request.url.toString());"
+          "console.log('Making request to:', pm.request.url.toString());",
+          "// Fetch CSRF token and set environment variable for Newman runs",
+          "pm.sendRequest({",
+          "    url: pm.environment.get('baseUrl') + '/api/csrf-token',",
+          "    method: 'GET'",
+          "}, function (err, res) {",
+            "    if (!err && res && res.json) {",
+            "        try {",
+            "            const json = res.json();",
+            "            if (json && json.csrfToken) {",
+            "                pm.environment.set('csrfToken', json.csrfToken);",
+            "                // Attach csrf cookie to outgoing request so middleware sees both cookie + header",
+            "                try {",
+            "                    pm.request.headers.add({ key: 'Cookie', value: 'csrf-token=' + json.csrfToken });",
+            "                } catch (e) {",
+            "                    console.log('Failed to attach csrf cookie header', e);",
+            "                }",
+            "                console.log('Pre-request CSRF Token set:', json.csrfToken);",
+            "            }",
+            "        } catch (e) {",
+            "            console.log('Failed to parse CSRF token response', e);",
+            "        }",
+            "    } else {",
+            "        console.log('CSRF token request error:', err);",
+            "    }",
+          "});"
         ]
       }
     },

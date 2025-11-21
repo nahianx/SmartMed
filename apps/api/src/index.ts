@@ -4,6 +4,7 @@ import helmet from 'helmet'
 import morgan from 'morgan'
 import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
+import { csrfProtection, setCSRFToken, generateCSRFToken } from './middleware/csrf'
 
 // Import routes
 import patientRoutes from './routes/patient.routes'
@@ -26,6 +27,15 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
+// Conditionally enable CSRF protection. Set DISABLE_CSRF=true for local/dev/Postman convenience.
+const disableCsrf = process.env.DISABLE_CSR === 'true' || process.env.DISABLE_CSRF === 'true'
+if (!disableCsrf && process.env.NODE_ENV !== 'test') {
+  app.use(setCSRFToken)
+  app.use(csrfProtection)
+} else {
+  console.log('⚠️  CSRF protection is disabled (DISABLE_CSRF=true or NODE_ENV=test)')
+}
+
 // Health check
 app.get('/health', (_req: Request, res: Response) => {
   res.json({
@@ -33,6 +43,27 @@ app.get('/health', (_req: Request, res: Response) => {
     message: 'SmartMed API is running',
     timestamp: new Date().toISOString(),
   })
+})
+
+// API-prefixed health check (keeps Postman and docs working)
+app.get('/api/health', (_req: Request, res: Response) => {
+  res.json({
+    status: 'ok',
+    message: 'SmartMed API is running',
+    timestamp: new Date().toISOString(),
+  })
+})
+
+// Dev-friendly CSRF token endpoint. Returns a token and sets the CSRF cookie.
+app.get('/api/csrf-token', (_req: Request, res: Response) => {
+  const token = generateCSRFToken()
+  res.cookie('csrf-token', token, {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 24 * 60 * 60 * 1000,
+  })
+  return res.json({ csrfToken: token })
 })
 
 // API Routes
