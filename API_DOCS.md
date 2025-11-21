@@ -1,16 +1,21 @@
-# SmartMed Auth API Documentation
+# SmartMed Authentication API Documentation
+
+## Overview
+Complete API documentation for the SmartMed dual-path authentication system supporting both doctor and patient registration flows with OAuth integration.
 
 ## Base URL
 
 - Local development API: `http://localhost:4000/api`
+- Production API: `https://api.smartmed.com/api`
 
 ## Authentication Overview
 
-SmartMed uses:
-- Short-lived JWT access tokens (15 minutes) in the `Authorization: Bearer <token>` header.
-- Long-lived refresh tokens (7 days) stored in `httpOnly`, `secure` cookies (`refreshToken`).
-
-Most protected endpoints require an access token; refresh and logout rely on the refresh token cookie.
+SmartMed uses a secure token-based authentication system:
+- **Access tokens**: Short-lived JWT (15 minutes) for API requests
+- **Refresh tokens**: Long-lived secure tokens (7 days) in HTTP-only cookies
+- **OAuth integration**: Google Sign-In with account linking
+- **Role-based access**: Doctor and Patient specific endpoints
+- **Security features**: Rate limiting, CSRF protection, token rotation
 
 ---
 
