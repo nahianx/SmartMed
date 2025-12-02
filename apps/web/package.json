@@ -18,7 +18,8 @@
     "@smartmed/types": "*",
     "@tanstack/react-query": "^5.32.0",
     "axios": "^1.6.8",
-    "zustand": "^4.5.2"
+    "zustand": "^4.5.2",
+    "sonner": "^2.0.3"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.2",

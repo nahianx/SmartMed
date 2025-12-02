@@ -1,37 +1,137 @@
 import { Router, Request, Response } from 'express'
+import { requireAuth, requireRole, AuthenticatedRequest } from '../middleware/auth'
+import { UserRole } from '@smartmed/types'
+import {
+  getDoctorProfileByUserId,
+  updateDoctorSpecializations,
+  upsertClinicForDoctor,
+  getAvailability,
+  setAvailability,
+  removeAvailabilitySlot,
+  searchDoctors,
+} from '../services/doctor.service'
+import {
+  availabilityUpdateSchema,
+  clinicUpdateSchema,
+  specializationsUpdateSchema,
+  validate,
+} from '../services/validation.service'
 
 const router = Router()
 
-// Get all doctors
-router.get('/', async (_req: Request, res: Response) => {
+// Public search endpoint used by patients to find doctors
+router.get('/search', async (req: Request, res: Response) => {
   try {
-    // TODO: Fetch from database
-    res.json({ doctors: [] })
+    const q = String(req.query.q || '')
+    const doctors = await searchDoctors(q)
+    res.json({ doctors })
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch doctors' })
+    res.status(500).json({ error: 'Failed to search doctors' })
   }
 })
 
-// Get doctor by ID
-router.get('/:id', async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params
-    // TODO: Fetch doctor from database
-    res.json({ doctor: { id } })
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch doctor' })
-  }
-})
+// Doctor-specific profile
+router.get(
+  '/profile',
+  requireAuth,
+  requireRole(UserRole.DOCTOR),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const doctor = await getDoctorProfileByUserId(req.user!.id)
+      res.json({ doctor })
+    } catch (error: any) {
+      res
+        .status(error.status || 500)
+        .json({ error: error.message || 'Failed to load doctor profile' })
+    }
+  },
+)
 
-// Create doctor
-router.post('/', async (req: Request, res: Response) => {
-  try {
-    const doctorData = req.body
-    // TODO: Save to database
-    res.status(201).json({ message: 'Doctor created', doctor: doctorData })
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to create doctor' })
-  }
-})
+router.put(
+  '/specialization',
+  requireAuth,
+  requireRole(UserRole.DOCTOR),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const body = validate(specializationsUpdateSchema, req.body)
+      const doctor = await updateDoctorSpecializations(
+        req.user!.id,
+        body.specializations,
+      )
+      res.json({ message: 'Specializations updated', doctor })
+    } catch (error: any) {
+      res
+        .status(error.status || 500)
+        .json({ error: error.message || 'Failed to update specializations' })
+    }
+  },
+)
+
+router.put(
+  '/clinic',
+  requireAuth,
+  requireRole(UserRole.DOCTOR),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const body = validate(clinicUpdateSchema, req.body)
+      const clinic = await upsertClinicForDoctor(req.user!.id, body)
+      res.json({ message: 'Clinic updated', clinic })
+    } catch (error: any) {
+      res
+        .status(error.status || 500)
+        .json({ error: error.message || 'Failed to update clinic' })
+    }
+  },
+)
+
+router.get(
+  '/availability',
+  requireAuth,
+  requireRole(UserRole.DOCTOR),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const slots = await getAvailability(req.user!.id)
+      res.json({ slots })
+    } catch (error: any) {
+      res
+        .status(error.status || 500)
+        .json({ error: error.message || 'Failed to load availability' })
+    }
+  },
+)
+
+router.put(
+  '/availability',
+  requireAuth,
+  requireRole(UserRole.DOCTOR),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const body = validate(availabilityUpdateSchema, req.body)
+      const slots = await setAvailability(req.user!.id, body.slots as any)
+      res.json({ message: 'Availability updated', slots })
+    } catch (error: any) {
+      res
+        .status(error.status || 500)
+        .json({ error: error.message || 'Failed to update availability' })
+    }
+  },
+)
+
+router.delete(
+  '/availability/:slotId',
+  requireAuth,
+  requireRole(UserRole.DOCTOR),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { slotId } = req.params
+      await removeAvailabilitySlot(req.user!.id, slotId)
+      res.json({ message: 'Slot removed' })
+    } catch (error: any) {
+      res
+        .status(error.status || 500)
+        .json({ error: error.message || 'Failed to remove slot' })
+    }
+  },
+)
 
 export default router
