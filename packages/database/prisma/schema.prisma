@@ -8,63 +8,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  ADMIN
-  DOCTOR
-  PATIENT
-  NURSE
-}
-
-enum Gender {
-  MALE
-  FEMALE
-  OTHER
-}
-
-enum AppointmentStatus {
-  SCHEDULED
-  CONFIRMED
-  COMPLETED
-  CANCELLED
-  NO_SHOW
-}
-
-enum AuthProvider {
-  LOCAL
-  GOOGLE
-}
-
-enum ActivityType {
-  APPOINTMENT
-  PRESCRIPTION
-  REPORT
-}
-
-enum NotificationType {
-  APPOINTMENT_REMINDER_24H
-  APPOINTMENT_REMINDER_1H
-  ACTIVITY_CREATED
-  ACTIVITY_UPDATED
-}
+// Note: SQLite doesn't support enums, so we use String types with validation at application level
+// UserRole: ADMIN, DOCTOR, PATIENT, NURSE
+// Gender: MALE, FEMALE, OTHER
+// AppointmentStatus: SCHEDULED, CONFIRMED, COMPLETED, CANCELLED, NO_SHOW
+// AuthProvider: LOCAL, GOOGLE
+// ActivityType: APPOINTMENT, PRESCRIPTION, REPORT
+// NotificationType: APPOINTMENT_REMINDER_24H, APPOINTMENT_REMINDER_1H, ACTIVITY_CREATED, ACTIVITY_UPDATED
 
 model User {
-  id            String       @id @default(uuid())
-  email         String       @unique
+  id            String   @id @default(uuid())
+  email         String   @unique
   passwordHash  String?
   fullName      String?
-  role          UserRole
-  authProvider  AuthProvider @default(LOCAL)
-  googleId      String?      @unique
-  emailVerified Boolean      @default(false)
-  isActive      Boolean      @default(true)
+  role          String   // UserRole: ADMIN, DOCTOR, PATIENT, NURSE
+  authProvider  String   @default("LOCAL") // AuthProvider: LOCAL, GOOGLE
+  googleId      String?  @unique
+  emailVerified Boolean  @default(false)
+  isActive      Boolean  @default(true)
   lastLogin     DateTime?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   // Profile fields from profile management feature
   phoneNumber     String?
   dateOfBirth     DateTime?
-  gender          Gender?
+  gender          String?  // Gender: MALE, FEMALE, OTHER
   addressLine1    String?
   addressLine2    String?
   city            String?
@@ -89,7 +58,7 @@ model UserSession {
   id           String   @id @default(uuid())
   userId       String
   refreshToken String   @unique
-  deviceInfo   Json
+  deviceInfo   String   // JSON string for SQLite compatibility
   ipAddress    String
   expiresAt    DateTime
   createdAt    DateTime @default(now())
@@ -131,12 +100,12 @@ model Patient {
   firstName        String
   lastName         String
   dateOfBirth      DateTime
-  gender           Gender
+  gender           String   // Gender: MALE, FEMALE, OTHER
   phoneNumber      String
   address          String
   emergencyContact String?
   bloodGroup       String?
-  allergies        String? // JSON string for SQLite compatibility
+  allergies        String?  // JSON string for SQLite compatibility
   medicalHistory   String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
@@ -162,8 +131,8 @@ model Doctor {
   phoneNumber        String
   licenseNumber      String   @unique
   consultationFee    Float
-  availableDays      String // JSON string for SQLite compatibility
-  availableTimeSlots Json
+  availableDays      String   // JSON string for SQLite compatibility
+  availableTimeSlots String   // JSON string for SQLite compatibility
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
@@ -183,16 +152,16 @@ model Doctor {
 }
 
 model Appointment {
-  id        String            @id @default(uuid())
+  id        String   @id @default(uuid())
   patientId String
   doctorId  String
   dateTime  DateTime
-  duration  Int // in minutes
-  status    AppointmentStatus @default(SCHEDULED)
+  duration  Int      // in minutes
+  status    String   @default("SCHEDULED") // AppointmentStatus: SCHEDULED, CONFIRMED, COMPLETED, CANCELLED, NO_SHOW
   reason    String
   notes     String?
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   patient       Patient        @relation(fields: [patientId], references: [id])
   doctor        Doctor         @relation(fields: [doctorId], references: [id])
@@ -209,7 +178,7 @@ model Prescription {
   appointmentId String
   patientId     String
   doctorId      String
-  medications   Json // Array of medication objects
+  medications   String   // JSON string for SQLite compatibility - Array of medication objects
   diagnosis     String
   notes         String?
   createdAt     DateTime @default(now())
@@ -312,8 +281,8 @@ model Report {
 }
 
 model Activity {
-  id             String            @id @default(uuid())
-  type           ActivityType
+  id             String   @id @default(uuid())
+  type           String   // ActivityType: APPOINTMENT, PRESCRIPTION, REPORT
   occurredAt     DateTime
   patientId      String
   doctorId       String?
@@ -322,12 +291,12 @@ model Activity {
   reportId       String?
   title          String
   subtitle       String?
-  tags           String // JSON string for SQLite compatibility
-  status         AppointmentStatus?
+  tags           String   // JSON string for SQLite compatibility
+  status         String?  // AppointmentStatus: SCHEDULED, CONFIRMED, COMPLETED, CANCELLED, NO_SHOW
   notes          String?
-  vitals         Json?
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
+  vitals         String?  // JSON string for SQLite compatibility
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   patient      Patient      @relation(fields: [patientId], references: [id])
   doctor       Doctor?      @relation(fields: [doctorId], references: [id])
@@ -344,15 +313,15 @@ model Activity {
 }
 
 model Notification {
-  id            String           @id @default(uuid())
+  id            String    @id @default(uuid())
   userId        String
-  type          NotificationType
+  type          String    // NotificationType: APPOINTMENT_REMINDER_24H, APPOINTMENT_REMINDER_1H, ACTIVITY_CREATED, ACTIVITY_UPDATED
   title         String
   body          String?
   activityId    String?
   appointmentId String?
   readAt        DateTime?
-  createdAt     DateTime        @default(now())
+  createdAt     DateTime  @default(now())
 
   user        User        @relation(fields: [userId], references: [id])
   activity    Activity?   @relation(fields: [activityId], references: [id])
