@@ -1,48 +1,26 @@
-import React from 'react'
+import * as React from 'react'
 
-export interface InputProps {
-  label?: string
-  type?: string
-  placeholder?: string
-  value: string
-  onChange: (value: string) => void
-  error?: string
-  required?: boolean
-  disabled?: boolean
-  className?: string
-}
+import { cn } from '../utils/cn'
 
-export const Input: React.FC<InputProps> = ({
-  label,
-  type = 'text',
-  placeholder,
-  value,
-  onChange,
-  error,
-  required = false,
-  disabled = false,
-  className = '',
-}) => {
-  return (
-    <div className={`mb-4 ${className}`}>
-      {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
-        </label>
-      )}
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+
+export const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, ...props }, ref) => {
+    return (
       <input
+        ref={ref}
         type={type}
-        placeholder={placeholder}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        disabled={disabled}
-        required={required}
-        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-          error ? 'border-red-500' : 'border-gray-300'
-        } ${disabled ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+        data-slot="input"
+        className={cn(
+          'file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base bg-input-background transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+          'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+          'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+          className,
+        )}
+        {...props}
       />
-      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-    </div>
-  )
-}
+    )
+  },
+)
+
+Input.displayName = 'Input'

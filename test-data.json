@@ -1,0 +1,66 @@
+{
+  "users": [
+    {
+      "id": "user-1",
+      "email": "patient@example.com",
+      "role": "PATIENT"
+    },
+    {
+      "id": "user-2", 
+      "email": "doctor@example.com",
+      "role": "DOCTOR"
+    }
+  ],
+  "patients": [
+    {
+      "id": "patient-1",
+      "userId": "user-1",
+      "firstName": "John",
+      "lastName": "Doe"
+    }
+  ],
+  "doctors": [
+    {
+      "id": "doctor-1",
+      "userId": "user-2",
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "specialization": "Cardiology"
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity-1",
+      "type": "APPOINTMENT",
+      "occurredAt": "2024-11-15T10:00:00Z",
+      "patientId": "patient-1",
+      "doctorId": "doctor-1",
+      "title": "Appointment with Dr. Jane Smith",
+      "subtitle": "Regular checkup",
+      "tags": "Cardiology",
+      "status": "COMPLETED"
+    },
+    {
+      "id": "activity-2",
+      "type": "PRESCRIPTION",
+      "occurredAt": "2024-11-10T14:30:00Z",
+      "patientId": "patient-1",
+      "doctorId": "doctor-1",
+      "title": "Prescription from Dr. Jane Smith",
+      "subtitle": "Blood pressure medication",
+      "tags": "Cardiology",
+      "status": "COMPLETED"
+    },
+    {
+      "id": "activity-3",
+      "type": "REPORT",
+      "occurredAt": "2024-11-05T09:15:00Z",
+      "patientId": "patient-1",
+      "doctorId": "doctor-1",
+      "title": "Blood Test Results",
+      "subtitle": "Complete Blood Count",
+      "tags": "Lab Test",
+      "status": null
+    }
+  ]
+}

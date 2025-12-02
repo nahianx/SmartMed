@@ -59,6 +59,9 @@ module.exports = {
           600: '#0284c7',
           700: '#0369a1',
         },
+        // Map Tailwind utilities like bg-background and text-foreground
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
       },
       borderRadius: {
         lg: 'var(--radius)',

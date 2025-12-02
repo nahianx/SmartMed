@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -32,6 +32,19 @@ enum AppointmentStatus {
 enum AuthProvider {
   LOCAL
   GOOGLE
+}
+
+enum ActivityType {
+  APPOINTMENT
+  PRESCRIPTION
+  REPORT
+}
+
+enum NotificationType {
+  APPOINTMENT_REMINDER_24H
+  APPOINTMENT_REMINDER_1H
+  ACTIVITY_CREATED
+  ACTIVITY_UPDATED
 }
 
 model User {
@@ -67,6 +80,7 @@ model User {
   sessions            UserSession[]
   passwordResets      PasswordReset[]
   emailVerifications  EmailVerification[]
+  notifications       Notification[]
 
   @@map("users")
 }
@@ -122,7 +136,7 @@ model Patient {
   address          String
   emergencyContact String?
   bloodGroup       String?
-  allergies        String[]
+  allergies        String? // JSON string for SQLite compatibility
   medicalHistory   String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
@@ -131,6 +145,8 @@ model Patient {
   appointments     Appointment[]
   prescriptions    Prescription[]
   preferredDoctors PreferredDoctor[]
+  activities       Activity[]
+  reports          Report[]
 
   @@map("patients")
 }
@@ -146,7 +162,7 @@ model Doctor {
   phoneNumber        String
   licenseNumber      String   @unique
   consultationFee    Float
-  availableDays      String[]
+  availableDays      String // JSON string for SQLite compatibility
   availableTimeSlots Json
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
@@ -160,6 +176,8 @@ model Doctor {
   specializations DoctorSpecialization[]
   availabilities  DoctorAvailability[]
   preferredBy     PreferredDoctor[]
+  activities      Activity[]
+  reports         Report[]
 
   @@map("doctors")
 }
@@ -179,6 +197,9 @@ model Appointment {
   patient       Patient        @relation(fields: [patientId], references: [id])
   doctor        Doctor         @relation(fields: [doctorId], references: [id])
   prescriptions Prescription[]
+  activities    Activity[]
+  reports       Report[]
+  notifications Notification[]
 
   @@map("appointments")
 }
@@ -197,6 +218,7 @@ model Prescription {
   appointment Appointment @relation(fields: [appointmentId], references: [id])
   patient     Patient     @relation(fields: [patientId], references: [id])
   doctor      Doctor      @relation(fields: [doctorId], references: [id])
+  activities  Activity[]
 
   @@map("prescriptions")
 }
@@ -267,4 +289,76 @@ model PreferredDoctor {
 
   @@unique([patientId, doctorId], name: "patientId_doctorId")
   @@map("preferred_doctors")
+}
+
+model Report {
+  id            String   @id @default(uuid())
+  patientId     String
+  doctorId      String?
+  appointmentId String?
+  fileKey       String
+  fileName      String
+  fileSize      Int
+  mimeType      String
+  uploadedAt    DateTime @default(now())
+  notes         String?
+
+  patient     Patient     @relation(fields: [patientId], references: [id])
+  doctor      Doctor?     @relation(fields: [doctorId], references: [id])
+  appointment Appointment? @relation(fields: [appointmentId], references: [id])
+  activities  Activity[]
+
+  @@map("reports")
+}
+
+model Activity {
+  id             String            @id @default(uuid())
+  type           ActivityType
+  occurredAt     DateTime
+  patientId      String
+  doctorId       String?
+  appointmentId  String?
+  prescriptionId String?
+  reportId       String?
+  title          String
+  subtitle       String?
+  tags           String // JSON string for SQLite compatibility
+  status         AppointmentStatus?
+  notes          String?
+  vitals         Json?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  patient      Patient      @relation(fields: [patientId], references: [id])
+  doctor       Doctor?      @relation(fields: [doctorId], references: [id])
+  appointment  Appointment? @relation(fields: [appointmentId], references: [id])
+  prescription Prescription? @relation(fields: [prescriptionId], references: [id])
+  report       Report?      @relation(fields: [reportId], references: [id])
+
+  notifications Notification[]
+
+  @@index([patientId, occurredAt(sort: Desc)])
+  @@index([doctorId, occurredAt(sort: Desc)])
+  @@index([type, occurredAt(sort: Desc)])
+  @@map("activities")
+}
+
+model Notification {
+  id            String           @id @default(uuid())
+  userId        String
+  type          NotificationType
+  title         String
+  body          String?
+  activityId    String?
+  appointmentId String?
+  readAt        DateTime?
+  createdAt     DateTime        @default(now())
+
+  user        User        @relation(fields: [userId], references: [id])
+  activity    Activity?   @relation(fields: [activityId], references: [id])
+  appointment Appointment? @relation(fields: [appointmentId], references: [id])
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@unique([userId, appointmentId, type], map: "unique_notification_per_appointment_type")
+  @@map("notifications")
 }

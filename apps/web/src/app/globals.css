@@ -24,6 +24,8 @@
   --input: transparent;
   --input-background: #f3f3f5;
   --switch-background: #cbced4;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
   --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -45,8 +47,6 @@
   --text-lg: 1.125rem;
   --text-xl: 1.25rem;
   --text-2xl: 1.5rem;
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
 }
 
 .dark {
