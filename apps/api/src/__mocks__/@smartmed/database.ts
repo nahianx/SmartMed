@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const mockPrisma = {
   user: {
     findUnique: jest.fn(),

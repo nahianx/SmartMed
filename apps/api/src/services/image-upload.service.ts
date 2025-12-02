@@ -1,8 +1,9 @@
 import path from 'path'
 import fs from 'fs'
-import multer from 'multer'
+import multer, { FileFilterCallback } from 'multer'
 import sharp from 'sharp'
 import { prisma } from '@smartmed/database'
+import type { Request } from 'express'
 
 const uploadsDir = path.join(process.cwd(), 'uploads', 'profile-photos')
 
@@ -27,7 +28,7 @@ export const profilePhotoUpload = multer({
 
 export async function processAndStoreProfilePhoto(
   userId: string,
-  file: Express.Multer.File,
+  file: { buffer: Buffer; mimetype: string; originalname: string },
 ) {
   const filename = `${userId}-${Date.now()}.jpg`
   const filepath = path.join(uploadsDir, filename)

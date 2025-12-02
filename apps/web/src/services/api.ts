@@ -1,6 +1,6 @@
 // API service layer for profile management
 import axios, { AxiosResponse } from 'axios'
-import { ApiResponse, User, Doctor, Patient, DoctorAvailability, PreferredDoctor, Specialization } from '@smartmed/types'
+import { User, Doctor, Patient, DoctorAvailability, Specialization } from '@smartmed/types'
 
 // Configure axios instance
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1079/api'
@@ -12,6 +12,50 @@ const apiClient = axios.create({
     'Content-Type': 'application/json'
   }
 })
+
+// Backend response types (raw data format)
+interface ProfileResponse {
+  user?: User
+  message?: string
+  error?: string
+}
+
+interface DoctorResponse {
+  doctor?: Doctor
+  doctors?: Doctor[]
+  message?: string
+  error?: string
+}
+
+interface PatientResponse {
+  patient?: Patient
+  message?: string
+  error?: string
+}
+
+interface AvailabilityResponse {
+  slots?: DoctorAvailability[]
+  message?: string
+  error?: string
+}
+
+interface PreferredDoctorsResponse {
+  preferred?: Doctor[]
+  message?: string
+  error?: string
+}
+
+interface SpecializationsResponse {
+  specializations?: Specialization[]
+  message?: string
+  error?: string
+}
+
+interface PhotoUploadResponse {
+  url?: string
+  message?: string
+  error?: string
+}
 
 // Add auth token to requests
 apiClient.interceptors.request.use((config) => {
@@ -45,20 +89,25 @@ apiClient.interceptors.response.use(
 
 // Profile API Services
 export const profileApi = {
-  // Get user profile
+  // Get user profile - Backend returns the user object directly or { user }
   getProfile: async (): Promise<User> => {
-    const response: AxiosResponse<ApiResponse<User>> = await apiClient.get('/profile')
-    if (response.data.success && response.data.data) {
-      return response.data.data
+    const response: AxiosResponse<ProfileResponse | User> = await apiClient.get('/profile')
+    // Handle both raw user object and wrapped { user } response
+    const data = response.data
+    if ('user' in data && data.user) {
+      return data.user
     }
-    throw new Error(response.data.error || 'Failed to fetch profile')
+    if ('id' in data && 'email' in data) {
+      return data as User
+    }
+    throw new Error((data as ProfileResponse).error || 'Failed to fetch profile')
   },
 
   // Update user profile
   updateProfile: async (updates: Partial<User>): Promise<User> => {
-    const response: AxiosResponse<ApiResponse<User>> = await apiClient.put('/profile', updates)
-    if (response.data.success && response.data.data) {
-      return response.data.data
+    const response: AxiosResponse<ProfileResponse> = await apiClient.put('/profile', updates)
+    if (response.data.user) {
+      return response.data.user
     }
     throw new Error(response.data.error || 'Failed to update profile')
   },
@@ -66,9 +115,9 @@ export const profileApi = {
   // Upload profile photo
   uploadPhoto: async (file: File): Promise<{ profilePhotoUrl: string }> => {
     const formData = new FormData()
-    formData.append('photo', file)
+    formData.append('file', file)
     
-    const response: AxiosResponse<ApiResponse<{ profilePhotoUrl: string }>> = await apiClient.post(
+    const response: AxiosResponse<PhotoUploadResponse> = await apiClient.post(
       '/profile/photo',
       formData,
       {
@@ -78,38 +127,38 @@ export const profileApi = {
       }
     )
     
-    if (response.data.success && response.data.data) {
-      return response.data.data
+    if (response.data.url) {
+      return { profilePhotoUrl: response.data.url }
     }
     throw new Error(response.data.error || 'Failed to upload photo')
   },
 
   // Remove profile photo
   removePhoto: async (): Promise<void> => {
-    const response: AxiosResponse<ApiResponse<void>> = await apiClient.delete('/profile/photo')
-    if (!response.data.success) {
-      throw new Error(response.data.error || 'Failed to remove photo')
+    const response: AxiosResponse<{ message?: string; error?: string }> = await apiClient.delete('/profile/photo')
+    if (response.data.error) {
+      throw new Error(response.data.error)
     }
   },
 
   // Change password
   changePassword: async (currentPassword: string, newPassword: string): Promise<void> => {
-    const response: AxiosResponse<ApiResponse<void>> = await apiClient.put('/profile/password', {
+    const response: AxiosResponse<{ message?: string; error?: string }> = await apiClient.post('/profile/password', {
       currentPassword,
       newPassword
     })
-    if (!response.data.success) {
-      throw new Error(response.data.error || 'Failed to change password')
+    if (response.data.error) {
+      throw new Error(response.data.error)
     }
   },
 
   // Toggle MFA
   toggleMFA: async (enabled: boolean): Promise<void> => {
-    const response: AxiosResponse<ApiResponse<void>> = await apiClient.post('/profile/mfa', {
+    const response: AxiosResponse<{ message?: string; error?: string }> = await apiClient.post('/profile/mfa', {
       enabled
     })
-    if (!response.data.success) {
-      throw new Error(response.data.error || 'Failed to toggle MFA')
+    if (response.data.error) {
+      throw new Error(response.data.error)
     }
   }
 }
@@ -119,78 +168,66 @@ export const doctorApi = {
   // Search doctors
   searchDoctors: async (query?: string, specialization?: string): Promise<Doctor[]> => {
     const params = new URLSearchParams()
-    if (query) params.append('query', query)
+    if (query) params.append('q', query)
     if (specialization) params.append('specialization', specialization)
     
-    const response: AxiosResponse<ApiResponse<Doctor[]>> = await apiClient.get(`/doctor/search?${params}`)
-    if (response.data.success && response.data.data) {
-      return response.data.data
-    }
-    throw new Error(response.data.error || 'Failed to search doctors')
+    const response: AxiosResponse<DoctorResponse> = await apiClient.get(`/doctor/search?${params}`)
+    return response.data.doctors || []
   },
 
   // Get doctor profile
   getDoctorProfile: async (): Promise<Doctor> => {
-    const response: AxiosResponse<ApiResponse<Doctor>> = await apiClient.get('/doctor/profile')
-    if (response.data.success && response.data.data) {
-      return response.data.data
+    const response: AxiosResponse<DoctorResponse> = await apiClient.get('/doctor/profile')
+    if (response.data.doctor) {
+      return response.data.doctor
     }
     throw new Error(response.data.error || 'Failed to fetch doctor profile')
   },
 
   // Update doctor specializations
   updateSpecializations: async (specializationIds: string[]): Promise<void> => {
-    const response: AxiosResponse<ApiResponse<void>> = await apiClient.put('/doctor/specializations', {
-      specializationIds
+    const response: AxiosResponse<{ message?: string; error?: string }> = await apiClient.put('/doctor/specialization', {
+      specializations: specializationIds
     })
-    if (!response.data.success) {
-      throw new Error(response.data.error || 'Failed to update specializations')
+    if (response.data.error) {
+      throw new Error(response.data.error)
     }
   },
 
   // Update clinic info
   updateClinicInfo: async (clinicInfo: { name: string; address: string; phone: string; consultationFee: number }): Promise<void> => {
-    const response: AxiosResponse<ApiResponse<void>> = await apiClient.put('/doctor/clinic', clinicInfo)
-    if (!response.data.success) {
-      throw new Error(response.data.error || 'Failed to update clinic info')
+    const response: AxiosResponse<{ message?: string; error?: string }> = await apiClient.put('/doctor/clinic', clinicInfo)
+    if (response.data.error) {
+      throw new Error(response.data.error)
     }
   },
 
   // Get doctor availability
   getAvailability: async (): Promise<DoctorAvailability[]> => {
-    const response: AxiosResponse<ApiResponse<DoctorAvailability[]>> = await apiClient.get('/doctor/availability')
-    if (response.data.success && response.data.data) {
-      return response.data.data
-    }
-    throw new Error(response.data.error || 'Failed to fetch availability')
+    const response: AxiosResponse<AvailabilityResponse> = await apiClient.get('/doctor/availability')
+    return response.data.slots || []
   },
 
   // Update doctor availability
   updateAvailability: async (availability: Omit<DoctorAvailability, 'id' | 'doctorId' | 'createdAt' | 'updatedAt'>[]): Promise<DoctorAvailability[]> => {
-    const response: AxiosResponse<ApiResponse<DoctorAvailability[]>> = await apiClient.put('/doctor/availability', {
-      availability
+    const response: AxiosResponse<AvailabilityResponse> = await apiClient.put('/doctor/availability', {
+      slots: availability
     })
-    if (response.data.success && response.data.data) {
-      return response.data.data
-    }
-    throw new Error(response.data.error || 'Failed to update availability')
+    return response.data.slots || []
   },
 
   // Delete availability slot
   deleteAvailabilitySlot: async (slotId: string): Promise<void> => {
-    const response: AxiosResponse<ApiResponse<void>> = await apiClient.delete(`/doctor/availability/${slotId}`)
-    if (!response.data.success) {
-      throw new Error(response.data.error || 'Failed to delete availability slot')
+    const response: AxiosResponse<{ message?: string; error?: string }> = await apiClient.delete(`/doctor/availability/${slotId}`)
+    if (response.data.error) {
+      throw new Error(response.data.error)
     }
   },
 
   // Get all specializations
   getSpecializations: async (): Promise<Specialization[]> => {
-    const response: AxiosResponse<ApiResponse<Specialization[]>> = await apiClient.get('/doctor/specializations/list')
-    if (response.data.success && response.data.data) {
-      return response.data.data
-    }
-    throw new Error(response.data.error || 'Failed to fetch specializations')
+    const response: AxiosResponse<SpecializationsResponse> = await apiClient.get('/doctor/specializations/list')
+    return response.data.specializations || []
   }
 }
 
@@ -198,35 +235,32 @@ export const doctorApi = {
 export const patientApi = {
   // Get patient profile
   getPatientProfile: async (): Promise<Patient> => {
-    const response: AxiosResponse<ApiResponse<Patient>> = await apiClient.get('/patient/profile')
-    if (response.data.success && response.data.data) {
-      return response.data.data
+    const response: AxiosResponse<PatientResponse> = await apiClient.get('/patient/profile')
+    if (response.data.patient) {
+      return response.data.patient
     }
     throw new Error(response.data.error || 'Failed to fetch patient profile')
   },
 
   // Get preferred doctors
   getPreferredDoctors: async (): Promise<Doctor[]> => {
-    const response: AxiosResponse<ApiResponse<Doctor[]>> = await apiClient.get('/patient/preferred-doctors')
-    if (response.data.success && response.data.data) {
-      return response.data.data
-    }
-    throw new Error(response.data.error || 'Failed to fetch preferred doctors')
+    const response: AxiosResponse<PreferredDoctorsResponse> = await apiClient.get('/patient/preferred-doctors')
+    return response.data.preferred || []
   },
 
   // Add preferred doctor
   addPreferredDoctor: async (doctorId: string): Promise<void> => {
-    const response: AxiosResponse<ApiResponse<void>> = await apiClient.post(`/patient/preferred-doctors/${doctorId}`)
-    if (!response.data.success) {
-      throw new Error(response.data.error || 'Failed to add preferred doctor')
+    const response: AxiosResponse<{ message?: string; error?: string }> = await apiClient.post(`/patient/preferred-doctors/${doctorId}`)
+    if (response.data.error) {
+      throw new Error(response.data.error)
     }
   },
 
   // Remove preferred doctor
   removePreferredDoctor: async (doctorId: string): Promise<void> => {
-    const response: AxiosResponse<ApiResponse<void>> = await apiClient.delete(`/patient/preferred-doctors/${doctorId}`)
-    if (!response.data.success) {
-      throw new Error(response.data.error || 'Failed to remove preferred doctor')
+    const response: AxiosResponse<{ message?: string; error?: string }> = await apiClient.delete(`/patient/preferred-doctors/${doctorId}`)
+    if (response.data.error) {
+      throw new Error(response.data.error)
     }
   }
 }

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen as testScreen, fireEvent } from '@testing-library/react'
 import { Button } from './Button'
 
 describe('Button component', () => {
@@ -7,7 +7,7 @@ describe('Button component', () => {
 
     render(<Button onClick={onClick}>Click me</Button>)
 
-    const button = screen.getByRole('button', { name: /click me/i })
+    const button = testScreen.getByRole('button', { name: /click me/i })
     fireEvent.click(button)
 
     expect(onClick).toHaveBeenCalledTimes(1)

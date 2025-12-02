@@ -103,10 +103,11 @@ router.get('/', async (req: AuthenticatedRequest, res: Response) => {
 
     if (search) {
       const text = String(search).toLowerCase()
+      // Note: SQLite doesn't support mode: 'insensitive', LIKE is case-insensitive by default
       where.OR = [
-        { title: { contains: text, mode: 'insensitive' } },
-        { subtitle: { contains: text, mode: 'insensitive' } },
-        { notes: { contains: text, mode: 'insensitive' } },
+        { title: { contains: text } },
+        { subtitle: { contains: text } },
+        { notes: { contains: text } },
       ]
     }
 
