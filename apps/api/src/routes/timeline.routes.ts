@@ -4,7 +4,7 @@ import { AuthenticatedRequest } from '../types/auth'
 
 const router = Router()
 
-function mapActivityTypeToClient(type: ActivityType): 'appointment' | 'prescription' | 'report' {
+function mapActivityTypeToClient(type: string): 'appointment' | 'prescription' | 'report' {
   switch (type) {
     case ActivityType.APPOINTMENT:
       return 'appointment'
@@ -16,7 +16,7 @@ function mapActivityTypeToClient(type: ActivityType): 'appointment' | 'prescript
   }
 }
 
-function mapStatusToClient(status: AppointmentStatus | null): 'completed' | 'cancelled' | 'no-show' | null {
+function mapStatusToClient(status: string | null): 'completed' | 'cancelled' | 'no-show' | null {
   if (!status) return null
   switch (status) {
     case AppointmentStatus.COMPLETED:
@@ -134,25 +134,43 @@ router.get('/', async (req: AuthenticatedRequest, res: Response) => {
 
       const doctor = activity.doctor ?? activity.appointment?.doctor ?? null
 
+      // Parse tags from JSON string
+      let tags: string[] = []
+      try {
+        tags = activity.tags ? JSON.parse(activity.tags) : []
+      } catch {
+        tags = []
+      }
+
+      // Parse medications from JSON string
+      let medications: any[] = []
+      if (activity.prescription?.medications) {
+        try {
+          medications = typeof activity.prescription.medications === 'string' 
+            ? JSON.parse(activity.prescription.medications) 
+            : activity.prescription.medications
+        } catch {
+          medications = []
+        }
+      }
+
       return {
         id: activity.id,
         type,
         date: activity.occurredAt,
         title: activity.title,
         subtitle: activity.subtitle ?? '',
-        tags: activity.tags,
+        tags,
         status,
         doctorName: doctor ? `Dr. ${doctor.firstName} ${doctor.lastName}` : undefined,
         specialty: doctor?.specialization,
         clinic: undefined,
-        medications: activity.prescription
-          ? (activity.prescription.medications as any[]).map((m) => ({
-              name: m.name,
-              dose: m.dosage ?? m.dose,
-              frequency: m.frequency,
-              duration: m.duration,
-            }))
-          : undefined,
+        medications: medications.map((m: any) => ({
+          name: m.name,
+          dose: m.dosage ?? m.dose,
+          frequency: m.frequency,
+          duration: m.duration,
+        })),
         warnings: undefined,
         fileName: activity.report?.fileName,
         fileSize: activity.report?.fileSize ? `${activity.report.fileSize} bytes` : undefined,

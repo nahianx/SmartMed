@@ -37,10 +37,12 @@ export async function updateDoctorSpecializations(
     where: { doctorId: doctor.id },
   })
 
-  await prisma.doctorSpecialization.createMany({
-    data: specs.map((s) => ({ doctorId: doctor.id, specializationId: s.id })),
-    skipDuplicates: true,
-  })
+  // Create new links one by one (SQLite doesn't support skipDuplicates in createMany)
+  for (const s of specs) {
+    await prisma.doctorSpecialization.create({
+      data: { doctorId: doctor.id, specializationId: s.id },
+    })
+  }
 
   return getDoctorProfileByUserId(userId)
 }
@@ -167,12 +169,15 @@ export async function searchDoctors(query: string) {
     return []
   }
 
+  // SQLite uses LIKE which is case-insensitive by default for ASCII
+  const lowerQuery = query.toLowerCase()
+
   const doctors = await prisma.doctor.findMany({
     where: {
       OR: [
-        { firstName: { contains: query, mode: 'insensitive' } },
-        { lastName: { contains: query, mode: 'insensitive' } },
-        { specialization: { contains: query, mode: 'insensitive' } },
+        { firstName: { contains: lowerQuery } },
+        { lastName: { contains: lowerQuery } },
+        { specialization: { contains: lowerQuery } },
       ],
     },
     include: {

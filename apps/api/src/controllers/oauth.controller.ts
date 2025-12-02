@@ -32,7 +32,7 @@ export class OAuthController {
 
     const info = await OAuthService.verifyGoogleToken(idToken)
 
-    const ip = (req.headers['x-forwarded-for'] as string) || req.ip
+    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || 'unknown'
     const deviceInfo = getDeviceInfo(req)
 
     let user = await prisma.user.findFirst({

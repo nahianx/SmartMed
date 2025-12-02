@@ -1,5 +1,5 @@
 import { useState, forwardRef } from "react"
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
+import { Eye, EyeOff } from "lucide-react"
 
 interface PasswordInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> {
   label?: string
@@ -33,9 +33,9 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600"
           >
             {showPassword ? (
-              <EyeSlashIcon className="h-4 w-4" />
+              <EyeOff className="h-4 w-4" />
             ) : (
-              <EyeIcon className="h-4 w-4" />
+              <Eye className="h-4 w-4" />
             )}
           </button>
         </div>

@@ -3,10 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertTriangle, User, Settings, Calendar, Heart } from 'lucide-react';
-import { Button } from '@smartmed/ui/button';
-import { Card } from '@smartmed/ui/card';
-import { Badge } from '@smartmed/ui/badge';
-import { Alert, AlertDescription } from '@smartmed/ui';
+import { Button, Card, Badge, Alert, AlertDescription } from '@smartmed/ui';
 import { useRequireAuth, useIsDoctor, useIsPatient } from '@/store/auth';
 import { ProfileSection } from '@/components/profile/ProfileSection';
 import { SecuritySection } from '@/components/profile/SecuritySection';

@@ -119,7 +119,7 @@ router.get('/:id',
     }
 
     // Check if user has access to this appointment
-    let hasAccess = false
+    let hasAccess: boolean = false
     
     if (req.user.role === 'ADMIN') {
       hasAccess = true
@@ -127,12 +127,12 @@ router.get('/:id',
       const patient = await prisma.patient.findUnique({
         where: { userId: req.user.id }
       })
-      hasAccess = patient && appointment.patient.id === patient.id
+      hasAccess = !!(patient && appointment.patient.id === patient.id)
     } else if (req.user.role === 'DOCTOR') {
       const doctor = await prisma.doctor.findUnique({
         where: { userId: req.user.id }
       })
-      hasAccess = doctor && appointment.doctor.id === doctor.id
+      hasAccess = !!(doctor && appointment.doctor.id === doctor.id)
     }
 
     if (!hasAccess) {
@@ -214,7 +214,7 @@ router.post('/',
         appointmentId: appointment.id,
         title: `Appointment with Dr. ${appointment.doctor.firstName} ${appointment.doctor.lastName}`,
         subtitle: reason.trim(),
-        tags: [appointment.doctor.specialization],
+        tags: JSON.stringify([appointment.doctor.specialization]),
         status: AppointmentStatus.SCHEDULED,
         notes
       }
@@ -258,7 +258,7 @@ router.put('/:id',
     }
 
     // Check authorization
-    let hasAccess = false
+    let hasAccess: boolean = false
     
     if (req.user.role === 'ADMIN') {
       hasAccess = true
@@ -266,12 +266,12 @@ router.put('/:id',
       const patient = await prisma.patient.findUnique({
         where: { userId: req.user.id }
       })
-      hasAccess = patient && existingAppointment.patientId === patient.id
+      hasAccess = !!(patient && existingAppointment.patientId === patient.id)
     } else if (req.user.role === 'DOCTOR') {
       const doctor = await prisma.doctor.findUnique({
         where: { userId: req.user.id }
       })
-      hasAccess = doctor && existingAppointment.doctorId === doctor.id
+      hasAccess = !!(doctor && existingAppointment.doctorId === doctor.id)
     }
 
     if (!hasAccess) {
@@ -375,7 +375,7 @@ router.delete('/:id',
     }
 
     // Check authorization
-    let hasAccess = false
+    let hasAccess: boolean = false
     
     if (req.user.role === 'ADMIN') {
       hasAccess = true
@@ -383,12 +383,12 @@ router.delete('/:id',
       const patient = await prisma.patient.findUnique({
         where: { userId: req.user.id }
       })
-      hasAccess = patient && appointment.patientId === patient.id
+      hasAccess = !!(patient && appointment.patientId === patient.id)
     } else if (req.user.role === 'DOCTOR') {
       const doctor = await prisma.doctor.findUnique({
         where: { userId: req.user.id }
       })
-      hasAccess = doctor && appointment.doctorId === doctor.id
+      hasAccess = !!(doctor && appointment.doctorId === doctor.id)
     }
 
     if (!hasAccess) {

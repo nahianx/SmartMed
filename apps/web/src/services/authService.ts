@@ -36,6 +36,10 @@ export const authService = {
   async requestPasswordReset(email: string) {
     await apiClient.post("/auth/password-reset/request", { email })
   },
+  async verifyPasswordResetToken(token: string) {
+    const { data } = await apiClient.get(`/auth/password-reset/verify/${token}`)
+    return data
+  },
   async completePasswordReset(token: string, newPassword: string) {
     await apiClient.post("/auth/password-reset/complete", { token, newPassword })
   },

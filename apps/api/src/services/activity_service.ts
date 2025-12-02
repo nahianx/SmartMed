@@ -37,7 +37,7 @@ export async function createAppointmentActivity({
       appointmentId: appointment.id,
       title,
       subtitle,
-      tags: [],
+      tags: JSON.stringify([]),
       status: appointment.status,
       notes: appointment.notes ?? undefined,
     },
@@ -46,7 +46,7 @@ export async function createAppointmentActivity({
 
 export async function updateAppointmentActivityStatus(
   appointmentId: string,
-  status: AppointmentStatus,
+  status: string,
 ) {
   await prisma.activity.updateMany({
     where: {
@@ -81,7 +81,7 @@ export async function createPrescriptionActivity({
       prescriptionId: prescription.id,
       title: `Rx by doctor`,
       subtitle: prescription.diagnosis,
-      tags: [],
+      tags: JSON.stringify([]),
       notes: prescription.notes ?? undefined,
     },
   })
@@ -107,7 +107,7 @@ export async function createReportActivity({ reportId }: CreateReportActivityArg
       reportId: report.id,
       title: `${report.fileName} uploaded`,
       subtitle: 'Lab Report',
-      tags: [],
+      tags: JSON.stringify([]),
       notes: report.notes ?? undefined,
     },
   })

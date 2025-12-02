@@ -1,14 +1,14 @@
 import { describe, it, expect, beforeEach, jest, afterEach } from '@jest/globals'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { useAuthContext } from '../../context/AuthContext'
-import { authService } from '../../services/authService'
-import DoctorRegisterPage from '../../app/auth/register/doctor/page'
+import { useAuthContext } from '@/context/AuthContext'
+import { authService } from '@/services/authService'
+import DoctorRegisterPage from './page'
 
 // Mock dependencies
-jest.mock('../../context/AuthContext')
-jest.mock('../../services/authService')
-jest.mock('../../utils/tokenManager')
+jest.mock('@/context/AuthContext')
+jest.mock('@/services/authService')
+jest.mock('@/utils/tokenManager')
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: jest.fn(),

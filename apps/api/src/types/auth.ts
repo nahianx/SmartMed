@@ -1,9 +1,8 @@
 import { Request } from 'express'
-import { UserRole } from '@smartmed/types'
 
 export interface AuthUser {
   id: string
-  role: UserRole
+  role: string
   email?: string
 }
 

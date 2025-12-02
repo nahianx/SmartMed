@@ -1,8 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter } from 'react-router-dom';
-import ProfilePage from '../page';
-import { useRequireAuth } from '@/store/auth';
+import ProfilePage from './page';
+import { useRequireAuth, useIsDoctor, useIsPatient } from '@/store/auth';
 
 // Mock the hooks and components
 jest.mock('@/store/auth');
@@ -28,6 +27,8 @@ jest.mock('@/components/profile/patient/PreferredDoctorsSection', () => {
 });
 
 const mockUseRequireAuth = useRequireAuth as jest.MockedFunction<typeof useRequireAuth>;
+const mockUseIsDoctor = useIsDoctor as jest.MockedFunction<typeof useIsDoctor>;
+const mockUseIsPatient = useIsPatient as jest.MockedFunction<typeof useIsPatient>;
 
 // Mock Next.js router
 const mockPush = jest.fn();
@@ -47,9 +48,7 @@ const createWrapper = () => {
     },
   });
   return ({ children }: { children: React.ReactNode }) => (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 };
 
@@ -64,6 +63,8 @@ describe('ProfilePage', () => {
       isAuthenticated: false,
       user: null,
     });
+    mockUseIsDoctor.mockReturnValue(false);
+    mockUseIsPatient.mockReturnValue(false);
 
     render(<ProfilePage />, { wrapper: createWrapper() });
 
@@ -76,6 +77,8 @@ describe('ProfilePage', () => {
       isAuthenticated: false,
       user: null,
     });
+    mockUseIsDoctor.mockReturnValue(false);
+    mockUseIsPatient.mockReturnValue(false);
 
     render(<ProfilePage />, { wrapper: createWrapper() });
 
@@ -88,10 +91,12 @@ describe('ProfilePage', () => {
       isAuthenticated: true,
       user: {
         id: '1',
-        role: 'PATIENT',
+        role: 'PATIENT' as const,
         email: 'patient@example.com',
       },
     });
+    mockUseIsDoctor.mockReturnValue(false);
+    mockUseIsPatient.mockReturnValue(true);
 
     render(<ProfilePage />, { wrapper: createWrapper() });
 
@@ -109,10 +114,12 @@ describe('ProfilePage', () => {
       isAuthenticated: true,
       user: {
         id: '1',
-        role: 'DOCTOR',
+        role: 'DOCTOR' as const,
         email: 'doctor@example.com',
       },
     });
+    mockUseIsDoctor.mockReturnValue(true);
+    mockUseIsPatient.mockReturnValue(false);
 
     render(<ProfilePage />, { wrapper: createWrapper() });
 
@@ -130,10 +137,12 @@ describe('ProfilePage', () => {
       isAuthenticated: true,
       user: {
         id: '1',
-        role: 'PATIENT',
+        role: 'PATIENT' as const,
         email: 'patient@example.com',
       },
     });
+    mockUseIsDoctor.mockReturnValue(false);
+    mockUseIsPatient.mockReturnValue(true);
 
     render(<ProfilePage />, { wrapper: createWrapper() });
 

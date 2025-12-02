@@ -55,23 +55,21 @@ export default function TimelinePage() {
     return params
   }, [filters])
 
-  const { data, isLoading } = useQuery<{ items: TimelineApiItem[] }>(
-    ['timeline', queryParams],
-    async () => {
+  const { data, isLoading } = useQuery({
+    queryKey: ['timeline', queryParams],
+    queryFn: async () => {
       try {
         const resp = await apiClient.get('/api/timeline', { params: queryParams })
-        return resp.data
+        return resp.data as { items: TimelineApiItem[] }
       } catch (error) {
         handleApiError(error, 'Failed to load timeline activities')
         throw error
       }
     },
-    {
-      refetchInterval: 15000,
-      retry: 2,
-      retryDelay: 1000,
-    },
-  )
+    refetchInterval: 15000,
+    retry: 2,
+    retryDelay: 1000,
+  })
 
   const activities = useMemo(() => {
     if (!data?.items) return []
@@ -81,44 +79,40 @@ export default function TimelinePage() {
   const {
     data: currentPatientData,
     isLoading: isLoadingCurrentPatient,
-  } = useQuery<{ patient: Patient }>(
-    ['currentPatient'],
-    async () => {
+  } = useQuery({
+    queryKey: ['currentPatient'],
+    queryFn: async () => {
       try {
         const resp = await apiClient.get('/api/patients/me')
-        return resp.data
+        return resp.data as { patient: Patient }
       } catch (error) {
         handleApiError(error, 'Failed to load patient information')
         throw error
       }
     },
-    {
-      retry: 1,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-    },
-  )
+    retry: 1,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  })
 
   const currentPatient = currentPatientData?.patient
 
   const {
     data: notificationsData,
     refetch: refetchNotifications,
-  } = useQuery<{ items: NotificationItem[] }>(
-    ['notifications'],
-    async () => {
+  } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: async () => {
       try {
         const resp = await apiClient.get('/api/notifications')
-        return resp.data
+        return resp.data as { items: NotificationItem[] }
       } catch (error) {
         handleApiError(error, 'Failed to load notifications')
         throw error
       }
     },
-    {
-      refetchInterval: 30000,
-      retry: 1,
-    },
-  )
+    refetchInterval: 30000,
+    retry: 1,
+  })
 
   const notifications = notificationsData?.items ?? []
   const unreadCount = notifications.filter((n) => !n.readAt).length

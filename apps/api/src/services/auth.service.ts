@@ -17,8 +17,8 @@ export interface AuthResult {
   user: {
     id: string
     email: string
-    fullName: string
-    role: UserRole
+    fullName: string | null
+    role: string
     emailVerified: boolean
   }
 }

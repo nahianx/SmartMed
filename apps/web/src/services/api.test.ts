@@ -1,4 +1,6 @@
-import { profileApi, doctorApi, patientApi } from '../api';
+import { profileApi, doctorApi, patientApi } from './api';
+// Note: This test requires msw package to be installed
+// npm install -D msw
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
 

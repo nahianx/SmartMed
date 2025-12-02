@@ -3,11 +3,8 @@ import './globals.css'
 import { AuthProvider } from '../context/AuthContext'
 import { AppToaster } from '../components/ui/toaster'
 import { Providers } from '../components/providers'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ErrorProvider } from '@/components/error/error_provider'
 import React from 'react'
-
-const queryClient = new QueryClient()
 
 export const metadata: Metadata = {
   title: 'SmartMed - Healthcare Management System',
@@ -22,16 +19,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <QueryClientProvider client={queryClient}>
+        <Providers>
           <ErrorProvider>
             <AuthProvider>
-              <Providers>
-                {children}
-                <AppToaster />
-              </Providers>
+              {children}
+              <AppToaster />
             </AuthProvider>
           </ErrorProvider>
-        </QueryClientProvider>
+        </Providers>
       </body>
     </html>
   )

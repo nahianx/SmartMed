@@ -118,7 +118,13 @@ export async function updatePassword(
     throw Object.assign(new Error('User not found'), { status: 404 })
   }
 
-  const valid = await bcrypt.compare(currentPassword, user.password)
+  if (!user.passwordHash) {
+    const error: any = new Error('Cannot change password for OAuth account')
+    error.status = 400
+    throw error
+  }
+
+  const valid = await bcrypt.compare(currentPassword, user.passwordHash)
   if (!valid) {
     const error: any = new Error('Current password is incorrect')
     error.status = 400
@@ -129,7 +135,7 @@ export async function updatePassword(
 
   await prisma.user.update({
     where: { id: userId },
-    data: { password: hashed },
+    data: { passwordHash: hashed },
   })
 }
 

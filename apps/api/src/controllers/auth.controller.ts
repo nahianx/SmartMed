@@ -23,7 +23,7 @@ function setRefreshCookie(res: Response, refreshToken: string) {
 
 export class AuthController {
   static async registerDoctor(req: Request, res: Response) {
-    const ip = (req.headers['x-forwarded-for'] as string) || req.ip
+    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || 'unknown'
     const deviceInfo = getDeviceInfo(req)
 
     const { fullName, email, password } = req.body
@@ -44,7 +44,7 @@ export class AuthController {
   }
 
   static async registerPatient(req: Request, res: Response) {
-    const ip = (req.headers['x-forwarded-for'] as string) || req.ip
+    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || 'unknown'
     const deviceInfo = getDeviceInfo(req)
 
     const { fullName, email, password } = req.body
@@ -65,7 +65,7 @@ export class AuthController {
   }
 
   static async login(req: Request, res: Response) {
-    const ip = (req.headers['x-forwarded-for'] as string) || req.ip
+    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || 'unknown'
     const deviceInfo = getDeviceInfo(req)
 
     const { email, password } = req.body
@@ -81,7 +81,7 @@ export class AuthController {
   }
 
   static async refresh(req: Request, res: Response) {
-    const ip = (req.headers['x-forwarded-for'] as string) || req.ip
+    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || 'unknown'
     const deviceInfo = getDeviceInfo(req)
 
     const refreshToken =

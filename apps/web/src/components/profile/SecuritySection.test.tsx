@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { SecuritySection } from '../SecuritySection';
+import { SecuritySection } from './SecuritySection';
 import { useProfile, useChangePassword, useToggleMFA } from '@/hooks/useProfile';
 
 // Mock the hooks

@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import PDFViewer from '../src/components/timeline/pdf_viewer'
+import PDFViewer from '../../src/components/timeline/pdf_viewer'
 
 // Mock react-pdf to avoid PDF.js worker issues in tests
 jest.mock('react-pdf', () => ({

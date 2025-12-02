@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Search, Calendar as CalendarIcon } from 'lucide-react'
 import { Button, Input, Checkbox, Separator, Badge, Popover, PopoverContent, PopoverTrigger } from '@smartmed/ui'
-import { Calendar } from 'react-day-picker'
+import { DayPicker } from 'react-day-picker'
 import type { FilterState, ActivityType, AppointmentStatus } from '@/types/timeline'
 import { format } from 'date-fns'
 
@@ -108,10 +108,10 @@ export function FilterRail({ filters, onFiltersChange }: FilterRailProps) {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
+              <DayPicker
                 mode="single"
                 selected={filters.dateRange.from || undefined}
-                onSelect={(date) => {
+                onSelect={(date: Date | undefined) => {
                   updateFilters({ dateRange: { ...filters.dateRange, from: date || null } })
                   setDatePickerOpen(null)
                 }}
@@ -131,10 +131,10 @@ export function FilterRail({ filters, onFiltersChange }: FilterRailProps) {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
+              <DayPicker
                 mode="single"
                 selected={filters.dateRange.to || undefined}
-                onSelect={(date) => {
+                onSelect={(date: Date | undefined) => {
                   updateFilters({ dateRange: { ...filters.dateRange, to: date || null } })
                   setDatePickerOpen(null)
                 }}

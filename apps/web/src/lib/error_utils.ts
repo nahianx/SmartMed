@@ -65,6 +65,9 @@ export function handleApiError(error: unknown, defaultMessage = 'An unexpected e
   return message
 }
 
+// Alias for handleApiError - used in some tests
+export const showError = handleApiError
+
 export function showSuccess(message: string) {
   toast.success(message)
 }
