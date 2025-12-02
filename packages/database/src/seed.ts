@@ -1,4 +1,4 @@
-import { prisma, AppointmentStatus, UserRole } from '.'
+import { prisma, UserRole, AppointmentStatus } from '.'
 
 async function main() {
   // Upsert a sample patient user
@@ -7,7 +7,7 @@ async function main() {
     update: {},
     create: {
       email: 'patient@example.com',
-      password: 'hashed-password', // replace with real hash in production
+      passwordHash: 'hashed-password', // replace with real hash in production
       role: UserRole.PATIENT,
     },
   })
@@ -17,7 +17,7 @@ async function main() {
     update: {},
     create: {
       email: 'doctor@example.com',
-      password: 'hashed-password',
+      passwordHash: 'hashed-password',
       role: UserRole.DOCTOR,
     },
   })
@@ -33,7 +33,7 @@ async function main() {
       gender: 'FEMALE',
       phoneNumber: '+10000000000',
       address: '123 Main St',
-      allergies: [],
+      allergies: JSON.stringify([]),
     },
   })
 
@@ -50,8 +50,8 @@ async function main() {
       phoneNumber: '+19999999999',
       licenseNumber: 'LIC-12345',
       consultationFee: 150,
-      availableDays: ['MONDAY', 'WEDNESDAY'],
-      availableTimeSlots: { slots: ['10:00', '11:00'] },
+      availableDays: JSON.stringify(['MONDAY', 'WEDNESDAY']),
+      availableTimeSlots: JSON.stringify({ slots: ['10:00', '11:00'] }),
     },
   })
 
@@ -88,14 +88,14 @@ async function main() {
       patientId: patient.id,
       doctorId: doctor.id,
       diagnosis: 'Hypertension',
-      medications: [
+      medications: JSON.stringify([
         {
           name: 'Lisinopril',
           dosage: '10mg',
           frequency: 'Once daily',
           duration: '90 days',
         },
-      ],
+      ]),
       notes: 'Monitor blood pressure daily.',
     },
   })
@@ -125,15 +125,15 @@ async function main() {
         appointmentId: pastAppointment.id,
         title: 'Visit with Dr. Sarah Chen, Cardiology',
         subtitle: 'Follow-up consultation',
-        tags: ['Follow-up'],
+        tags: JSON.stringify(['Follow-up']),
         status: AppointmentStatus.COMPLETED,
         notes: pastAppointment.notes,
-        vitals: {
+        vitals: JSON.stringify({
           bloodPressure: '120/80',
           heartRate: '72 bpm',
           temperature: '98.6°F',
           weight: '165 lbs',
-        },
+        }),
       },
       {
         type: 'PRESCRIPTION',
@@ -144,7 +144,7 @@ async function main() {
         prescriptionId: prescription.id,
         title: 'Rx by Dr. Sarah Chen',
         subtitle: 'Cardiology prescription',
-        tags: [],
+        tags: JSON.stringify([]),
         notes: prescription.notes,
       },
       {
@@ -156,11 +156,10 @@ async function main() {
         reportId: report.id,
         title: 'Blood Panel Results.pdf uploaded',
         subtitle: 'Lab Report',
-        tags: [],
+        tags: JSON.stringify([]),
         notes: report.notes,
       },
     ],
-    skipDuplicates: true,
   })
 
   console.log('✅ Database seeded with sample SmartMed activity data')
