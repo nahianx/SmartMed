@@ -1,14 +1,14 @@
-"use client"
+'use client'
 
-import Link from "next/link"
-import { FormEvent, useState } from "react"
-import { useAuthContext } from "../../../context/AuthContext"
-import { GoogleSignInButton } from "../../../components/auth/GoogleSignInButton"
+import Link from 'next/link'
+import { FormEvent, useState } from 'react'
+import { useAuthContext } from '../../../context/AuthContext'
+import { GoogleSignInButton } from '../../../components/auth/GoogleSignInButton'
 
 export default function LoginPage() {
   const { login, loading } = useAuthContext()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -18,7 +18,13 @@ export default function LoginPage() {
     try {
       await login({ email, password, remember })
     } catch (err: any) {
-      setError("Invalid email or password.")
+      if (err.response?.data?.error === 'ACCOUNT_INACTIVE') {
+        setError('Your account has been deactivated. Please contact support.')
+      } else if (err.response?.data?.error === 'INVALID_CREDENTIALS') {
+        setError('Invalid email or password.')
+      } else {
+        setError('Invalid email or password.')
+      }
     }
   }
 
@@ -44,7 +50,10 @@ export default function LoginPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="password">
+            <label
+              className="block text-sm font-medium mb-1"
+              htmlFor="password"
+            >
               Password
             </label>
             <input
@@ -66,7 +75,10 @@ export default function LoginPage() {
               />
               <span>Remember me</span>
             </label>
-            <Link href="/auth/forgot-password" className="text-blue-600 hover:underline">
+            <Link
+              href="/auth/forgot-password"
+              className="text-blue-600 hover:underline"
+            >
               Forgot password?
             </Link>
           </div>
@@ -76,12 +88,12 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full rounded-md bg-blue-600 text-white py-2 text-sm font-medium hover:bg-blue-700 disabled:opacity-60"
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
         <GoogleSignInButton />
         <div className="mt-4 text-center text-sm text-slate-600">
-          Don&apos;t have an account?{" "}
+          Don&apos;t have an account?{' '}
           <Link href="/auth" className="text-blue-600 hover:underline">
             Sign up
           </Link>

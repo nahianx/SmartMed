@@ -11,7 +11,9 @@ const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string
 if (!JWT_SECRET || !JWT_REFRESH_SECRET) {
   // In production you should fail fast at startup; here we keep it simple.
   // eslint-disable-next-line no-console
-  console.warn('JWT secrets are not set. Make sure JWT_SECRET and JWT_REFRESH_SECRET are configured.')
+  console.warn(
+    'JWT secrets are not set. Make sure JWT_SECRET and JWT_REFRESH_SECRET are configured.'
+  )
 }
 
 export class TokenService {
@@ -33,7 +35,11 @@ export class TokenService {
     return jwt.verify(token, JWT_SECRET)
   }
 
-  static async issueTokensForUser(user: User, ipAddress: string, deviceInfo: unknown) {
+  static async issueTokensForUser(
+    user: User,
+    ipAddress: string,
+    deviceInfo: unknown
+  ) {
     const accessToken = this.generateAccessToken(user)
     const refreshToken = await this.generateRefreshToken()
 
@@ -42,7 +48,7 @@ export class TokenService {
         userId: user.id,
         refreshToken,
         ipAddress,
-        deviceInfo: deviceInfo as any,
+        deviceInfo: JSON.stringify(deviceInfo),
         expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL_MS),
       },
     })
@@ -50,13 +56,21 @@ export class TokenService {
     return { accessToken, refreshToken, session }
   }
 
-  static async rotateRefreshToken(oldToken: string, ipAddress: string, deviceInfo: unknown) {
-    const existing = await prisma.userSession.findUnique({ where: { refreshToken: oldToken } })
+  static async rotateRefreshToken(
+    oldToken: string,
+    ipAddress: string,
+    deviceInfo: unknown
+  ) {
+    const existing = await prisma.userSession.findUnique({
+      where: { refreshToken: oldToken },
+    })
     if (!existing || existing.expiresAt < new Date()) {
       throw new Error('INVALID_REFRESH_TOKEN')
     }
 
-    const user = await prisma.user.findUnique({ where: { id: existing.userId } })
+    const user = await prisma.user.findUnique({
+      where: { id: existing.userId },
+    })
     if (!user) {
       throw new Error('INVALID_REFRESH_TOKEN')
     }
@@ -68,7 +82,7 @@ export class TokenService {
       data: {
         refreshToken: newRefreshToken,
         ipAddress,
-        deviceInfo: deviceInfo as any,
+        deviceInfo: JSON.stringify(deviceInfo),
         expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL_MS),
       },
     })

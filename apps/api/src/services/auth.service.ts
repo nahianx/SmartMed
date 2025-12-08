@@ -30,7 +30,7 @@ export class AuthService {
     data: RegisterInput,
     role: UserRole,
     ipAddress: string,
-    deviceInfo: unknown,
+    deviceInfo: unknown
   ): Promise<AuthResult> {
     const { fullName, email, password } = data
 
@@ -66,13 +66,11 @@ export class AuthService {
       },
     })
 
-    await EmailService.sendVerificationEmail(user, verification.verificationToken)
+    // TODO: Email service not implemented yet - skip sending verification email during development
+    // await EmailService.sendVerificationEmail(user, verification.verificationToken)
 
-    const { accessToken, refreshToken, session } = await TokenService.issueTokensForUser(
-      user,
-      ipAddress,
-      deviceInfo,
-    )
+    const { accessToken, refreshToken, session } =
+      await TokenService.issueTokensForUser(user, ipAddress, deviceInfo)
 
     return {
       accessToken,
@@ -91,7 +89,7 @@ export class AuthService {
     email: string,
     password: string,
     ipAddress: string,
-    deviceInfo: unknown,
+    deviceInfo: unknown
   ): Promise<AuthResult> {
     ValidationService.validateEmail(email)
 
@@ -117,7 +115,7 @@ export class AuthService {
     const { accessToken, refreshToken } = await TokenService.issueTokensForUser(
       user,
       ipAddress,
-      deviceInfo,
+      deviceInfo
     )
 
     return {
@@ -185,7 +183,9 @@ export class AuthService {
   }
 
   static async verifyPasswordResetToken(token: string) {
-    const record = await prisma.passwordReset.findUnique({ where: { resetToken: token } })
+    const record = await prisma.passwordReset.findUnique({
+      where: { resetToken: token },
+    })
     if (!record || record.expiresAt < new Date() || record.used) {
       throw new Error('INVALID_OR_EXPIRED_TOKEN')
     }
@@ -194,7 +194,9 @@ export class AuthService {
   }
 
   static async completePasswordReset(token: string, newPassword: string) {
-    const record = await prisma.passwordReset.findUnique({ where: { resetToken: token } })
+    const record = await prisma.passwordReset.findUnique({
+      where: { resetToken: token },
+    })
     if (!record || record.expiresAt < new Date() || record.used) {
       throw new Error('INVALID_OR_EXPIRED_TOKEN')
     }
@@ -218,7 +220,7 @@ export class AuthService {
   static async refreshAccessToken(
     refreshToken: string,
     ipAddress: string,
-    deviceInfo: unknown,
+    deviceInfo: unknown
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const { accessToken, refreshToken: newRefresh } =
       await TokenService.rotateRefreshToken(refreshToken, ipAddress, deviceInfo)
