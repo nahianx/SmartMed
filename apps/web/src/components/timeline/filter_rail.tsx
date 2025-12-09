@@ -2,18 +2,22 @@ import { useState } from 'react'
 import { Search, Calendar as CalendarIcon } from 'lucide-react'
 import { Button, Input, Checkbox, Separator, Badge, Popover, PopoverContent, PopoverTrigger } from '@smartmed/ui'
 import { DayPicker } from 'react-day-picker'
-import type { FilterState, ActivityType, AppointmentStatus } from '@/types/timeline'
+import type { FilterState, ActivityType, AppointmentStatus, UserRole } from '@/types/timeline'
 import { format } from 'date-fns'
 
 interface FilterRailProps {
   filters: FilterState
   onFiltersChange: (filters: FilterState) => void
+  lockedRole?: UserRole
 }
 
-export function FilterRail({ filters, onFiltersChange }: FilterRailProps) {
+export function FilterRail({ filters, onFiltersChange, lockedRole }: FilterRailProps) {
   const [datePickerOpen, setDatePickerOpen] = useState<'from' | 'to' | null>(null)
 
   const updateFilters = (updates: Partial<FilterState>) => {
+    if (lockedRole && updates.role && updates.role !== lockedRole) {
+      return
+    }
     onFiltersChange({ ...filters, ...updates })
   }
 
@@ -44,30 +48,6 @@ export function FilterRail({ filters, onFiltersChange }: FilterRailProps) {
 
   return (
     <aside className="w-full lg:w-64 lg:border-r bg-gray-50 p-4 space-y-6 overflow-y-auto">
-      <div className="space-y-2">
-        <span className="text-sm font-medium">View as</span>
-        <div className="flex gap-2">
-          <Button
-            variant={filters.role === 'patient' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => updateFilters({ role: 'patient' })}
-            className="flex-1"
-          >
-            Patient
-          </Button>
-          <Button
-            variant={filters.role === 'doctor' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => updateFilters({ role: 'doctor' })}
-            className="flex-1"
-          >
-            Doctor
-          </Button>
-        </div>
-      </div>
-
-      <Separator />
-
       <div className="space-y-3">
         <span className="text-sm font-medium">Date Range</span>
 
@@ -105,43 +85,47 @@ export function FilterRail({ filters, onFiltersChange }: FilterRailProps) {
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {filters.dateRange.from ? format(filters.dateRange.from, 'MMM dd, yyyy') : 'From date'}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <DayPicker
-                mode="single"
-                selected={filters.dateRange.from || undefined}
-                onSelect={(date: Date | undefined) => {
-                  updateFilters({ dateRange: { ...filters.dateRange, from: date || null } })
-                  setDatePickerOpen(null)
-                }}
-              />
-            </PopoverContent>
-          </Popover>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0 z-50 shadow-lg border bg-white" align="start" side="bottom">
+          <div className="p-3">
+            <DayPicker
+              mode="single"
+              selected={filters.dateRange.from || undefined}
+              onSelect={(date: Date | undefined) => {
+                updateFilters({ dateRange: { ...filters.dateRange, from: date || null } })
+                setDatePickerOpen(null)
+              }}
+            />
+          </div>
+        </PopoverContent>
+      </Popover>
 
-          <Popover open={datePickerOpen === 'to'} onOpenChange={(open) => setDatePickerOpen(open ? 'to' : null)}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full justify-start"
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {filters.dateRange.to ? format(filters.dateRange.to, 'MMM dd, yyyy') : 'To date'}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <DayPicker
-                mode="single"
-                selected={filters.dateRange.to || undefined}
-                onSelect={(date: Date | undefined) => {
-                  updateFilters({ dateRange: { ...filters.dateRange, to: date || null } })
-                  setDatePickerOpen(null)
-                }}
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
+      <Popover open={datePickerOpen === 'to'} onOpenChange={(open) => setDatePickerOpen(open ? 'to' : null)}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full justify-start"
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {filters.dateRange.to ? format(filters.dateRange.to, 'MMM dd, yyyy') : 'To date'}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0 z-50 shadow-lg border bg-white" align="start" side="bottom">
+          <div className="p-3">
+            <DayPicker
+              mode="single"
+              selected={filters.dateRange.to || undefined}
+              onSelect={(date: Date | undefined) => {
+                updateFilters({ dateRange: { ...filters.dateRange, to: date || null } })
+                setDatePickerOpen(null)
+              }}
+            />
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
       </div>
 
       <Separator />
