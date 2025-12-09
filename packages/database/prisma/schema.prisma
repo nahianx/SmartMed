@@ -1,267 +1,115 @@
-// This is your Prisma schema file
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-// Note: SQLite doesn't support enums, so we use String types with validation at application level
-// UserRole: ADMIN, DOCTOR, PATIENT, NURSE
-// Gender: MALE, FEMALE, OTHER
-// AppointmentStatus: SCHEDULED, CONFIRMED, COMPLETED, CANCELLED, NO_SHOW
-// AuthProvider: LOCAL, GOOGLE
-// ActivityType: APPOINTMENT, PRESCRIPTION, REPORT
-// NotificationType: APPOINTMENT_REMINDER_24H, APPOINTMENT_REMINDER_1H, ACTIVITY_CREATED, ACTIVITY_UPDATED
-
 model User {
-  id            String   @id @default(uuid())
-  email         String   @unique
-  passwordHash  String?
-  fullName      String?
-  role          String   // UserRole: ADMIN, DOCTOR, PATIENT, NURSE
-  authProvider  String   @default("LOCAL") // AuthProvider: LOCAL, GOOGLE
-  googleId      String?  @unique
-  emailVerified Boolean  @default(false)
-  isActive      Boolean  @default(true)
-  lastLogin     DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  // Profile fields from profile management feature
-  phoneNumber     String?
-  dateOfBirth     DateTime?
-  gender          String?  // Gender: MALE, FEMALE, OTHER
-  addressLine1    String?
-  addressLine2    String?
-  city            String?
-  region          String?
-  postalCode      String?
-  country         String?
-  profilePhotoUrl String?
-  isMfaEnabled    Boolean @default(false)
-
-  // Relations
-  patient             Patient?
-  doctor              Doctor?
-  sessions            UserSession[]
-  passwordResets      PasswordReset[]
-  emailVerifications  EmailVerification[]
-  notifications       Notification[]
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String
+  role          UserRole
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  doctor        Doctor?
+  notifications Notification[]
+  patient       Patient?
 
   @@map("users")
 }
 
-model UserSession {
-  id           String   @id @default(uuid())
-  userId       String
-  refreshToken String   @unique
-  deviceInfo   String   // JSON string for SQLite compatibility
-  ipAddress    String
-  expiresAt    DateTime
-  createdAt    DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("user_sessions")
-}
-
-model PasswordReset {
-  id         String   @id @default(uuid())
-  userId     String
-  resetToken String   @unique
-  expiresAt  DateTime
-  used       Boolean  @default(false)
-  createdAt  DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("password_resets")
-}
-
-model EmailVerification {
-  id                String   @id @default(uuid())
-  userId            String
-  verificationToken String   @unique
-  expiresAt         DateTime
-  verified          Boolean  @default(false)
-  createdAt         DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("email_verifications")
-}
-
 model Patient {
-  id               String   @id @default(uuid())
-  userId           String   @unique
+  id               String         @id @default(uuid())
+  userId           String         @unique
   firstName        String
   lastName         String
   dateOfBirth      DateTime
-  gender           String   // Gender: MALE, FEMALE, OTHER
+  gender           Gender
   phoneNumber      String
   address          String
   emergencyContact String?
   bloodGroup       String?
-  allergies        String?  // JSON string for SQLite compatibility
+  allergies        Json?
   medicalHistory   String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  appointments     Appointment[]
-  prescriptions    Prescription[]
-  preferredDoctors PreferredDoctor[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
   activities       Activity[]
+  appointments     Appointment[]
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prescriptions    Prescription[]
   reports          Report[]
 
   @@map("patients")
 }
 
 model Doctor {
-  id                 String   @id @default(uuid())
-  userId             String   @unique
+  id                 String         @id @default(uuid())
+  userId             String         @unique
   firstName          String
   lastName           String
   specialization     String
   qualification      String
   experience         Int
   phoneNumber        String
-  licenseNumber      String   @unique
+  licenseNumber      String         @unique
   consultationFee    Float
-  availableDays      String   // JSON string for SQLite compatibility
-  availableTimeSlots String   // JSON string for SQLite compatibility
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-
-  // Relations
-  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  appointments   Appointment[]
-  prescriptions  Prescription[]
-  clinicId       String?
-  clinic         Clinic?             @relation(fields: [clinicId], references: [id])
-  specializations DoctorSpecialization[]
-  availabilities  DoctorAvailability[]
-  preferredBy     PreferredDoctor[]
-  activities      Activity[]
-  reports         Report[]
+  availableDays      Json
+  availableTimeSlots Json
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  activities         Activity[]
+  appointments       Appointment[]
+  user               User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prescriptions      Prescription[]
+  reports            Report[]
 
   @@map("doctors")
 }
 
 model Appointment {
-  id        String   @id @default(uuid())
-  patientId String
-  doctorId  String
-  dateTime  DateTime
-  duration  Int      // in minutes
-  status    String   @default("SCHEDULED") // AppointmentStatus: SCHEDULED, CONFIRMED, COMPLETED, CANCELLED, NO_SHOW
-  reason    String
-  notes     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  patient       Patient        @relation(fields: [patientId], references: [id])
-  doctor        Doctor         @relation(fields: [doctorId], references: [id])
-  prescriptions Prescription[]
+  id            String            @id @default(uuid())
+  patientId     String
+  doctorId      String
+  dateTime      DateTime
+  duration      Int
+  status        AppointmentStatus @default(SCHEDULED)
+  reason        String
+  notes         String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
   activities    Activity[]
-  reports       Report[]
+  doctor        Doctor            @relation(fields: [doctorId], references: [id])
+  patient       Patient           @relation(fields: [patientId], references: [id])
   notifications Notification[]
+  prescriptions Prescription[]
+  reports       Report[]
 
   @@map("appointments")
 }
 
 model Prescription {
-  id            String   @id @default(uuid())
+  id            String      @id @default(uuid())
   appointmentId String
   patientId     String
   doctorId      String
-  medications   String   // JSON string for SQLite compatibility - Array of medication objects
+  medications   Json
   diagnosis     String
   notes         String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  appointment Appointment @relation(fields: [appointmentId], references: [id])
-  patient     Patient     @relation(fields: [patientId], references: [id])
-  doctor      Doctor      @relation(fields: [doctorId], references: [id])
-  activities  Activity[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  activities    Activity[]
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  doctor        Doctor      @relation(fields: [doctorId], references: [id])
+  patient       Patient     @relation(fields: [patientId], references: [id])
 
   @@map("prescriptions")
 }
 
-model Clinic {
-  id               String   @id @default(uuid())
-  name             String
-  address          String
-  phone            String
-  consultationFee  Float
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  doctors          Doctor[]
-
-  @@map("clinics")
-}
-
-model Specialization {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  doctors   DoctorSpecialization[]
-
-  @@map("specializations")
-}
-
-model DoctorSpecialization {
-  id               String   @id @default(uuid())
-  doctorId         String
-  specializationId String
-
-  doctor         Doctor         @relation(fields: [doctorId], references: [id], onDelete: Cascade)
-  specialization Specialization @relation(fields: [specializationId], references: [id], onDelete: Cascade)
-
-  @@unique([doctorId, specializationId])
-  @@map("doctor_specializations")
-}
-
-model DoctorAvailability {
-  id          String   @id @default(uuid())
-  doctorId    String
-  dayOfWeek   Int      // 0 = Sunday, 6 = Saturday
-  startTime   String   // HH:MM 24h format
-  endTime     String   // HH:MM 24h format
-  hasBreak    Boolean  @default(false)
-  breakStart  String?
-  breakEnd    String?
-  isAvailable Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
-
-  @@map("doctor_availability")
-}
-
-model PreferredDoctor {
-  id        String   @id @default(uuid())
-  patientId String
-  doctorId  String
-  createdAt DateTime @default(now())
-
-  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  doctor  Doctor  @relation(fields: [doctorId], references: [id], onDelete: Cascade)
-
-  @@unique([patientId, doctorId], name: "patientId_doctorId")
-  @@map("preferred_doctors")
-}
-
 model Report {
-  id            String   @id @default(uuid())
+  id            String       @id @default(uuid())
   patientId     String
   doctorId      String?
   appointmentId String?
@@ -269,20 +117,19 @@ model Report {
   fileName      String
   fileSize      Int
   mimeType      String
-  uploadedAt    DateTime @default(now())
+  uploadedAt    DateTime     @default(now())
   notes         String?
-
-  patient     Patient     @relation(fields: [patientId], references: [id])
-  doctor      Doctor?     @relation(fields: [doctorId], references: [id])
-  appointment Appointment? @relation(fields: [appointmentId], references: [id])
-  activities  Activity[]
+  activities    Activity[]
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+  doctor        Doctor?      @relation(fields: [doctorId], references: [id])
+  patient       Patient      @relation(fields: [patientId], references: [id])
 
   @@map("reports")
 }
 
 model Activity {
-  id             String   @id @default(uuid())
-  type           String   // ActivityType: APPOINTMENT, PRESCRIPTION, REPORT
+  id             String             @id @default(uuid())
+  type           ActivityType
   occurredAt     DateTime
   patientId      String
   doctorId       String?
@@ -291,20 +138,18 @@ model Activity {
   reportId       String?
   title          String
   subtitle       String?
-  tags           String   // JSON string for SQLite compatibility
-  status         String?  // AppointmentStatus: SCHEDULED, CONFIRMED, COMPLETED, CANCELLED, NO_SHOW
+  tags           Json
+  status         AppointmentStatus?
   notes          String?
-  vitals         String?  // JSON string for SQLite compatibility
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  patient      Patient      @relation(fields: [patientId], references: [id])
-  doctor       Doctor?      @relation(fields: [doctorId], references: [id])
-  appointment  Appointment? @relation(fields: [appointmentId], references: [id])
-  prescription Prescription? @relation(fields: [prescriptionId], references: [id])
-  report       Report?      @relation(fields: [reportId], references: [id])
-
-  notifications Notification[]
+  vitals         Json?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  appointment    Appointment?       @relation(fields: [appointmentId], references: [id])
+  doctor         Doctor?            @relation(fields: [doctorId], references: [id])
+  patient        Patient            @relation(fields: [patientId], references: [id])
+  prescription   Prescription?      @relation(fields: [prescriptionId], references: [id])
+  report         Report?            @relation(fields: [reportId], references: [id])
+  notifications  Notification[]
 
   @@index([patientId, occurredAt(sort: Desc)])
   @@index([doctorId, occurredAt(sort: Desc)])
@@ -313,21 +158,54 @@ model Activity {
 }
 
 model Notification {
-  id            String    @id @default(uuid())
+  id            String           @id @default(uuid())
   userId        String
-  type          String    // NotificationType: APPOINTMENT_REMINDER_24H, APPOINTMENT_REMINDER_1H, ACTIVITY_CREATED, ACTIVITY_UPDATED
+  type          NotificationType
   title         String
   body          String?
   activityId    String?
   appointmentId String?
   readAt        DateTime?
-  createdAt     DateTime  @default(now())
+  createdAt     DateTime         @default(now())
+  activity      Activity?        @relation(fields: [activityId], references: [id])
+  appointment   Appointment?     @relation(fields: [appointmentId], references: [id])
+  user          User             @relation(fields: [userId], references: [id])
 
-  user        User        @relation(fields: [userId], references: [id])
-  activity    Activity?   @relation(fields: [activityId], references: [id])
-  appointment Appointment? @relation(fields: [appointmentId], references: [id])
-
-  @@index([userId, createdAt(sort: Desc)])
   @@unique([userId, appointmentId, type], map: "unique_notification_per_appointment_type")
+  @@index([userId, createdAt(sort: Desc)])
   @@map("notifications")
+}
+
+enum ActivityType {
+  APPOINTMENT
+  PRESCRIPTION
+  REPORT
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum NotificationType {
+  APPOINTMENT_REMINDER_24H
+  APPOINTMENT_REMINDER_1H
+  ACTIVITY_CREATED
+  ACTIVITY_UPDATED
+}
+
+enum UserRole {
+  ADMIN
+  DOCTOR
+  PATIENT
+  NURSE
 }

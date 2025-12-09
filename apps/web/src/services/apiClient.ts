@@ -1,9 +1,11 @@
 import axios from "axios"
-import config from "@smartmed/config"
 import { tokenManager } from "../utils/tokenManager"
 
+// Use NEXT_PUBLIC_API_URL from .env.local, which already includes /api
+const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1080/api'
+
 export const apiClient = axios.create({
-  baseURL: `${config.api.url}/api`,
+  baseURL,
   withCredentials: true,
 })
 
