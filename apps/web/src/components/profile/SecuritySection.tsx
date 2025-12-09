@@ -11,14 +11,14 @@ import {
 import { toast } from "sonner";
 import { useChangePassword, useToggleMFA, useProfile } from "@/hooks/useProfile";
 
-export function SecuritySection() {
+export function SecuritySection({ userId }: { userId?: string }) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Query hooks
-  const { data: profile } = useProfile();
+  const { data: profile } = useProfile(userId);
   
   // Mutation hooks
   const changePasswordMutation = useChangePassword();

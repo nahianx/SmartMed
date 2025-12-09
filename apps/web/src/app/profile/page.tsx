@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { AlertTriangle, User, Settings, Calendar, Heart } from 'lucide-react';
 import { Button, Card, Badge, Alert, AlertDescription } from '@smartmed/ui';
-import { useRequireAuth, useIsDoctor, useIsPatient } from '@/store/auth';
 import { ProfileSection } from '@/components/profile/ProfileSection';
 import { SecuritySection } from '@/components/profile/SecuritySection';
 import { AvailabilitySection } from '@/components/profile/doctor/AvailabilitySection';
@@ -19,20 +18,21 @@ const tabs = [
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { isLoading, isAuthenticated, user } = useRequireAuth();
-  const isDoctor = useIsDoctor();
-  const isPatient = useIsPatient();
+  const searchParams = useSearchParams();
+  const roleParam = (searchParams.get('role') || '').toUpperCase();
+  const userIdFromUrl = searchParams.get('userId') || undefined;
+
+  // Allow a demo user to be shown without authentication
+  const demoPatientId = process.env.NEXT_PUBLIC_DEMO_PATIENT_ID || '6efd69ce-a6db-468b-825d-5ce4762443de';
+  const demoDoctorId = process.env.NEXT_PUBLIC_DEMO_DOCTOR_ID || '00051eb8-35db-4b19-a975-ed37fec45e31';
+  const assumedRole = roleParam === 'DOCTOR' ? 'DOCTOR' : 'PATIENT';
+  const userId = userIdFromUrl || (assumedRole === 'DOCTOR' ? demoDoctorId : demoPatientId);
+  const isDoctor = assumedRole === 'DOCTOR';
+  const isPatient = assumedRole === 'PATIENT';
   
   const [activeTab, setActiveTab] = useState('profile');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
-
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push('/auth/login');
-    }
-  }, [isLoading, isAuthenticated, router]);
 
   // Filter tabs based on user role
   const availableTabs = tabs.filter(tab => {
@@ -67,33 +67,10 @@ export default function ProfilePage() {
     sessionStorage.removeItem('pendingTab');
   };
 
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-slate-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show not authenticated state
-  if (!isAuthenticated || !user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-slate-600">Redirecting to login...</p>
-        </div>
-      </div>
-    );
-  }
-
   const renderTabContent = () => {
     switch (activeTab) {
       case 'profile':
-        return <ProfileSection onUnsavedChanges={setHasUnsavedChanges} />;
+        return <ProfileSection onUnsavedChanges={setHasUnsavedChanges} userId={userId} />;
       case 'availability':
         return isDoctor ? (
           <AvailabilitySection onUnsavedChanges={setHasUnsavedChanges} />
@@ -101,9 +78,9 @@ export default function ProfilePage() {
       case 'preferred-doctors':
         return isPatient ? <PreferredDoctorsSection /> : null;
       case 'security':
-        return <SecuritySection />;
+        return <SecuritySection userId={userId} />;
       default:
-        return <ProfileSection onUnsavedChanges={setHasUnsavedChanges} />;
+        return <ProfileSection onUnsavedChanges={setHasUnsavedChanges} userId={userId} />;
     }
   };
 
@@ -116,8 +93,7 @@ export default function ProfilePage() {
             <div className="flex items-center gap-3">
               <h1 className="text-xl font-semibold">Profile Settings</h1>
               <Badge variant="outline" className="text-xs">
-                {user.role === 'DOCTOR' ? 'Healthcare Provider' : 
-                 user.role === 'PATIENT' ? 'Patient' : user.role}
+                {isDoctor ? 'Healthcare Provider' : isPatient ? 'Patient' : 'User'}
               </Badge>
             </div>
             <Button 

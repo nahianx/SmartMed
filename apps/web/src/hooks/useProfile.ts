@@ -17,10 +17,10 @@ export const queryKeys = {
 }
 
 // Profile hooks
-export const useProfile = () => {
+export const useProfile = (userId?: string) => {
   return useQuery({
-    queryKey: queryKeys.profile,
-    queryFn: profileApi.getProfile,
+    queryKey: [...queryKeys.profile, userId ?? 'self'],
+    queryFn: () => profileApi.getProfile(userId),
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }
@@ -122,10 +122,11 @@ export const useToggleMFA = () => {
 }
 
 // Doctor hooks
-export const useDoctorProfile = () => {
+export const useDoctorProfile = (userId?: string, enabled = true) => {
   return useQuery({
     queryKey: queryKeys.doctorProfile,
-    queryFn: doctorApi.getDoctorProfile,
+    queryFn: () => doctorApi.getDoctorProfile(userId),
+    enabled,
     staleTime: 5 * 60 * 1000,
   })
 }

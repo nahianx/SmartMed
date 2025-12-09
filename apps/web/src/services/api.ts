@@ -83,8 +83,10 @@ apiClient.interceptors.response.use(
 // Profile API Services
 export const profileApi = {
   // Get user profile - Backend returns the user object directly or { user }
-  getProfile: async (): Promise<User> => {
-    const response: AxiosResponse<ProfileResponse | User> = await apiClient.get('/profile')
+  getProfile: async (userId?: string): Promise<User> => {
+    const response: AxiosResponse<ProfileResponse | User> = await apiClient.get('/profile', {
+      params: userId ? { userId } : undefined,
+    })
     // Handle both raw user object and wrapped { user } response
     const data = response.data
     if ('user' in data && data.user) {
@@ -169,8 +171,10 @@ export const doctorApi = {
   },
 
   // Get doctor profile
-  getDoctorProfile: async (): Promise<Doctor> => {
-    const response: AxiosResponse<DoctorResponse> = await apiClient.get('/doctor/profile')
+  getDoctorProfile: async (userId?: string): Promise<Doctor> => {
+    const response: AxiosResponse<DoctorResponse> = await apiClient.get('/doctor/profile', {
+      params: userId ? { userId } : undefined,
+    })
     if (response.data.doctor) {
       return response.data.doctor
     }

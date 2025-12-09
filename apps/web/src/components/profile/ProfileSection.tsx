@@ -17,21 +17,20 @@ import {
 } from "@smartmed/ui";
 import { toast } from "sonner";
 import { useProfile, useUpdateProfile, useUploadProfilePhoto, useRemoveProfilePhoto, useSpecializations, useDoctorProfile, useUpdateSpecializations, useUpdateClinicInfo } from "@/hooks/useProfile";
-import { useIsDoctor, useAuthStore } from "@/store/auth";
 import { UserRole, User } from "@smartmed/types";
 
 interface ProfileSectionProps {
   onUnsavedChanges: (hasChanges: boolean) => void;
+  userId?: string;
 }
 
-export function ProfileSection({ onUnsavedChanges }: ProfileSectionProps) {
-  const user = useAuthStore((state: any) => state.user);
-  const isDoctor = useIsDoctor();
+export function ProfileSection({ onUnsavedChanges, userId }: ProfileSectionProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Query hooks
-  const { data: profile, isLoading: profileLoading, error: profileError } = useProfile();
-  const { data: doctorProfile, isLoading: doctorLoading } = useDoctorProfile();
+  const { data: profile, isLoading: profileLoading, error: profileError } = useProfile(userId);
+  const isDoctor = profile?.role === UserRole.DOCTOR;
+  const { data: doctorProfile, isLoading: doctorLoading } = useDoctorProfile(userId, !!isDoctor);
   const { data: specializations = [] } = useSpecializations();
   
   // Mutation hooks

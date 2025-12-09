@@ -16,6 +16,7 @@ import {
   specializationsUpdateSchema,
   validate,
 } from '../services/validation.service'
+import { prisma } from '@smartmed/database'
 
 const router = Router()
 
@@ -30,14 +31,32 @@ router.get('/search', async (req: Request, res: Response) => {
   }
 })
 
+// Public list of specializations (for dropdowns/search)
+router.get('/specializations/list', async (_req: Request, res: Response) => {
+  try {
+    const specializations = await prisma.specialization.findMany({
+      orderBy: { name: 'asc' },
+    })
+    res.json({ specializations })
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to load specializations' })
+  }
+})
+
 // Doctor-specific profile
 router.get(
   '/profile',
-  requireAuth,
-  requireRole(UserRole.DOCTOR),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const doctor = await getDoctorProfileByUserId(req.user!.id)
+      const userId =
+        (typeof req.query.userId === 'string' ? req.query.userId : undefined) ||
+        req.user?.id
+
+      if (!userId) {
+        return res.status(400).json({ error: 'userId is required' })
+      }
+
+      const doctor = await getDoctorProfileByUserId(userId)
       res.json({ doctor })
     } catch (error: any) {
       res
