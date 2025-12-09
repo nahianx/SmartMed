@@ -39,10 +39,8 @@ export function authMiddleware(
 
   try {
     const payload = jwt.verify(token, getJwtSecret()) as AuthUser
-    console.log('AUTH MIDDLEWARE - verified payload:', payload)
     req.user = { id: payload.id, role: payload.role }
   } catch (err) {
-    console.error('AUTH MIDDLEWARE - JWT verify error:', (err as Error).message)
     // ignore invalid tokens; routes can still enforce requireAuth
   }
 

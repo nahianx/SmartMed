@@ -4,6 +4,10 @@ export function errorHandler(err: any, _req: Request, res: Response, _next: Next
   // eslint-disable-next-line no-console
   console.error(err)
 
+  if (err.status) {
+    return res.status(err.status).json({ error: err.message })
+  }
+
   const known = new Set([
     'INVALID_EMAIL',
     'INVALID_NAME',

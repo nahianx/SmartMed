@@ -1,14 +1,16 @@
 import './config/env'
 import express, { Application, Request, Response } from 'express'
-import cors from 'cors'
-import helmet from 'helmet'
 import morgan from 'morgan'
 import dotenv from 'dotenv'
-import cookieParser from 'cookie-parser'
 import path from 'path'
-import { csrfProtection, setCSRFToken, generateCSRFToken } from './middleware/csrf'
-import { authStub } from './middleware/auth_stub'
+import {
+  csrfProtection,
+  setCSRFToken,
+  generateCSRFToken,
+} from './middleware/csrf'
 import { startReminderScheduler } from './scheduler/reminder_scheduler'
+import { setupSecurityMiddleware } from './middleware/security'
+import { authMiddleware } from './middleware/auth'
 
 // Import routes
 import patientRoutes from './routes/patient.routes'
@@ -20,6 +22,7 @@ import profileRoutes from './routes/profile.routes'
 import timelineRoutes from './routes/timeline.routes'
 import reportRoutes from './routes/report.routes'
 import notificationRoutes from './routes/notification.routes'
+import adminRoutes from './routes/admin.routes'
 import { errorHandler } from './middleware/errorHandler'
 
 dotenv.config()
@@ -27,25 +30,26 @@ dotenv.config()
 const app: Application = express()
 const PORT = process.env.PORT || 4000
 
-// Middleware
-app.use(helmet())
-app.use(cors())
+// Middleware - Apply security middleware first (includes proper CORS config)
+setupSecurityMiddleware(app)
 app.use(morgan('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use(cookieParser())
-app.use(authStub)
+app.use(authMiddleware)
 
 // Serve static files from public directory
 app.use(express.static(path.join(__dirname, '../public')))
 
 // Conditionally enable CSRF protection. Set DISABLE_CSRF=true for local/dev/Postman convenience.
-const disableCsrf = process.env.DISABLE_CSR === 'true' || process.env.DISABLE_CSRF === 'true'
+const disableCsrf =
+  process.env.DISABLE_CSR === 'true' || process.env.DISABLE_CSRF === 'true'
 if (!disableCsrf && process.env.NODE_ENV !== 'test') {
   app.use(setCSRFToken)
   app.use(csrfProtection)
 } else {
-  console.log('⚠️  CSRF protection is disabled (DISABLE_CSRF=true or NODE_ENV=test)')
+  console.log(
+    '⚠️  CSRF protection is disabled (DISABLE_CSRF=true or NODE_ENV=test)'
+  )
 }
 
 // Health check
@@ -89,6 +93,7 @@ app.use('/api/dashboard', dashboardRoutes)
 app.use('/api/timeline', timelineRoutes)
 app.use('/api/reports', reportRoutes)
 app.use('/api/notifications', notificationRoutes)
+app.use('/api/admin', adminRoutes)
 
 // 404 handler
 app.use((_req: Request, res: Response) => {

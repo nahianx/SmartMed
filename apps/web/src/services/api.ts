@@ -1,9 +1,10 @@
 // API service layer for profile management
 import axios, { AxiosResponse } from 'axios'
 import { User, Doctor, Patient, DoctorAvailability, Specialization } from '@smartmed/types'
+import { tokenManager } from '@/utils/tokenManager'
 
 // Configure axios instance
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1079/api'
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api').replace(/\/$/, '')
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -59,17 +60,10 @@ interface PhotoUploadResponse {
 
 // Add auth token to requests
 apiClient.interceptors.request.use((config) => {
-  // Get token from auth store
-  const token = localStorage.getItem('smartmed-auth')
+  const token = tokenManager.getAccessToken()
   if (token) {
-    try {
-      const authData = JSON.parse(token)
-      if (authData?.state?.token) {
-        config.headers.Authorization = `Bearer ${authData.state.token}`
-      }
-    } catch (error) {
-      console.error('Error parsing auth token:', error)
-    }
+    config.headers = config.headers || {}
+    config.headers.Authorization = `Bearer ${token}`
   }
   return config
 })
@@ -79,9 +73,8 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Clear auth state on unauthorized
-      localStorage.removeItem('smartmed-auth')
-      window.location.href = '/login'
+      tokenManager.clear()
+      window.location.href = '/auth/login'
     }
     return Promise.reject(error)
   }

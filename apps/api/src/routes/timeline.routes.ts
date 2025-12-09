@@ -1,8 +1,10 @@
 import { Router, Response } from 'express'
 import { prisma, ActivityType, AppointmentStatus } from '@smartmed/database'
-import { AuthenticatedRequest } from '../types/auth'
+import { UserRole } from '@smartmed/types'
+import { requireAuth, AuthenticatedRequest } from '../middleware/auth'
 
 const router = Router()
+router.use(requireAuth)
 
 function mapActivityTypeToClient(type: string): 'appointment' | 'prescription' | 'report' {
   switch (type) {
@@ -39,18 +41,20 @@ router.get('/', async (req: AuthenticatedRequest, res: Response) => {
     const where: any = {}
 
     // Role-based scoping: derive patient or doctor scope from user
-    if (req.user) {
-      if (req.user.role === 'PATIENT') {
-        const patient = await prisma.patient.findFirst({ where: { userId: req.user.id } })
-        if (patient) {
-          where.patientId = patient.id
-        }
-      } else if (req.user.role === 'DOCTOR') {
-        const doctor = await prisma.doctor.findFirst({ where: { userId: req.user.id } })
-        if (doctor) {
-          where.doctorId = doctor.id
-        }
+    if (req.user?.role === UserRole.PATIENT) {
+      const patient = await prisma.patient.findFirst({ where: { userId: req.user.id } })
+      if (!patient) {
+        return res.status(404).json({ error: 'Patient profile not found for current user' })
       }
+      where.patientId = patient.id
+    } else if (req.user?.role === UserRole.DOCTOR) {
+      const doctor = await prisma.doctor.findFirst({ where: { userId: req.user.id } })
+      if (!doctor) {
+        return res.status(404).json({ error: 'Doctor profile not found for current user' })
+      }
+      where.doctorId = doctor.id
+    } else {
+      return res.status(403).json({ error: 'Timeline is only available for patients and doctors' })
     }
 
     if (from) {

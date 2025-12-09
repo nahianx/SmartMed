@@ -7,7 +7,7 @@ const globalForPrisma = globalThis as unknown as {
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    log: ['query', 'error', 'warn'],
+    log: process.env.NODE_ENV === 'production' ? ['error'] : [],
   })
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
@@ -64,7 +64,8 @@ export const AppointmentStatus = {
   NO_SHOW: 'NO_SHOW',
 } as const
 // eslint-disable-next-line no-redeclare
-export type AppointmentStatus = (typeof AppointmentStatus)[keyof typeof AppointmentStatus]
+export type AppointmentStatus =
+  (typeof AppointmentStatus)[keyof typeof AppointmentStatus]
 
 // eslint-disable-next-line no-redeclare
 export const AuthProvider = {
@@ -91,4 +92,5 @@ export const NotificationType = {
   ACTIVITY_UPDATED: 'ACTIVITY_UPDATED',
 } as const
 // eslint-disable-next-line no-redeclare
-export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
+export type NotificationType =
+  (typeof NotificationType)[keyof typeof NotificationType]

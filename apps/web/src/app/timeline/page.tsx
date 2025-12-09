@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { apiClient } from '@/lib/api_client'
+import { apiClient } from '@/services/apiClient'
 import { handleApiError, showSuccess } from '@/lib/error_utils'
 import type { FilterState, TimelineActivity } from '@/types/timeline'
 import { TopAppBar } from '@/components/timeline/top_app_bar'
@@ -59,7 +59,7 @@ export default function TimelinePage() {
     queryKey: ['timeline', queryParams],
     queryFn: async () => {
       try {
-        const resp = await apiClient.get('/api/timeline', { params: queryParams })
+        const resp = await apiClient.get('/timeline', { params: queryParams })
         return resp.data as { items: TimelineApiItem[] }
       } catch (error) {
         handleApiError(error, 'Failed to load timeline activities')
@@ -83,7 +83,7 @@ export default function TimelinePage() {
     queryKey: ['currentPatient'],
     queryFn: async () => {
       try {
-        const resp = await apiClient.get('/api/patients/me')
+        const resp = await apiClient.get('/patient/profile')
         return resp.data as { patient: Patient }
       } catch (error) {
         handleApiError(error, 'Failed to load patient information')
@@ -103,7 +103,7 @@ export default function TimelinePage() {
     queryKey: ['notifications'],
     queryFn: async () => {
       try {
-        const resp = await apiClient.get('/api/notifications')
+        const resp = await apiClient.get('/notifications')
         return resp.data as { items: NotificationItem[] }
       } catch (error) {
         handleApiError(error, 'Failed to load notifications')
@@ -129,7 +129,7 @@ export default function TimelinePage() {
 
   const handleMarkNotificationRead = async (id: string) => {
     try {
-      await apiClient.post(`/api/notifications/${id}/read`)
+      await apiClient.post(`/notifications/${id}/read`)
       refetchNotifications()
       showSuccess('Notification marked as read')
     } catch (error) {
@@ -164,7 +164,7 @@ export default function TimelinePage() {
 
     try {
       setUploading(true)
-      await apiClient.post('/api/reports', formData, {
+      await apiClient.post('/reports', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       

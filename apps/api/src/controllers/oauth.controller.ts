@@ -54,8 +54,11 @@ export class OAuthController {
         })
       }
     } else {
-      // Create new user with role hint; default to PATIENT if not provided
-      const effectiveRole = role || UserRole.PATIENT
+      // Create new user with validated role hint; default to PATIENT if not provided/invalid
+      const allowedRoles = new Set<UserRole>([UserRole.PATIENT, UserRole.DOCTOR])
+      const effectiveRole = allowedRoles.has(role as UserRole)
+        ? (role as UserRole)
+        : UserRole.PATIENT
 
       user = await prisma.user.create({
         data: {

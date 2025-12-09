@@ -1,7 +1,10 @@
+'use client'
+
 import React, { useState } from 'react'
 import { Document, Page, pdfjs } from 'react-pdf'
 import { FileText, Loader, AlertTriangle, ZoomIn, ZoomOut } from 'lucide-react'
 import { Button } from '@smartmed/ui'
+import { tokenManager } from '@/utils/tokenManager'
 
 // Set up PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`
@@ -15,29 +18,31 @@ export function PDFViewer({ reportId, fileName }: PDFViewerProps) {
   const [numPages, setNumPages] = useState<number>(0)
   const [pageNumber, setPageNumber] = useState<number>(1)
   const [scale, setScale] = useState<number>(1.0)
-  const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
-  const pdfUrl = `/api/reports/${reportId}/download?disposition=inline`
+  const apiBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api').replace(/\/$/, '')
+  const accessToken = typeof window !== 'undefined' ? tokenManager.getAccessToken() : null
+  const pdfUrl = `${apiBase}/reports/${reportId}/download?disposition=inline`
+  const documentFile = accessToken
+    ? { url: pdfUrl, httpHeaders: { Authorization: `Bearer ${accessToken}` } }
+    : null
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages)
-    setLoading(false)
     setError(null)
   }
 
   function onDocumentLoadError(error: Error) {
     console.error('PDF loading error:', error)
     setError('Failed to load PDF document')
-    setLoading(false)
   }
 
-  if (loading) {
+  if (!documentFile) {
     return (
       <div className="aspect-[8.5/11] rounded-lg border bg-gray-100 flex items-center justify-center">
         <div className="text-center text-gray-500">
-          <Loader className="h-8 w-8 mx-auto mb-2 animate-spin" />
-          <p className="text-sm">Loading PDF...</p>
+          <FileText className="h-8 w-8 mx-auto mb-2" />
+          <p className="text-sm">Login is required to view this report.</p>
         </div>
       </div>
     )
@@ -49,9 +54,9 @@ export function PDFViewer({ reportId, fileName }: PDFViewerProps) {
         <div className="text-center text-red-500">
           <AlertTriangle className="h-8 w-8 mx-auto mb-2" />
           <p className="text-sm">{error}</p>
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             className="mt-2"
             onClick={() => {
               setLoading(true)
@@ -78,7 +83,9 @@ export function PDFViewer({ reportId, fileName }: PDFViewerProps) {
           >
             <ZoomOut className="h-4 w-4" />
           </Button>
-          <span className="text-sm text-gray-600">{Math.round(scale * 100)}%</span>
+          <span className="text-sm text-gray-600">
+            {Math.round(scale * 100)}%
+          </span>
           <Button
             variant="outline"
             size="sm"
@@ -117,7 +124,7 @@ export function PDFViewer({ reportId, fileName }: PDFViewerProps) {
       <div className="rounded-lg border bg-white overflow-hidden">
         <div className="flex justify-center p-4 bg-gray-50">
           <Document
-            file={pdfUrl}
+            file={documentFile}
             onLoadSuccess={onDocumentLoadSuccess}
             onLoadError={onDocumentLoadError}
             loading={

@@ -1,15 +1,12 @@
 import { Router, Response } from 'express'
 import { prisma } from '@smartmed/database'
-import { AuthenticatedRequest } from '../types/auth'
+import { AuthenticatedRequest, requireAuth } from '../middleware/auth'
 
 const router = Router()
+router.use(requireAuth)
 
 router.get('/', async (req: AuthenticatedRequest, res: Response) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({ error: 'Unauthorized' })
-    }
-
     const notifications = await prisma.notification.findMany({
       where: { userId: req.user.id },
       orderBy: { createdAt: 'desc' },
@@ -25,10 +22,6 @@ router.get('/', async (req: AuthenticatedRequest, res: Response) => {
 
 router.post('/:id/read', async (req: AuthenticatedRequest, res: Response) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({ error: 'Unauthorized' })
-    }
-
     const { id } = req.params
 
     const notification = await prisma.notification.updateMany({
