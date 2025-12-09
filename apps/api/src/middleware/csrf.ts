@@ -31,7 +31,11 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction) 
   // Development convenience: if the CSRF cookie is missing but a token
   // header is present, allow the request in non-production environments.
   // In production we require both header and cookie and that they match.
+  // In non-production environments, accept a valid CSRF cookie even if the header is missing.
   if (!token) {
+    if (process.env.NODE_ENV !== 'production' && cookieToken) {
+      return next()
+    }
     return res.status(403).json({ error: 'Invalid CSRF token' })
   }
 
