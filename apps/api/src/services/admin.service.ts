@@ -138,7 +138,7 @@ export class AdminService {
 
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: { role: newRole },
+      data: { role: newRole as UserRole },
       select: {
         id: true,
         email: true,

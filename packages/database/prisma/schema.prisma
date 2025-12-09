@@ -8,15 +8,35 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(uuid())
-  email         String         @unique
-  password      String
-  role          UserRole
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  doctor        Doctor?
-  notifications Notification[]
-  patient       Patient?
+  id              String         @id @default(uuid())
+  email           String         @unique
+  fullName        String?
+  passwordHash    String?
+  role            UserRole
+  authProvider    AuthProvider   @default(LOCAL)
+  googleId        String?        @unique
+  emailVerified   Boolean        @default(false)
+  isActive        Boolean        @default(true)
+  lastLogin       DateTime?
+  phoneNumber     String?
+  dateOfBirth     DateTime?
+  gender          Gender?
+  addressLine1    String?
+  addressLine2    String?
+  city            String?
+  region          String?
+  postalCode      String?
+  country         String?
+  profilePhotoUrl String?
+  isMfaEnabled    Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  doctor          Doctor?
+  notifications   Notification[]
+  patient         Patient?
+  sessions        UserSession[]
+  passwordResets  PasswordReset[]
+  emailVerifications EmailVerification[]
 
   @@map("users")
 }
@@ -41,32 +61,51 @@ model Patient {
   user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   prescriptions    Prescription[]
   reports          Report[]
+  preferredBy      PreferredDoctor[]
 
   @@map("patients")
 }
 
 model Doctor {
-  id                 String         @id @default(uuid())
-  userId             String         @unique
+  id                 String                  @id @default(uuid())
+  userId             String                  @unique
   firstName          String
   lastName           String
   specialization     String
   qualification      String
   experience         Int
   phoneNumber        String
-  licenseNumber      String         @unique
+  licenseNumber      String                  @unique
   consultationFee    Float
   availableDays      Json
   availableTimeSlots Json
-  createdAt          DateTime       @default(now())
-  updatedAt          DateTime       @updatedAt
+  clinicId           String?
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
   activities         Activity[]
   appointments       Appointment[]
-  user               User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
   prescriptions      Prescription[]
   reports            Report[]
+  clinic             Clinic?                 @relation(fields: [clinicId], references: [id])
+  availability       DoctorAvailability[]
+  specializations    DoctorSpecialization[]
+  preferredBy        PreferredDoctor[]
 
   @@map("doctors")
+}
+
+model Clinic {
+  id               String   @id @default(uuid())
+  name             String
+  address          String
+  phone            String
+  consultationFee  Float
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  doctors          Doctor[]
+
+  @@map("clinics")
 }
 
 model Appointment {
@@ -176,6 +215,92 @@ model Notification {
   @@map("notifications")
 }
 
+model UserSession {
+  id           String   @id @default(uuid())
+  userId       String
+  refreshToken String   @unique
+  ipAddress    String?
+  deviceInfo   Json?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_sessions")
+}
+
+model PasswordReset {
+  id         String   @id @default(uuid())
+  userId     String
+  resetToken String   @unique
+  expiresAt  DateTime
+  used       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_resets")
+}
+
+model EmailVerification {
+  id                String   @id @default(uuid())
+  userId            String
+  verificationToken String   @unique
+  expiresAt         DateTime
+  verified          Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("email_verifications")
+}
+
+model Specialization {
+  id    String   @id @default(uuid())
+  name  String   @unique
+  doctorSpecializations DoctorSpecialization[]
+
+  @@map("specializations")
+}
+
+model DoctorSpecialization {
+  id               String          @id @default(uuid())
+  doctorId         String
+  specializationId String
+  doctor           Doctor          @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  specialization   Specialization  @relation(fields: [specializationId], references: [id], onDelete: Cascade)
+
+  @@unique([doctorId, specializationId], map: "unique_doctor_specialization")
+  @@map("doctor_specializations")
+}
+
+model DoctorAvailability {
+  id         String   @id @default(uuid())
+  doctorId   String
+  dayOfWeek  Int
+  startTime  String
+  endTime    String
+  hasBreak   Boolean  @default(false)
+  breakStart String?
+  breakEnd   String?
+  isAvailable Boolean @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  doctor     Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@index([doctorId, dayOfWeek])
+  @@map("doctor_availability")
+}
+
+model PreferredDoctor {
+  id        String   @id @default(uuid())
+  patientId String
+  doctorId  String
+  createdAt DateTime @default(now())
+  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor    Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@unique([patientId, doctorId], map: "unique_preferred_doctor")
+  @@map("preferred_doctors")
+}
+
 enum ActivityType {
   APPOINTMENT
   PRESCRIPTION
@@ -208,4 +333,9 @@ enum UserRole {
   DOCTOR
   PATIENT
   NURSE
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
 }

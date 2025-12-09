@@ -139,21 +139,31 @@ router.get('/', async (req: AuthenticatedRequest, res: Response) => {
 
       const doctor = activity.doctor ?? activity.appointment?.doctor ?? null
 
-      // Parse tags from JSON string
+      // Parse tags from JSON value
       let tags: string[] = []
-      try {
-        tags = activity.tags ? JSON.parse(activity.tags) : []
-      } catch {
-        tags = []
+      if (activity.tags) {
+        if (typeof activity.tags === 'string') {
+          try {
+            const parsed = JSON.parse(activity.tags)
+            if (Array.isArray(parsed)) tags = parsed as string[]
+          } catch {
+            tags = []
+          }
+        } else if (Array.isArray(activity.tags)) {
+          tags = activity.tags as string[]
+        }
       }
 
       // Parse medications from JSON string
       let medications: any[] = []
       if (activity.prescription?.medications) {
         try {
-          medications = typeof activity.prescription.medications === 'string' 
-            ? JSON.parse(activity.prescription.medications) 
-            : activity.prescription.medications
+          medications =
+            typeof activity.prescription.medications === 'string'
+              ? JSON.parse(activity.prescription.medications)
+              : Array.isArray(activity.prescription.medications)
+                ? (activity.prescription.medications as any[])
+                : []
         } catch {
           medications = []
         }

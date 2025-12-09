@@ -48,13 +48,20 @@ export async function updateAppointmentActivityStatus(
   appointmentId: string,
   status: string,
 ) {
+  const mappedStatus =
+    status === AppointmentStatus.COMPLETED ||
+    status === AppointmentStatus.CANCELLED ||
+    status === AppointmentStatus.NO_SHOW
+      ? status
+      : undefined
+
   await prisma.activity.updateMany({
     where: {
       appointmentId,
       type: ActivityType.APPOINTMENT,
     },
     data: {
-      status,
+      status: mappedStatus,
     },
   })
 }

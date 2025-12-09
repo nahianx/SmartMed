@@ -4,7 +4,7 @@ import { AxiosError } from 'axios'
 // Mock react-hot-toast
 const mockToast = {
   success: jest.fn(),
-  error: jest.fn()
+  error: jest.fn(),
 }
 
 jest.mock('react-hot-toast', () => mockToast)

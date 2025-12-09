@@ -8,9 +8,11 @@ import { useRouter } from "next/navigation"
 import { GoogleSignInButton } from "../../../../components/auth/GoogleSignInButton"
 import { getPasswordStrength } from "../../../../utils/passwordStrength"
 import { validateEmailFormat, validateName, validatePasswordBasic } from "../../../../utils/validators"
+import { useAuthContext } from "../../../../context/AuthContext"
 
 export default function PatientRegisterPage() {
   const router = useRouter()
+  const { setUser, setAccessToken } = useAuthContext()
   const [fullName, setFullName] = useState("")
   const [email, setEmail] = useState("")
   const [emailError, setEmailError] = useState<string | null>(null)
@@ -65,6 +67,8 @@ export default function PatientRegisterPage() {
 
       const { user, accessToken } = await authService.registerPatient({ fullName, email, password })
       tokenManager.setAccessToken(accessToken, true)
+      setUser(user)
+      setAccessToken(accessToken)
       if (user.role === "PATIENT") router.push("/dashboard/patient")
       else router.push("/")
     } catch (err: any) {

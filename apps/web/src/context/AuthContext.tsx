@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .then((u) => {
           setUser(u)
           useAuthStore.setState({
-            user: u,
+            user: u as any,
             token: stored,
             isAuthenticated: true,
             isLoading: false,
@@ -97,7 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setAccessToken(token)
       tokenManager.setAccessToken(token, remember)
       useAuthStore.setState({
-        user: loggedUser,
+        user: loggedUser as any,
         token,
         isAuthenticated: true,
         isLoading: false,
@@ -132,7 +132,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (user && accessToken) {
       useAuthStore.setState({
-        user,
+        user: user as any,
         token: accessToken,
         isAuthenticated: true,
         isLoading: false,

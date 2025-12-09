@@ -8,7 +8,7 @@ router.use(requireAuth)
 router.get('/', async (req: AuthenticatedRequest, res: Response) => {
   try {
     const notifications = await prisma.notification.findMany({
-      where: { userId: req.user.id },
+      where: { userId: req.user!.id },
       orderBy: { createdAt: 'desc' },
       take: 50,
     })
@@ -25,7 +25,7 @@ router.post('/:id/read', async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params
 
     const notification = await prisma.notification.updateMany({
-      where: { id, userId: req.user.id },
+      where: { id, userId: req.user!.id },
       data: { readAt: new Date() },
     })
 

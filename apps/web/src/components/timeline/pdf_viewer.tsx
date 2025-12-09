@@ -59,7 +59,6 @@ export function PDFViewer({ reportId, fileName }: PDFViewerProps) {
             size="sm"
             className="mt-2"
             onClick={() => {
-              setLoading(true)
               setError(null)
             }}
           >
