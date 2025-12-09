@@ -11,6 +11,7 @@ interface TopAppBarProps {
   searchValue?: string
   onSearchChange?: (value: string) => void
   uploading?: boolean
+  hideUploadButton?: boolean
 }
 
 export function TopAppBar({
@@ -23,6 +24,7 @@ export function TopAppBar({
   searchValue = '',
   onSearchChange,
   uploading = false,
+  hideUploadButton = false,
 }: TopAppBarProps) {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white">
@@ -71,30 +73,32 @@ export function TopAppBar({
           />
         </div>
 
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="hidden md:inline-flex"
-          onClick={onUploadClick}
-          disabled={uploadDisabled || uploading}
-        >
-          {uploading ? (
-            <svg
-              className="h-4 w-4 mr-2 animate-spin text-gray-600"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <circle cx="12" cy="12" r="10" className="opacity-25" />
-              <path d="M12 2a10 10 0 0 1 10 10" className="opacity-75" />
-            </svg>
-          ) : (
-            <Upload className="h-4 w-4 mr-1" />
-          )}
-          {uploading ? 'Uploading...' : 'Upload report'}
-        </Button>
+        {!hideUploadButton && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="hidden md:inline-flex"
+            onClick={onUploadClick}
+            disabled={uploadDisabled || uploading}
+          >
+            {uploading ? (
+              <svg
+                className="h-4 w-4 mr-2 animate-spin text-gray-600"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <circle cx="12" cy="12" r="10" className="opacity-25" />
+                <path d="M12 2a10 10 0 0 1 10 10" className="opacity-75" />
+              </svg>
+            ) : (
+              <Upload className="h-4 w-4 mr-1" />
+            )}
+            {uploading ? 'Uploading...' : 'Upload report'}
+          </Button>
+        )}
 
         <button
           type="button"

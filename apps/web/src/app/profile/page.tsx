@@ -2,15 +2,17 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { AlertTriangle, User, Settings, Calendar, Heart } from 'lucide-react';
+import { AlertTriangle, User, Settings, Calendar, Heart, Clock3 } from 'lucide-react';
 import { Button, Card, Badge, Alert, AlertDescription } from '@smartmed/ui';
 import { ProfileSection } from '@/components/profile/ProfileSection';
 import { SecuritySection } from '@/components/profile/SecuritySection';
 import { AvailabilitySection } from '@/components/profile/doctor/AvailabilitySection';
 import { PreferredDoctorsSection } from '@/components/profile/patient/PreferredDoctorsSection';
+import { TimelineContainer } from '@/components/timeline/timeline_container';
 
 const tabs = [
   { id: 'profile', label: 'Profile', icon: User, forRole: 'all' },
+  { id: 'timeline', label: 'Timeline', icon: Clock3, forRole: 'all' },
   { id: 'availability', label: 'Availability', icon: Calendar, forRole: 'doctor' },
   { id: 'preferred-doctors', label: 'Preferred Doctors', icon: Heart, forRole: 'patient' },
   { id: 'security', label: 'Security', icon: Settings, forRole: 'all' },
@@ -77,6 +79,17 @@ export default function ProfilePage() {
         ) : null;
       case 'preferred-doctors':
         return isPatient ? <PreferredDoctorsSection /> : null;
+      case 'timeline':
+        return (
+          <TimelineContainer
+            variant="embedded"
+            initialRole={isDoctor ? 'doctor' : 'patient'}
+            lockRole
+            heading="Activity Timeline"
+            subheading={`Connected to this ${isDoctor ? 'doctor' : 'patient'} profile`}
+            uploadPatientId={isPatient ? userId : undefined}
+          />
+        );
       case 'security':
         return <SecuritySection userId={userId} />;
       default:
