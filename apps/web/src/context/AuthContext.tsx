@@ -102,8 +102,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated: true,
         isLoading: false,
       })
-      if (loggedUser.role === 'DOCTOR') router.push('/dashboard/doctor')
-      else if (loggedUser.role === 'PATIENT') router.push('/dashboard/patient')
+      if (loggedUser.role === 'DOCTOR') router.push('/profile?role=DOCTOR')
+      else if (loggedUser.role === 'PATIENT') router.push('/profile?role=PATIENT')
       else if (loggedUser.role === 'ADMIN') router.push('/dashboard/admin')
       else router.push('/')
     } finally {

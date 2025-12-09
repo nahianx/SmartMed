@@ -167,6 +167,7 @@ export default function ProfilePage() {
                           ? 'bg-blue-50 text-blue-700 border border-blue-200'
                           : 'text-slate-700 hover:bg-slate-50'
                       }`}
+                      aria-current={isActive ? 'page' : undefined}
                     >
                       <Icon className="w-4 h-4" />
                       <span className="font-medium">{tab.label}</span>

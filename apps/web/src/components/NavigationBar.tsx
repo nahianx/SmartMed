@@ -26,10 +26,10 @@ export function NavigationBar() {
             {user.role === 'PATIENT' && (
               <>
                 <Link
-                  href="/dashboard/patient"
+                  href="/profile?role=PATIENT"
                   className="text-slate-600 hover:text-slate-900 text-sm font-medium"
                 >
-                  Dashboard
+                  Profile
                 </Link>
               </>
             )}
@@ -37,10 +37,10 @@ export function NavigationBar() {
             {user.role === 'DOCTOR' && (
               <>
                 <Link
-                  href="/dashboard/doctor"
+                  href="/profile?role=DOCTOR"
                   className="text-slate-600 hover:text-slate-900 text-sm font-medium"
                 >
-                  Dashboard
+                  Profile
                 </Link>
               </>
             )}
@@ -63,7 +63,7 @@ export function NavigationBar() {
             )}
 
             <Link
-              href="/profile"
+              href={`/profile${user.role === 'DOCTOR' ? '?role=DOCTOR' : user.role === 'PATIENT' ? '?role=PATIENT' : ''}`}
               className="text-slate-600 hover:text-slate-900 text-sm font-medium"
             >
               Profile

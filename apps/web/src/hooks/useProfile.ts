@@ -184,6 +184,7 @@ export const useDoctorAvailability = () => {
     queryKey: queryKeys.doctorAvailability,
     queryFn: doctorApi.getAvailability,
     staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 }
 

@@ -38,6 +38,30 @@ interface DaySchedule {
   slots: TimeSlot[];
 }
 
+function buildScheduleFromAvailability(availability: DoctorAvailability[]): DaySchedule[] {
+  return daysOfWeek.map(day => {
+    const daySlots = availability
+      .filter(slot => slot.dayOfWeek === day.value && slot.isAvailable)
+      .map(slot => ({
+        id: slot.id,
+        dayOfWeek: slot.dayOfWeek,
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+        hasBreak: slot.hasBreak,
+        breakStart: slot.breakStart,
+        breakEnd: slot.breakEnd,
+        isAvailable: slot.isAvailable,
+      }));
+
+    return {
+      day: day.name,
+      dayOfWeek: day.value,
+      isOff: daySlots.length === 0,
+      slots: daySlots,
+    };
+  });
+}
+
 const daysOfWeek = [
   { name: "Sunday", value: 0 },
   { name: "Monday", value: 1 },
@@ -49,41 +73,21 @@ const daysOfWeek = [
 ];
 
 export function AvailabilitySection({ onUnsavedChanges }: AvailabilitySectionProps) {
-  const [schedule, setSchedule] = useState<DaySchedule[]>([]);
+  const [schedule, setSchedule] = useState<DaySchedule[]>(() => buildScheduleFromAvailability([]));
   const [hasChanges, setHasChanges] = useState(false);
   const [copyFromDay, setCopyFromDay] = useState<string>("");
   
   // Query hooks
-  const { data: availability = [], isLoading } = useDoctorAvailability();
+  const { data: availabilityData, isLoading, isError } = useDoctorAvailability();
   const updateAvailabilityMutation = useUpdateAvailability();
   const deleteSlotMutation = useDeleteAvailabilitySlot();
   
   // Initialize schedule from availability data
   useEffect(() => {
-    const initSchedule = daysOfWeek.map(day => {
-      const daySlots = availability
-        .filter(slot => slot.dayOfWeek === day.value && slot.isAvailable)
-        .map(slot => ({
-          id: slot.id,
-          dayOfWeek: slot.dayOfWeek,
-          startTime: slot.startTime,
-          endTime: slot.endTime,
-          hasBreak: slot.hasBreak,
-          breakStart: slot.breakStart,
-          breakEnd: slot.breakEnd,
-          isAvailable: slot.isAvailable,
-        }));
-      
-      return {
-        day: day.name,
-        dayOfWeek: day.value,
-        isOff: daySlots.length === 0,
-        slots: daySlots,
-      };
-    });
-    
-    setSchedule(initSchedule);
-  }, [availability]);
+    if (!availabilityData) return;
+    setSchedule(buildScheduleFromAvailability(availabilityData));
+    setHasChanges(false);
+  }, [availabilityData]);
   
   // Notify parent of changes
   useEffect(() => {
@@ -213,29 +217,11 @@ export function AvailabilitySection({ onUnsavedChanges }: AvailabilitySectionPro
   
   const handleCancel = () => {
     // Reset to original data
-    const initSchedule = daysOfWeek.map(day => {
-      const daySlots = availability
-        .filter(slot => slot.dayOfWeek === day.value && slot.isAvailable)
-        .map(slot => ({
-          id: slot.id,
-          dayOfWeek: slot.dayOfWeek,
-          startTime: slot.startTime,
-          endTime: slot.endTime,
-          hasBreak: slot.hasBreak,
-          breakStart: slot.breakStart,
-          breakEnd: slot.breakEnd,
-          isAvailable: slot.isAvailable,
-        }));
-      
-      return {
-        day: day.name,
-        dayOfWeek: day.value,
-        isOff: daySlots.length === 0,
-        slots: daySlots,
-      };
-    });
-    
-    setSchedule(initSchedule);
+    if (availabilityData) {
+      setSchedule(buildScheduleFromAvailability(availabilityData));
+    } else {
+      setSchedule(buildScheduleFromAvailability([]));
+    }
     setHasChanges(false);
   };
   
@@ -244,6 +230,14 @@ export function AvailabilitySection({ onUnsavedChanges }: AvailabilitySectionPro
       <div className="flex items-center justify-center py-8">
         <Loader2 className="h-6 w-6 animate-spin" />
         <span className="ml-2">Loading availability...</span>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+        Unable to load availability right now. Please try again later.
       </div>
     );
   }

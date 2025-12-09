@@ -1,4 +1,4 @@
-import { Calendar, Download, Eye, ExternalLink, Mail, MapPin, Pill, FileText, Stethoscope } from 'lucide-react'
+import { Calendar, Eye, MapPin, Pill, FileText, Stethoscope } from 'lucide-react'
 import type { TimelineActivity } from '@/types/timeline'
 import { Badge, Button } from '@smartmed/ui'
 import { format } from 'date-fns'
@@ -71,7 +71,7 @@ export function TimelineItem({ activity, onOpenDetails }: TimelineItemProps) {
             <div className="mt-1 flex items-center gap-3 text-sm text-gray-600 flex-wrap">
               <span className="flex items-center gap-1">
                 <Calendar className="h-3.5 w-3.5" />
-                {format(activity.date, 'MMM dd, yyyy • h:mm a')}
+                {format(activity.date, 'MMM dd, yyyy at h:mm a')}
               </span>
 
               {activity.clinic && (
@@ -107,15 +107,6 @@ export function TimelineItem({ activity, onOpenDetails }: TimelineItemProps) {
                   <Eye className="h-4 w-4 mr-1" />
                   View
                 </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                  }}
-                >
-                  Rebook
-                </Button>
               </>
             )}
 
@@ -126,20 +117,11 @@ export function TimelineItem({ activity, onOpenDetails }: TimelineItemProps) {
                   variant="outline"
                   onClick={(e) => {
                     e.stopPropagation()
+                    onOpenDetails(activity)
                   }}
                 >
-                  <ExternalLink className="h-4 w-4 mr-1" />
+                  <Eye className="h-4 w-4 mr-1" />
                   View Rx
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                  }}
-                >
-                  <Mail className="h-4 w-4 mr-1" />
-                  Email
                 </Button>
               </>
             )}
@@ -157,23 +139,13 @@ export function TimelineItem({ activity, onOpenDetails }: TimelineItemProps) {
                   <Eye className="h-4 w-4 mr-1" />
                   Preview
                 </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                  }}
-                >
-                  <Download className="h-4 w-4 mr-1" />
-                  Download
-                </Button>
               </>
             )}
           </div>
         </div>
 
         <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-gray-500">
-          Click to view details in drawer →
+          Click to view details in drawer.
         </div>
       </div>
     </div>

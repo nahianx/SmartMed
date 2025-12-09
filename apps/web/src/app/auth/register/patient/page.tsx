@@ -69,7 +69,7 @@ export default function PatientRegisterPage() {
       tokenManager.setAccessToken(accessToken, true)
       setUser(user)
       setAccessToken(accessToken)
-      if (user.role === "PATIENT") router.push("/dashboard/patient")
+      if (user.role === "PATIENT") router.push("/profile?role=PATIENT")
       else router.push("/")
     } catch (err: any) {
       setError("Registration failed. Please check your details.")

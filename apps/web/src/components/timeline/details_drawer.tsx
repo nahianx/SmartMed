@@ -30,7 +30,7 @@ export function DetailsDrawer({ activity, open, onClose }: DetailsDrawerProps) {
           </SheetTitle>
           <SheetDescription className="flex items-center gap-2">
             <Calendar className="h-4 w-4" />
-            {format(activity.date, 'EEEE, MMMM dd, yyyy • h:mm a')}
+            {format(activity.date, 'EEEE, MMMM dd, yyyy at h:mm a')}
           </SheetDescription>
         </SheetHeader>
 
@@ -200,7 +200,7 @@ export function DetailsDrawer({ activity, open, onClose }: DetailsDrawerProps) {
                     <ul className="space-y-1 text-sm">
                       {activity.warnings.map((warning, index) => (
                         <li key={index} className="flex gap-2">
-                          <span>•</span>
+                          <span>-</span>
                           <span>{warning}</span>
                         </li>
                       ))}

@@ -30,11 +30,13 @@ export function ProtectedRoute({
 
       // If specific role is required but user doesn't have it
       if (requireRole && user && user.role !== requireRole) {
-        // Redirect to appropriate dashboard based on user's role
+        // Redirect to role-appropriate profile/dashboard
         if (user.role === "DOCTOR") {
-          router.replace("/dashboard/doctor")
+          router.replace("/profile?role=DOCTOR")
         } else if (user.role === "PATIENT") {
-          router.replace("/dashboard/patient")
+          router.replace("/profile?role=PATIENT")
+        } else if (user.role === "ADMIN") {
+          router.replace("/dashboard/admin")
         } else {
           router.replace("/")
         }
@@ -44,9 +46,11 @@ export function ProtectedRoute({
       // If user is logged in but trying to access auth pages
       if (!requireAuth && user) {
         if (user.role === "DOCTOR") {
-          router.replace("/dashboard/doctor")
+          router.replace("/profile?role=DOCTOR")
         } else if (user.role === "PATIENT") {
-          router.replace("/dashboard/patient")
+          router.replace("/profile?role=PATIENT")
+        } else if (user.role === "ADMIN") {
+          router.replace("/dashboard/admin")
         } else {
           router.replace("/")
         }

@@ -38,8 +38,9 @@ export function GoogleSignInButton({ role }: Props) {
             setUser(user)
             setAccessToken(accessToken)
             tokenManager.setAccessToken(accessToken, true)
-            if (user.role === "DOCTOR") router.push("/dashboard/doctor")
-            else if (user.role === "PATIENT") router.push("/dashboard/patient")
+            if (user.role === "DOCTOR") router.push("/profile?role=DOCTOR")
+            else if (user.role === "PATIENT") router.push("/profile?role=PATIENT")
+            else if (user.role === "ADMIN") router.push("/dashboard/admin")
             else router.push("/")
           } catch (e) {
             console.error("Google sign-in failed", e)

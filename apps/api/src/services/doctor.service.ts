@@ -1,9 +1,42 @@
 import { prisma } from '@smartmed/database'
 import { DoctorAvailability } from '@smartmed/types'
+import { randomUUID } from 'crypto'
+
+async function getOrCreateDoctor(userId: string) {
+  const existing = await prisma.doctor.findUnique({ where: { userId } })
+  if (existing) return existing
+
+  const user = await prisma.user.findUnique({ where: { id: userId } })
+  if (!user) {
+    const error: any = new Error('User not found')
+    error.status = 404
+    throw error
+  }
+
+  const [firstName, ...rest] = (user.fullName || 'Doctor Unknown').split(' ')
+  const lastName = rest.join(' ') || 'Unknown'
+
+  return prisma.doctor.create({
+    data: {
+      userId,
+      firstName,
+      lastName,
+      specialization: 'General Medicine',
+      qualification: 'MD',
+      experience: 0,
+      phoneNumber: user.phoneNumber || 'N/A',
+      licenseNumber: `TMP-${userId.slice(0, 8)}-${randomUUID().slice(0, 6)}`,
+      consultationFee: 0,
+      availableDays: [],
+      availableTimeSlots: [],
+    },
+  })
+}
 
 export async function getDoctorProfileByUserId(userId: string) {
+  const doctor = await getOrCreateDoctor(userId)
   return prisma.doctor.findUnique({
-    where: { userId },
+    where: { id: doctor.id },
     include: {
       clinic: true,
       specializations: {
@@ -85,10 +118,7 @@ export async function upsertClinicForDoctor(userId: string, data: ClinicInput) {
 }
 
 export async function getAvailability(userId: string) {
-  const doctor = await prisma.doctor.findUnique({ where: { userId } })
-  if (!doctor) {
-    throw Object.assign(new Error('Doctor not found'), { status: 404 })
-  }
+  const doctor = await getOrCreateDoctor(userId)
 
   const slots = await prisma.doctorAvailability.findMany({
     where: { doctorId: doctor.id },
@@ -102,10 +132,7 @@ export async function setAvailability(
   userId: string,
   slots: Omit<DoctorAvailability, 'id' | 'doctorId' | 'createdAt' | 'updatedAt'>[],
 ) {
-  const doctor = await prisma.doctor.findUnique({ where: { userId } })
-  if (!doctor) {
-    throw Object.assign(new Error('Doctor not found'), { status: 404 })
-  }
+  const doctor = await getOrCreateDoctor(userId)
 
   // Basic conflict detection: ensure no overlapping slots per day
   const byDay: Record<number, { start: string; end: string }[]> = {}
@@ -148,10 +175,7 @@ export async function setAvailability(
 }
 
 export async function removeAvailabilitySlot(userId: string, slotId: string) {
-  const doctor = await prisma.doctor.findUnique({ where: { userId } })
-  if (!doctor) {
-    throw Object.assign(new Error('Doctor not found'), { status: 404 })
-  }
+  const doctor = await getOrCreateDoctor(userId)
 
   const slot = await prisma.doctorAvailability.findUnique({
     where: { id: slotId },

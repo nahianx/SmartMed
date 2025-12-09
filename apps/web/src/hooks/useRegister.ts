@@ -27,7 +27,7 @@ export function useRegister() {
       setAccessToken(result.accessToken)
       tokenManager.setAccessToken(result.accessToken, true)
       
-      router.push("/dashboard/doctor")
+      router.push("/profile?role=DOCTOR")
       return result
     } catch (err: any) {
       if (err.response?.data?.error === "EMAIL_ALREADY_IN_USE") {
@@ -52,7 +52,7 @@ export function useRegister() {
       setAccessToken(result.accessToken)
       tokenManager.setAccessToken(result.accessToken, true)
       
-      router.push("/dashboard/patient")
+      router.push("/profile?role=PATIENT")
       return result
     } catch (err: any) {
       if (err.response?.data?.error === "EMAIL_ALREADY_IN_USE") {
