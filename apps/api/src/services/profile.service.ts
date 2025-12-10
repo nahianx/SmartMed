@@ -1,6 +1,7 @@
 import { prisma } from '@smartmed/database'
 import { UserRole } from '@smartmed/types'
 import bcrypt from 'bcryptjs'
+import { getOrCreatePatient } from './patient.service'
 
 export async function getProfile(userId: string) {
   const user = await prisma.user.findUnique({
@@ -55,17 +56,18 @@ export async function getProfile(userId: string) {
     }
   }
 
-  if (user.role === UserRole.PATIENT && user.patient) {
+  if (user.role === UserRole.PATIENT) {
+    const patientRecord = user.patient ?? (await getOrCreatePatient(user.id))
     return {
       ...base,
       patient: {
-        id: user.patient.id,
-        firstName: user.patient.firstName,
-        lastName: user.patient.lastName,
-        emergencyContact: user.patient.emergencyContact,
-        bloodGroup: user.patient.bloodGroup,
-        allergies: user.patient.allergies,
-        medicalHistory: user.patient.medicalHistory,
+        id: patientRecord.id,
+        firstName: patientRecord.firstName,
+        lastName: patientRecord.lastName,
+        emergencyContact: patientRecord.emergencyContact,
+        bloodGroup: patientRecord.bloodGroup,
+        allergies: patientRecord.allergies,
+        medicalHistory: patientRecord.medicalHistory,
       },
     }
   }

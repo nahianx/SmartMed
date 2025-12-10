@@ -1,5 +1,5 @@
 import { Router, Response } from 'express'
-import { AuthenticatedRequest } from '../middleware/auth'
+import { AuthenticatedRequest, requireAuth } from '../middleware/auth'
 import { getProfile, updateProfile, updatePassword, setMfaEnabled } from '../services/profile.service'
 import { profileUpdateSchema, passwordChangeSchema, mfaUpdateSchema, validate } from '../services/validation.service'
 import {
@@ -9,6 +9,7 @@ import {
 } from '../services/image-upload.service'
 
 const router = Router()
+router.use(requireAuth)
 
 const resolveUserId = (req: AuthenticatedRequest, res: Response) => {
   const userId =

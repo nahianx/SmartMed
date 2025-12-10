@@ -6,12 +6,19 @@ import { tokenManager } from '@/utils/tokenManager'
 // Configure axios instance
 const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api').replace(/\/$/, '')
 
+function getCookie(name: string): string | null {
+  if (typeof document === 'undefined') return null
+  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`))
+  return match ? decodeURIComponent(match[1]) : null
+}
+
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json'
-  }
+  },
+  withCredentials: true,
 })
 
 // Backend response types (raw data format)
@@ -64,6 +71,11 @@ apiClient.interceptors.request.use((config) => {
   if (token) {
     config.headers = config.headers || {}
     config.headers.Authorization = `Bearer ${token}`
+  }
+  const csrf = getCookie('csrf-token')
+  if (csrf) {
+    config.headers = config.headers || {}
+    config.headers['x-csrf-token'] = csrf
   }
   return config
 })

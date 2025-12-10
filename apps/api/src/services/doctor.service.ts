@@ -2,7 +2,7 @@ import { prisma } from '@smartmed/database'
 import { DoctorAvailability } from '@smartmed/types'
 import { randomUUID } from 'crypto'
 
-async function getOrCreateDoctor(userId: string) {
+export async function getOrCreateDoctor(userId: string) {
   const existing = await prisma.doctor.findUnique({ where: { userId } })
   if (existing) return existing
 

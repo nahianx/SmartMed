@@ -9,6 +9,7 @@ import { SecuritySection } from '@/components/profile/SecuritySection';
 import { AvailabilitySection } from '@/components/profile/doctor/AvailabilitySection';
 import { PreferredDoctorsSection } from '@/components/profile/patient/PreferredDoctorsSection';
 import { TimelineContainer } from '@/components/timeline/timeline_container';
+import { useAuthContext } from '@/context/AuthContext';
 
 const tabs = [
   { id: 'profile', label: 'Profile', icon: User, forRole: 'all' },
@@ -21,16 +22,16 @@ const tabs = [
 export default function ProfilePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user } = useAuthContext();
   const roleParam = (searchParams.get('role') || '').toUpperCase();
   const userIdFromUrl = searchParams.get('userId') || undefined;
 
-  // Allow a demo user to be shown without authentication
-  const demoPatientId = process.env.NEXT_PUBLIC_DEMO_PATIENT_ID || '6efd69ce-a6db-468b-825d-5ce4762443de';
-  const demoDoctorId = process.env.NEXT_PUBLIC_DEMO_DOCTOR_ID || '00051eb8-35db-4b19-a975-ed37fec45e31';
-  const assumedRole = roleParam === 'DOCTOR' ? 'DOCTOR' : 'PATIENT';
-  const userId = userIdFromUrl || (assumedRole === 'DOCTOR' ? demoDoctorId : demoPatientId);
-  const isDoctor = assumedRole === 'DOCTOR';
-  const isPatient = assumedRole === 'PATIENT';
+  const resolvedRole =
+    (user?.role?.toUpperCase() as 'DOCTOR' | 'PATIENT' | 'ADMIN' | 'NURSE' | undefined) ||
+    (roleParam === 'DOCTOR' ? 'DOCTOR' : roleParam === 'PATIENT' ? 'PATIENT' : undefined);
+  const resolvedUserId = user?.id || userIdFromUrl || undefined;
+  const isDoctor = resolvedRole === 'DOCTOR';
+  const isPatient = resolvedRole === 'PATIENT';
   
   const [activeTab, setActiveTab] = useState('profile');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -72,7 +73,7 @@ export default function ProfilePage() {
   const renderTabContent = () => {
     switch (activeTab) {
       case 'profile':
-        return <ProfileSection onUnsavedChanges={setHasUnsavedChanges} userId={userId} />;
+        return <ProfileSection onUnsavedChanges={setHasUnsavedChanges} userId={resolvedUserId} />;
       case 'availability':
         return isDoctor ? (
           <AvailabilitySection onUnsavedChanges={setHasUnsavedChanges} />
@@ -87,15 +88,26 @@ export default function ProfilePage() {
             lockRole
             heading="Activity Timeline"
             subheading={`Connected to this ${isDoctor ? 'doctor' : 'patient'} profile`}
-            uploadPatientId={isPatient ? userId : undefined}
+            uploadPatientId={isPatient ? resolvedUserId : undefined}
           />
         );
       case 'security':
-        return <SecuritySection userId={userId} />;
+        return <SecuritySection userId={resolvedUserId} />;
       default:
-        return <ProfileSection onUnsavedChanges={setHasUnsavedChanges} userId={userId} />;
+        return <ProfileSection onUnsavedChanges={setHasUnsavedChanges} userId={resolvedUserId} />;
     }
   };
+
+  if (!resolvedUserId && !user) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <p className="text-red-600">Profile requires a signed-in user.</p>
+          <Button onClick={() => router.push('/auth/login')}>Go to Login</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -111,7 +123,11 @@ export default function ProfilePage() {
             </div>
             <Button 
               variant="outline" 
-              onClick={() => router.push('/dashboard')}
+              onClick={() => {
+                if (user?.role === 'DOCTOR') router.push('/dashboard/doctor');
+                else if (user?.role === 'PATIENT') router.push('/dashboard/patient');
+                else router.push('/dashboard');
+              }}
             >
               Back to Dashboard
             </Button>

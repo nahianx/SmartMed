@@ -2,6 +2,8 @@ import { Router, Response } from 'express'
 import { prisma, ActivityType, AppointmentStatus } from '@smartmed/database'
 import { UserRole } from '@smartmed/types'
 import { requireAuth, AuthenticatedRequest } from '../middleware/auth'
+import { getOrCreateDoctor } from '../services/doctor.service'
+import { getOrCreatePatient } from '../services/patient.service'
 
 const router = Router()
 router.use(requireAuth)
@@ -42,16 +44,10 @@ router.get('/', async (req: AuthenticatedRequest, res: Response) => {
 
     // Role-based scoping: derive patient or doctor scope from user
     if (req.user?.role === UserRole.PATIENT) {
-      const patient = await prisma.patient.findFirst({ where: { userId: req.user.id } })
-      if (!patient) {
-        return res.status(404).json({ error: 'Patient profile not found for current user' })
-      }
+      const patient = await getOrCreatePatient(req.user.id)
       where.patientId = patient.id
     } else if (req.user?.role === UserRole.DOCTOR) {
-      const doctor = await prisma.doctor.findFirst({ where: { userId: req.user.id } })
-      if (!doctor) {
-        return res.status(404).json({ error: 'Doctor profile not found for current user' })
-      }
+      const doctor = await getOrCreateDoctor(req.user.id)
       where.doctorId = doctor.id
     } else {
       return res.status(403).json({ error: 'Timeline is only available for patients and doctors' })
