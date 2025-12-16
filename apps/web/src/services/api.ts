@@ -126,12 +126,7 @@ export const profileApi = {
     
     const response: AxiosResponse<PhotoUploadResponse> = await apiClient.post(
       '/profile/photo',
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      }
+      formData
     )
     
     if (response.data.url) {

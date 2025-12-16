@@ -59,12 +59,18 @@ export function requireAuth(
 }
 
 export function requireRole(roles: UserRole | UserRole[]) {
-  const allowed = Array.isArray(roles) ? roles : [roles]
+  const allowed = (Array.isArray(roles) ? roles : [roles]).map((r) =>
+    typeof r === 'string' ? r.toUpperCase() : r,
+  )
   return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
-    if (!allowed.includes(req.user.role)) {
+    const userRole =
+      typeof req.user.role === 'string'
+        ? (req.user.role.toUpperCase() as UserRole)
+        : req.user.role
+    if (!allowed.includes(userRole)) {
       return res.status(403).json({ error: 'Forbidden' })
     }
     return next()
