@@ -18,9 +18,10 @@ export interface AuthenticatedRequest extends Request {
 export function authMiddleware(
   req: AuthenticatedRequest,
   _res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) {
-  const rawHeader = (req.headers['authorization'] || req.headers['Authorization']) as string | string[] | undefined
+  const rawHeader = (req.headers['authorization'] ||
+    req.headers['Authorization']) as string | string[] | undefined
   const authHeader = Array.isArray(rawHeader) ? rawHeader[0] : rawHeader
 
   if (!authHeader || typeof authHeader !== 'string') {
@@ -38,8 +39,8 @@ export function authMiddleware(
   }
 
   try {
-    const payload = jwt.verify(token, getJwtSecret()) as AuthUser
-    req.user = { id: payload.id, role: payload.role }
+    const payload = jwt.verify(token, getJwtSecret()) as any
+    req.user = { id: payload.sub || payload.id, role: payload.role }
   } catch (err) {
     // ignore invalid tokens; routes can still enforce requireAuth
   }
@@ -50,7 +51,7 @@ export function authMiddleware(
 export function requireAuth(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) {
   if (!req.user) {
     return res.status(401).json({ error: 'Unauthorized' })
@@ -60,7 +61,7 @@ export function requireAuth(
 
 export function requireRole(roles: UserRole | UserRole[]) {
   const allowed = (Array.isArray(roles) ? roles : [roles]).map((r) =>
-    typeof r === 'string' ? r.toUpperCase() : r,
+    typeof r === 'string' ? r.toUpperCase() : r
   )
   return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     if (!req.user) {

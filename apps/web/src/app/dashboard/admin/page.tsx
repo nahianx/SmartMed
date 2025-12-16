@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Users, RefreshCw, Calendar } from 'lucide-react'
+import { Badge, Button } from '@smartmed/ui'
 import { useAuthContext } from '../../../context/AuthContext'
-import { NavigationBar } from '../../../components/NavigationBar'
 import { adminService, DashboardStats } from '../../../services/adminService'
 
 export default function AdminDashboardPage() {
@@ -37,21 +38,59 @@ export default function AdminDashboardPage() {
 
   if (loading || !user) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-        Loading...
+      <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-orange-50">
+        <div className="text-gray-600">Loading...</div>
       </main>
     )
   }
 
+  const managementCards = [
+    {
+      icon: Users,
+      title: 'Manage Users',
+      description: 'View and manage all users, roles, and permissions',
+      color: 'red' as const,
+      action: () => router.push('/dashboard/admin/users'),
+    },
+    {
+      icon: Calendar,
+      title: 'Manage Appointments',
+      description:
+        'View all appointments, patient context, and update statuses',
+      color: 'blue' as const,
+      action: () => router.push('/dashboard/admin/appointments'),
+    },
+  ]
+
   return (
-    <>
-      <NavigationBar />
-      <main className="min-h-screen bg-slate-50 p-6">
-        <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-slate-50">
+      {/* Header */}
+      <div className="bg-white border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl font-semibold">Admin Dashboard</h1>
+              <Badge variant="outline" className="text-xs">
+                Administrator
+              </Badge>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => router.push('/profile?role=ADMIN')}
+            >
+              Profile Settings
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-gradient-to-br from-red-50 via-white to-orange-50 min-h-[calc(100vh-4rem)]">
+        {/* Main Content */}
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-            <p className="text-slate-600">
-              Welcome, {user.fullName}. Manage users, roles, and permissions.
+            <h2 className="text-gray-900 mb-2">Welcome, {user.fullName}!</h2>
+            <p className="text-gray-600">
+              Manage users, roles, and system settings
             </p>
           </div>
 
@@ -61,86 +100,126 @@ export default function AdminDashboardPage() {
             </div>
           )}
 
+          <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6 mb-12">
+            {managementCards.map((card, index) => (
+              <DashboardCard key={index} {...card} />
+            ))}
+          </div>
+
+          {/* Quick Stats */}
+          <div className="mb-4 flex justify-between items-center">
+            <h3 className="text-gray-900 text-lg font-semibold">
+              System Statistics
+            </h3>
+            <button
+              onClick={loadStats}
+              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-white rounded-lg transition-all"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Refresh
+            </button>
+          </div>
+
           {stats ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              <StatCard
-                label="Total Users"
-                value={stats.totalUsers}
-                color="bg-blue-50"
-              />
-              <StatCard
-                label="Admins"
-                value={stats.admins}
-                color="bg-purple-50"
-              />
-              <StatCard
-                label="Doctors"
-                value={stats.doctors}
-                color="bg-green-50"
-              />
-              <StatCard
-                label="Patients"
-                value={stats.patients}
-                color="bg-amber-50"
-              />
-              <StatCard
-                label="Active Users"
-                value={stats.activeUsers}
-                color="bg-emerald-50"
-              />
-              <StatCard
-                label="Inactive Users"
-                value={stats.inactiveUsers}
-                color="bg-red-50"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
+              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                <p className="text-gray-600 mb-1">Total Users</p>
+                <p className="text-gray-900 text-2xl font-semibold">
+                  {stats.totalUsers}
+                </p>
+              </div>
+              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                <p className="text-gray-600 mb-1">Admins</p>
+                <p className="text-gray-900 text-2xl font-semibold">
+                  {stats.admins}
+                </p>
+              </div>
+              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                <p className="text-gray-600 mb-1">Doctors</p>
+                <p className="text-gray-900 text-2xl font-semibold">
+                  {stats.doctors}
+                </p>
+              </div>
+              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                <p className="text-gray-600 mb-1">Patients</p>
+                <p className="text-gray-900 text-2xl font-semibold">
+                  {stats.patients}
+                </p>
+              </div>
+              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                <p className="text-gray-600 mb-1">Active Users</p>
+                <p className="text-gray-900 text-2xl font-semibold">
+                  {stats.activeUsers}
+                </p>
+              </div>
+              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                <p className="text-gray-600 mb-1">Inactive</p>
+                <p className="text-gray-900 text-2xl font-semibold">
+                  {stats.inactiveUsers}
+                </p>
+              </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
               {[...Array(6)].map((_, i) => (
                 <div
                   key={i}
-                  className="h-32 bg-slate-200 rounded-lg animate-pulse"
+                  className="h-28 bg-white rounded-xl shadow-md border border-gray-100 animate-pulse"
                 />
               ))}
             </div>
           )}
-
-          <div className="bg-white rounded-lg border border-slate-200 p-6">
-            <h2 className="text-xl font-semibold mb-4">Management Options</h2>
-            <div className="flex gap-4 flex-wrap">
-              <button
-                onClick={() => router.push('/dashboard/admin/users')}
-                className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-              >
-                Manage All Users & Permissions
-              </button>
-              <button
-                onClick={loadStats}
-                className="px-6 py-2 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition"
-              >
-                Refresh Statistics
-              </button>
-            </div>
-          </div>
-        </div>
-      </main>
-    </>
+        </main>
+      </div>
+    </div>
   )
 }
 
-function StatCard({
-  label,
-  value,
+interface DashboardCardProps {
+  icon: React.ComponentType<{ className?: string }>
+  title: string
+  description: string
+  color: 'red' | 'orange' | 'purple' | 'blue'
+  action: () => void
+}
+
+function DashboardCard({
+  icon: Icon,
+  title,
+  description,
   color,
-}: {
-  label: string
-  value: number
-  color: string
-}) {
+  action,
+}: DashboardCardProps) {
+  const colorClasses = {
+    red: 'bg-red-100 text-red-600 group-hover:bg-red-600',
+    orange: 'bg-orange-100 text-orange-600 group-hover:bg-orange-600',
+    purple: 'bg-purple-100 text-purple-600 group-hover:bg-purple-600',
+    blue: 'bg-blue-100 text-blue-600 group-hover:bg-blue-600',
+  }
+
+  const borderClasses = {
+    red: 'hover:border-red-500',
+    orange: 'hover:border-orange-500',
+    purple: 'hover:border-purple-500',
+    blue: 'hover:border-blue-500',
+  }
+
   return (
-    <div className={`${color} rounded-lg border border-slate-200 p-6`}>
-      <p className="text-slate-600 text-sm font-medium mb-2">{label}</p>
-      <p className="text-4xl font-bold text-slate-900">{value}</p>
-    </div>
+    <button
+      onClick={action}
+      className={`group w-full text-left bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border-2 border-transparent ${borderClasses[color]} hover:scale-105`}
+    >
+      <div className="flex items-start gap-4">
+        <div
+          className={`w-14 h-14 rounded-lg flex items-center justify-center transition-all ${colorClasses[color]}`}
+        >
+          <Icon className="w-7 h-7 group-hover:text-white transition-colors" />
+        </div>
+        <div className="flex-1">
+          <h3 className="text-gray-900 mb-1">{title}</h3>
+          <p className="text-gray-600">{description}</p>
+        </div>
+      </div>
+    </button>
   )
 }

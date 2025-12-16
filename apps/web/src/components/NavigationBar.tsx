@@ -48,6 +48,12 @@ export function NavigationBar() {
             {user.role === 'ADMIN' && (
               <>
                 <Link
+                  href="/profile?role=ADMIN"
+                  className="text-slate-600 hover:text-slate-900 text-sm font-medium"
+                >
+                  Profile
+                </Link>
+                <Link
                   href="/dashboard/admin"
                   className="text-slate-600 hover:text-slate-900 text-sm font-medium"
                 >
@@ -61,13 +67,6 @@ export function NavigationBar() {
                 </Link>
               </>
             )}
-
-            <Link
-              href={`/profile${user.role === 'DOCTOR' ? '?role=DOCTOR' : user.role === 'PATIENT' ? '?role=PATIENT' : ''}`}
-              className="text-slate-600 hover:text-slate-900 text-sm font-medium"
-            >
-              Profile
-            </Link>
           </div>
         </div>
 
