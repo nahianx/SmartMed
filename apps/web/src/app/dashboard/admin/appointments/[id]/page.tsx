@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { Badge, Button } from '@smartmed/ui'
 import { useAuthContext } from '../../../../../context/AuthContext'
+import { ConfirmDialog } from '../../../../../components/ConfirmDialog'
 import {
   appointmentService,
   Appointment,
@@ -41,6 +42,8 @@ export default function AdminAppointmentDetailPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [updating, setUpdating] = useState(false)
+  const [success, setSuccess] = useState<string | null>(null)
+  const [pendingStatus, setPendingStatus] = useState<'COMPLETED' | 'NO_SHOW' | null>(null)
 
   useEffect(() => {
     if (!loading) {
@@ -90,15 +93,13 @@ export default function AdminAppointmentDetailPage() {
       setError(null)
       await appointmentService.updateAppointmentStatus(appointment.id, status)
       await loadAppointmentData()
-
-      alert(
-        `Appointment marked as ${status === 'COMPLETED' ? 'Completed' : 'No Show'}`
-      )
+      setSuccess(`Appointment marked as ${status === 'COMPLETED' ? 'Completed' : 'No Show'}`)
     } catch (err) {
       setError(`Failed to update appointment status`)
       console.error(err)
     } finally {
       setUpdating(false)
+      setPendingStatus(null)
     }
   }
 
@@ -173,6 +174,11 @@ export default function AdminAppointmentDetailPage() {
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
               {error}
+            </div>
+          )}
+          {success && (
+            <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6" role="status" aria-live="polite">
+              {success}
             </div>
           )}
 
@@ -296,7 +302,7 @@ export default function AdminAppointmentDetailPage() {
                   </h3>
                   <div className="space-y-3">
                     <button
-                      onClick={() => handleStatusUpdate('COMPLETED')}
+                      onClick={() => setPendingStatus('COMPLETED')}
                       disabled={updating}
                       className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-medium py-3 px-4 rounded-lg transition-colors"
                     >
@@ -305,7 +311,7 @@ export default function AdminAppointmentDetailPage() {
                     </button>
 
                     <button
-                      onClick={() => handleStatusUpdate('NO_SHOW')}
+                      onClick={() => setPendingStatus('NO_SHOW')}
                       disabled={updating}
                       className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white font-medium py-3 px-4 rounded-lg transition-colors"
                     >
@@ -504,6 +510,20 @@ export default function AdminAppointmentDetailPage() {
           </div>
         </main>
       </div>
+
+      <ConfirmDialog
+        isOpen={pendingStatus !== null}
+        title="Confirm status change"
+        message={
+          pendingStatus === 'COMPLETED'
+            ? 'Mark this appointment as completed?'
+            : 'Mark this appointment as no-show?'
+        }
+        confirmText={pendingStatus === 'COMPLETED' ? 'Mark Completed' : 'Mark No-show'}
+        isDangerous={pendingStatus === 'NO_SHOW'}
+        onConfirm={() => pendingStatus && handleStatusUpdate(pendingStatus)}
+        onCancel={() => setPendingStatus(null)}
+      />
     </div>
   )
 }

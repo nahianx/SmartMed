@@ -27,6 +27,16 @@ export interface DashboardStats {
   inactiveUsers: number
 }
 
+export interface AuditLogEntry {
+  id: string
+  actorId: string
+  actorEmail: string
+  action: string
+  resource: string
+  reason?: string
+  createdAt: string
+}
+
 export const adminService = {
   async getAllUsers(
     page: number = 1,
@@ -77,5 +87,10 @@ export const adminService = {
   async getDashboardStats(): Promise<DashboardStats> {
     const response = await apiClient.get('/admin/stats')
     return response.data
+  },
+
+  async getAuditLog(): Promise<AuditLogEntry[]> {
+    const response = await apiClient.get('/admin/audit')
+    return response.data?.items ?? []
   },
 }

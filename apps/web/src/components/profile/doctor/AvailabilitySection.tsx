@@ -38,6 +38,14 @@ interface DaySchedule {
   slots: TimeSlot[];
 }
 
+function rangesOverlap(a: TimeSlot, b: TimeSlot) {
+  const startA = a.startTime;
+  const endA = a.endTime;
+  const startB = b.startTime;
+  const endB = b.endTime;
+  return startA < endB && startB < endA;
+}
+
 function buildScheduleFromAvailability(availability: DoctorAvailability[]): DaySchedule[] {
   return daysOfWeek.map(day => {
     const daySlots = availability
@@ -194,6 +202,24 @@ export function AvailabilitySection({ onUnsavedChanges }: AvailabilitySectionPro
   };
   
   const handleSave = async () => {
+    // Prevent overlapping slots for the same day
+    const hasOverlap = schedule.some((day) => {
+      const slots = day.slots;
+      for (let i = 0; i < slots.length; i++) {
+        for (let j = i + 1; j < slots.length; j++) {
+          if (rangesOverlap(slots[i], slots[j])) {
+            return true;
+          }
+        }
+      }
+      return false;
+    });
+
+    if (hasOverlap) {
+      toast.error("Time slots overlap on the same day. Adjust start/end times.");
+      return;
+    }
+
     try {
       // Convert schedule to the format expected by the API
       const availabilityData = schedule.flatMap(day => 

@@ -94,53 +94,39 @@ export function TimelineItem({ activity, onOpenDetails }: TimelineItemProps) {
           </div>
 
           <div className="flex gap-2 shrink-0">
-            {activity.type === 'appointment' && (
-              <>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onOpenDetails(activity)
-                  }}
-                >
-                  <Eye className="h-4 w-4 mr-1" />
-                  View
-                </Button>
-              </>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={(e) => {
+                e.stopPropagation()
+                onOpenDetails(activity)
+              }}
+            >
+              <Eye className="h-4 w-4 mr-1" />
+              {activity.type === 'prescription' ? 'View Rx' : activity.type === 'report' ? 'Preview' : 'View'}
+            </Button>
+            {activity.type !== 'appointment' && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation()
+                }}
+              >
+                <FileText className="h-4 w-4 mr-1" />
+                Download
+              </Button>
             )}
-
-            {activity.type === 'prescription' && (
-              <>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onOpenDetails(activity)
-                  }}
-                >
-                  <Eye className="h-4 w-4 mr-1" />
-                  View Rx
-                </Button>
-              </>
-            )}
-
-            {activity.type === 'report' && (
-              <>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onOpenDetails(activity)
-                  }}
-                >
-                  <Eye className="h-4 w-4 mr-1" />
-                  Preview
-                </Button>
-              </>
-            )}
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={(e) => {
+                e.stopPropagation()
+              }}
+            >
+              <MapPin className="h-4 w-4 mr-1" />
+              Share
+            </Button>
           </div>
         </div>
 

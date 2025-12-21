@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type KeyboardEvent } from 'react'
 import { Search, Calendar as CalendarIcon } from 'lucide-react'
 import { Button, Input, Checkbox, Separator, Badge, Popover, PopoverContent, PopoverTrigger } from '@smartmed/ui'
 import { DayPicker } from 'react-day-picker'
@@ -33,6 +33,13 @@ export function FilterRail({ filters, onFiltersChange, lockedRole }: FilterRailP
       ? filters.statuses.filter((s) => s !== status)
       : [...filters.statuses, status]
     updateFilters({ statuses: newStatuses })
+  }
+
+  const handleStatusKeyDown = (status: AppointmentStatus, e: KeyboardEvent<HTMLSpanElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      toggleStatus(status)
+    }
   }
 
   const setQuickDateRange = (days: number | null) => {
@@ -82,50 +89,52 @@ export function FilterRail({ filters, onFiltersChange, lockedRole }: FilterRailP
                 variant="outline"
                 size="sm"
                 className="w-full justify-start"
+                aria-expanded={datePickerOpen === 'from'}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {filters.dateRange.from ? format(filters.dateRange.from, 'MMM dd, yyyy') : 'From date'}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 z-50 shadow-lg border bg-white" align="start" side="bottom">
-          <div className="p-3">
-            <DayPicker
-              mode="single"
-              selected={filters.dateRange.from || undefined}
-              onSelect={(date: Date | undefined) => {
-                updateFilters({ dateRange: { ...filters.dateRange, from: date || null } })
-                setDatePickerOpen(null)
-              }}
-            />
-          </div>
-        </PopoverContent>
-      </Popover>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0 z-50 shadow-lg border bg-white" align="start" side="bottom">
+              <div className="p-3">
+                <DayPicker
+                  mode="single"
+                  selected={filters.dateRange.from || undefined}
+                  onSelect={(date: Date | undefined) => {
+                    updateFilters({ dateRange: { ...filters.dateRange, from: date || null } })
+                    setDatePickerOpen(null)
+                  }}
+                />
+              </div>
+            </PopoverContent>
+          </Popover>
 
-      <Popover open={datePickerOpen === 'to'} onOpenChange={(open) => setDatePickerOpen(open ? 'to' : null)}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full justify-start"
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {filters.dateRange.to ? format(filters.dateRange.to, 'MMM dd, yyyy') : 'To date'}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 z-50 shadow-lg border bg-white" align="start" side="bottom">
-          <div className="p-3">
-            <DayPicker
-              mode="single"
-              selected={filters.dateRange.to || undefined}
-              onSelect={(date: Date | undefined) => {
-                updateFilters({ dateRange: { ...filters.dateRange, to: date || null } })
-                setDatePickerOpen(null)
-              }}
-            />
-          </div>
-        </PopoverContent>
-      </Popover>
-    </div>
+          <Popover open={datePickerOpen === 'to'} onOpenChange={(open) => setDatePickerOpen(open ? 'to' : null)}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start"
+                aria-expanded={datePickerOpen === 'to'}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {filters.dateRange.to ? format(filters.dateRange.to, 'MMM dd, yyyy') : 'To date'}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0 z-50 shadow-lg border bg-white" align="start" side="bottom">
+              <div className="p-3">
+                <DayPicker
+                  mode="single"
+                  selected={filters.dateRange.to || undefined}
+                  onSelect={(date: Date | undefined) => {
+                    updateFilters({ dateRange: { ...filters.dateRange, to: date || null } })
+                    setDatePickerOpen(null)
+                  }}
+                />
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
       </div>
 
       <Separator />
@@ -168,22 +177,31 @@ export function FilterRail({ filters, onFiltersChange, lockedRole }: FilterRailP
         <div className="flex flex-wrap gap-2">
           <Badge
             variant={filters.statuses.includes('completed') ? 'default' : 'outline'}
-            className="cursor-pointer"
+            className="cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500"
             onClick={() => toggleStatus('completed')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => handleStatusKeyDown('completed', e)}
           >
             Completed
           </Badge>
           <Badge
             variant={filters.statuses.includes('cancelled') ? 'default' : 'outline'}
-            className="cursor-pointer"
+            className="cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500"
             onClick={() => toggleStatus('cancelled')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => handleStatusKeyDown('cancelled', e)}
           >
             Cancelled
           </Badge>
           <Badge
             variant={filters.statuses.includes('no-show') ? 'default' : 'outline'}
-            className="cursor-pointer"
+            className="cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500"
             onClick={() => toggleStatus('no-show')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => handleStatusKeyDown('no-show', e)}
           >
             No-show
           </Badge>

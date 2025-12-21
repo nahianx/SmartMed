@@ -95,9 +95,11 @@ export default function PatientRegisterPage() {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
+              aria-invalid={!!nameError}
+              aria-describedby={nameError ? "fullName-error" : undefined}
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            {nameError && <p className="mt-1 text-xs text-red-600">{nameError}</p>}
+            {nameError && <p id="fullName-error" role="alert" className="mt-1 text-xs text-red-600">{nameError}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="email">
@@ -109,21 +111,25 @@ export default function PatientRegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              aria-invalid={!!emailError}
+              aria-describedby={emailError ? "email-error" : undefined}
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            {emailError && <p className="mt-1 text-xs text-red-600">{emailError}</p>}
+            {emailError && <p id="email-error" role="alert" className="mt-1 text-xs text-red-600">{emailError}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="password">
               Password
             </label>
-            {passwordError && <p className="mb-1 text-xs text-red-600">{passwordError}</p>}
+            {passwordError && <p id="password-error" role="alert" className="mb-1 text-xs text-red-600">{passwordError}</p>}
             <input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              aria-invalid={!!passwordError}
+              aria-describedby={passwordError ? "password-error" : undefined}
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <p className="mt-1 text-xs text-slate-600">
@@ -140,6 +146,8 @@ export default function PatientRegisterPage() {
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               required
+              aria-invalid={!!error}
+              aria-describedby={error ? "form-error" : undefined}
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -154,7 +162,11 @@ export default function PatientRegisterPage() {
               I agree to the <span className="text-blue-600">terms and conditions</span>.
             </span>
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && (
+            <p id="form-error" role="alert" aria-live="assertive" className="text-sm text-red-600">
+              {error}
+            </p>
+          )}
           <button
             type="submit"
             disabled={loading}

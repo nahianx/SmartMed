@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AlertTriangle, User, Settings, Calendar, Heart, Clock3 } from 'lucide-react';
 import { Button, Card, Badge, Alert, AlertDescription } from '@smartmed/ui';
@@ -10,6 +10,7 @@ import { AvailabilitySection } from '@/components/profile/doctor/AvailabilitySec
 import { PreferredDoctorsSection } from '@/components/profile/patient/PreferredDoctorsSection';
 import { TimelineContainer } from '@/components/timeline/timeline_container';
 import { useAuthContext } from '@/context/AuthContext';
+import { useProfile } from '@/hooks/useProfile';
 
 const tabs = [
   { id: 'profile', label: 'Profile', icon: User, forRole: 'all' },
@@ -23,6 +24,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuthContext();
+  const { data: profile } = useProfile();
   const roleParam = (searchParams.get('role') || '').toUpperCase();
   const userIdFromUrl = searchParams.get('userId') || undefined;
 
@@ -36,6 +38,17 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('profile');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [hasUnsavedChanges]);
 
   // Filter tabs based on user role
   const availableTabs = tabs.filter(tab => {
@@ -98,6 +111,22 @@ export default function ProfilePage() {
     }
   };
 
+  const completeness = useMemo(() => {
+    if (!profile) return 0;
+    const fields = [
+      profile.fullName,
+      profile.phoneNumber,
+      profile.dateOfBirth,
+      profile.addressLine1,
+      profile.city,
+      profile.country,
+    ];
+    const filled = fields.filter(Boolean).length;
+    const doctorExtras = isDoctor ? [profile.gender, profile.profilePhotoUrl] : [];
+    const total = fields.length + doctorExtras.length || 1;
+    return Math.round(((filled + doctorExtras.filter(Boolean).length) / total) * 100);
+  }, [profile, isDoctor]);
+
   if (!resolvedUserId && !user) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -114,13 +143,18 @@ export default function ProfilePage() {
       {/* Header */}
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-3">
-              <h1 className="text-xl font-semibold">Profile Settings</h1>
-              <Badge variant="outline" className="text-xs">
-                {isDoctor ? 'Healthcare Provider' : isPatient ? 'Patient' : 'User'}
-              </Badge>
-            </div>
+            <div className="flex items-center justify-between h-16">
+              <div className="flex items-center gap-3">
+                <h1 className="text-xl font-semibold">Profile Settings</h1>
+                <Badge variant="outline" className="text-xs">
+                  {isDoctor ? 'Healthcare Provider' : isPatient ? 'Patient' : 'User'}
+                </Badge>
+                {profile && (
+                  <Badge variant="secondary" className="text-xs">
+                    {completeness}% complete
+                  </Badge>
+                )}
+              </div>
             <Button 
               variant="outline" 
               onClick={() => {
