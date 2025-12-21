@@ -1,4 +1,4 @@
-import { prisma, UserRole } from '@smartmed/database'
+import { prisma, UserRole, Prisma } from '@smartmed/database'
 
 export async function getOrCreatePatient(userId: string) {
   const existing = await prisma.patient.findUnique({ where: { userId } })
@@ -32,7 +32,7 @@ export async function getOrCreatePatient(userId: string) {
       address: user.addressLine1 || 'Not provided',
       emergencyContact: null,
       bloodGroup: null,
-      allergies: null,
+      allergies: Prisma.DbNull,
       medicalHistory: null,
     },
   })
