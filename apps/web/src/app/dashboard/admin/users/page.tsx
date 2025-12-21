@@ -22,6 +22,7 @@ export default function UserManagementPage() {
   const { user, loading } = useAuthContext()
   const router = useRouter()
   const [users, setUsers] = useState<User[]>([])
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [stats, setStats] = useState({
     total: 0,
     page: 1,
@@ -285,9 +286,25 @@ export default function UserManagementPage() {
               <h3 className="text-lg font-semibold text-gray-900">
                 All Users ({stats.total})
               </h3>
-              <span className="text-sm text-gray-600 font-medium">
-                Page {stats.page} of {stats.totalPages}
-              </span>
+              <div className="flex items-center gap-3 flex-wrap">
+                <button
+                  onClick={() => bulkUpdate('activate')}
+                  className="px-3 py-2 bg-green-600 text-white rounded-lg text-sm disabled:opacity-50"
+                  disabled={selectedIds.size === 0}
+                >
+                  Activate selected
+                </button>
+                <button
+                  onClick={() => bulkUpdate('deactivate')}
+                  className="px-3 py-2 bg-red-600 text-white rounded-lg text-sm disabled:opacity-50"
+                  disabled={selectedIds.size === 0}
+                >
+                  Deactivate selected
+                </button>
+                <span className="text-sm text-gray-600 font-medium">
+                  Page {stats.page} of {stats.totalPages}
+                </span>
+              </div>
             </div>
 
             {pageLoading ? (
@@ -305,6 +322,14 @@ export default function UserManagementPage() {
                 <table className="w-full">
                   <thead className="bg-slate-50 border-b border-slate-200">
                     <tr>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-slate-900">
+                        <input
+                          type="checkbox"
+                          aria-label="Select all"
+                          checked={users.length > 0 && selectedIds.size === users.length}
+                          onChange={(e) => selectAll(e.target.checked)}
+                        />
+                      </th>
                       <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">
                         Name
                       </th>
@@ -331,6 +356,14 @@ export default function UserManagementPage() {
                         key={u.id}
                         className="border-b border-slate-200 hover:bg-slate-50"
                       >
+                        <td className="px-4 py-4">
+                          <input
+                            type="checkbox"
+                            aria-label={`Select ${u.fullName || u.email}`}
+                            checked={selectedIds.has(u.id)}
+                            onChange={() => toggleSelect(u.id)}
+                          />
+                        </td>
                         <td className="px-6 py-4 text-sm text-slate-900 font-medium">
                           {u.fullName || 'N/A'}
                         </td>
@@ -528,6 +561,39 @@ function UserDetailsModal({
         e.preventDefault()
         first.focus()
       }
+    }
+  }
+
+  const toggleSelect = (id: string) => {
+    const next = new Set(selectedIds)
+    if (next.has(id)) next.delete(id)
+    else next.add(id)
+    setSelectedIds(next)
+  }
+
+  const selectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(new Set(users.map((u) => u.id)))
+    } else {
+      setSelectedIds(new Set())
+    }
+  }
+
+  const bulkUpdate = async (action: 'activate' | 'deactivate') => {
+    if (selectedIds.size === 0) return
+    try {
+      setError(null)
+      setSuccess(null)
+      for (const id of selectedIds) {
+        if (action === 'activate') await adminService.activateUser(id)
+        else await adminService.deactivateUser(id)
+      }
+      setSuccess(`Selected users ${action}d`)
+      setSelectedIds(new Set())
+      loadUsers(stats.page, searchTerm, roleFilter)
+      setTimeout(() => setSuccess(null), 3000)
+    } catch (err) {
+      setError(`Bulk ${action} failed`)
     }
   }
 

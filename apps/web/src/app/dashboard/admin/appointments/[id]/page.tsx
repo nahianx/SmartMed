@@ -44,6 +44,8 @@ export default function AdminAppointmentDetailPage() {
   const [updating, setUpdating] = useState(false)
   const [success, setSuccess] = useState<string | null>(null)
   const [pendingStatus, setPendingStatus] = useState<'COMPLETED' | 'NO_SHOW' | null>(null)
+  const [notesDraft, setNotesDraft] = useState('')
+  const [savingNotes, setSavingNotes] = useState(false)
 
   useEffect(() => {
     if (!loading) {
@@ -101,6 +103,21 @@ export default function AdminAppointmentDetailPage() {
       setUpdating(false)
       setPendingStatus(null)
       setPendingReason('')
+    }
+  }
+
+  const handleSaveNotes = async () => {
+    if (!appointment) return
+    try {
+      setSavingNotes(true)
+      await appointmentService.updateAppointmentNotes(appointment.id, notesDraft)
+      await loadAppointmentData()
+      setNotesDraft('')
+      setSuccess('Notes updated')
+    } catch (err) {
+      setError('Failed to save notes')
+    } finally {
+      setSavingNotes(false)
     }
   }
 
@@ -373,15 +390,31 @@ export default function AdminAppointmentDetailPage() {
                     </p>
                   </div>
                   {appointment.notes && (
-                    <div className="col-span-2">
-                      <label className="text-xs font-medium text-slate-500 uppercase">
-                        Notes
-                      </label>
-                      <p className="text-sm text-slate-900">
-                        {appointment.notes}
-                      </p>
-                    </div>
-                  )}
+                <div className="col-span-2">
+                  <label className="text-xs font-medium text-slate-500 uppercase">
+                    Notes
+                  </label>
+                  <p className="text-sm text-slate-900">
+                    {appointment.notes || '—'}
+                  </p>
+                  <div className="mt-2 space-y-2">
+                    <textarea
+                      value={notesDraft}
+                      onChange={(e) => setNotesDraft(e.target.value)}
+                      placeholder="Add or update appointment notes"
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={3}
+                    />
+                    <button
+                      onClick={handleSaveNotes}
+                      disabled={savingNotes || !notesDraft.trim()}
+                      className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium disabled:opacity-50"
+                    >
+                      {savingNotes ? 'Saving...' : 'Save Notes'}
+                    </button>
+                  </div>
+                </div>
+              )}
                 </div>
               </div>
 

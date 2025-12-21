@@ -192,6 +192,11 @@ class AppointmentService {
         new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
     )
   }
+
+  async updateAppointmentNotes(id: string, notes: string): Promise<Appointment> {
+    const response = await apiClient.put(`/appointments/${id}/notes`, { notes })
+    return response.data.appointment
+  }
 }
 
 export const appointmentService = new AppointmentService()
