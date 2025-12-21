@@ -212,6 +212,18 @@ export const doctorApi = {
     return response.data.slots || []
   },
 
+  validateAvailability: async (availability: Omit<DoctorAvailability, 'id' | 'doctorId' | 'createdAt' | 'updatedAt'>[]) => {
+    try {
+      const response: AxiosResponse<{ valid: boolean; conflicts?: any[] }> = await apiClient.post('/doctor/availability/validate', {
+        slots: availability
+      })
+      return response.data
+    } catch (error: any) {
+      if (error?.response?.status === 404) return { valid: true }
+      throw error
+    }
+  },
+
   // Update doctor availability
   updateAvailability: async (availability: Omit<DoctorAvailability, 'id' | 'doctorId' | 'createdAt' | 'updatedAt'>[]): Promise<DoctorAvailability[]> => {
     const response: AxiosResponse<AvailabilityResponse> = await apiClient.put('/doctor/availability', {

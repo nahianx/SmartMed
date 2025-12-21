@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { X, Search, Calendar, Clock, User, Stethoscope } from 'lucide-react'
 import { appointmentService } from '../services/appointmentService'
 
@@ -28,6 +28,8 @@ export default function CreateAppointmentModal({
   const [notes, setNotes] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const dialogRef = useRef<HTMLDivElement | null>(null)
+  const lastFocused = useRef<HTMLElement | null>(null)
 
   const searchPatients = useCallback(async () => {
     try {
@@ -46,6 +48,35 @@ export default function CreateAppointmentModal({
       console.error('Failed to search doctors:', err)
     }
   }, [doctorQuery])
+
+  useEffect(() => {
+    if (isOpen) {
+      lastFocused.current = document.activeElement as HTMLElement
+      const first = dialogRef.current?.querySelector<HTMLElement>('input, button, textarea, select')
+      first?.focus()
+    } else {
+      lastFocused.current?.focus()
+    }
+  }, [isOpen])
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== 'Tab') return
+    const focusable = dialogRef.current?.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+    if (!focusable || focusable.length === 0) return
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+    if (e.shiftKey) {
+      if (document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      }
+    } else {
+      if (document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+  }
 
   useEffect(() => {
     if (patientQuery.length >= 1) {
@@ -81,6 +112,18 @@ export default function CreateAppointmentModal({
       setIsSubmitting(true)
       // Convert local datetime-local value to ISO 8601 string (with timezone) to satisfy backend validation
       const isoDate = new Date(dateTime).toISOString()
+
+      const validation = await appointmentService.validateAppointment({
+        patientId: selectedPatient.id,
+        doctorId: selectedDoctor.id,
+        dateTime: isoDate,
+        duration,
+      })
+      if (validation && validation.valid === false) {
+        setError('Selected time conflicts with existing availability.')
+        setIsSubmitting(false)
+        return
+      }
 
       await appointmentService.createAppointment({
         patientId: selectedPatient.id,
@@ -131,7 +174,13 @@ export default function CreateAppointmentModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        onKeyDown={handleKeyDown}
+        className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+      >
         {/* Header */}
         <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-semibold text-gray-900">

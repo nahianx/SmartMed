@@ -3,6 +3,8 @@ import { format, isSameDay } from 'date-fns'
 import type { TimelineActivity, FilterState } from '@/types/timeline'
 import { TimelineItem } from './timeline_item'
 import { Separator, Skeleton } from '@smartmed/ui'
+import { FixedSizeList as VirtualList } from 'react-window'
+import type { CSSProperties } from 'react'
 
 interface TimelineProps {
   activities: TimelineActivity[]
@@ -82,6 +84,15 @@ export function Timeline({ activities, filters, onOpenDetails, isLoading = false
     return groups
   }, [filteredActivities])
 
+  const virtualRows = useMemo(() => {
+    const rows: Array<{ type: 'date'; date: Date } | { type: 'item'; activity: TimelineActivity }> = []
+    groupedActivities.forEach((group) => {
+      rows.push({ type: 'date', date: group.date })
+      group.activities.forEach((activity) => rows.push({ type: 'item', activity }))
+    })
+    return rows
+  }, [groupedActivities])
+
   if (isLoading) {
     return (
       <div className="space-y-6 p-6">
@@ -129,7 +140,42 @@ export function Timeline({ activities, filters, onOpenDetails, isLoading = false
     )
   }
 
-  return (
+  const renderRow = ({ index, style }: { index: number; style: CSSProperties }) => {
+    const row = virtualRows[index]
+    if (row.type === 'date') {
+      return (
+        <div style={style} className="px-2 py-3 flex items-center gap-4">
+          <div className="shrink-0 rounded-lg bg-gray-100 px-3 py-1">
+            <span className="text-sm font-medium">
+              {format(row.date, 'EEEE, MMMM dd, yyyy')}
+            </span>
+          </div>
+          <Separator className="flex-1" />
+        </div>
+      )
+    }
+    return (
+      <div style={style} className="px-2 pb-3">
+        <TimelineItem activity={row.activity} onOpenDetails={onOpenDetails} />
+      </div>
+    )
+  }
+
+  const shouldVirtualize = typeof window !== 'undefined' && virtualRows.length > 40
+
+  return shouldVirtualize ? (
+    <div className="p-2">
+      <VirtualList
+        height={640}
+        itemCount={virtualRows.length}
+        itemSize={110}
+        width="100%"
+        className="space-y-0"
+      >
+        {renderRow}
+      </VirtualList>
+    </div>
+  ) : (
     <div className="space-y-6 p-6">
       {groupedActivities.map((group, groupIndex) => (
         <div key={groupIndex} className="space-y-4">

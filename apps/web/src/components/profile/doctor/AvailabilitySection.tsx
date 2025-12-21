@@ -15,6 +15,7 @@ import {
 import { toast } from "sonner";
 import { useDoctorAvailability, useUpdateAvailability, useDeleteAvailabilitySlot } from "@/hooks/useProfile";
 import { DoctorAvailability } from "@smartmed/types";
+import { doctorApi } from "@/services/api";
 
 interface AvailabilitySectionProps {
   onUnsavedChanges: (hasChanges: boolean) => void;
@@ -233,7 +234,14 @@ export function AvailabilitySection({ onUnsavedChanges }: AvailabilitySectionPro
           isAvailable: slot.isAvailable,
         }))
       );
-      
+
+      // Server-side validation (graceful fallback if endpoint missing)
+      const validation = await doctorApi.validateAvailability(availabilityData);
+      if (validation && validation.valid === false) {
+        toast.error("Server validation failed: availability conflicts detected.");
+        return;
+      }
+
       await updateAvailabilityMutation.mutateAsync(availabilityData);
       setHasChanges(false);
     } catch (error) {

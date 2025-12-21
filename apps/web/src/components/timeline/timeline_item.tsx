@@ -9,6 +9,8 @@ interface TimelineItemProps {
 }
 
 export function TimelineItem({ activity, onOpenDetails }: TimelineItemProps) {
+  const apiBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api').replace(/\/$/, '')
+
   const getIcon = () => {
     switch (activity.type) {
       case 'appointment':
@@ -111,6 +113,10 @@ export function TimelineItem({ activity, onOpenDetails }: TimelineItemProps) {
                 variant="ghost"
                 onClick={(e) => {
                   e.stopPropagation()
+                  if (activity.type === 'report' && activity.reportId && typeof window !== 'undefined') {
+                    const url = `${apiBase}/reports/${activity.reportId}/download`
+                    window.open(url, '_blank')
+                  }
                 }}
               >
                 <FileText className="h-4 w-4 mr-1" />
@@ -122,6 +128,16 @@ export function TimelineItem({ activity, onOpenDetails }: TimelineItemProps) {
               variant="ghost"
               onClick={(e) => {
                 e.stopPropagation()
+                if (typeof window !== 'undefined') {
+                  const shareUrl = `${window.location.origin}/timeline?id=${activity.id}`
+                  if (navigator.share) {
+                    navigator.share({ title: activity.title, text: activity.subtitle, url: shareUrl }).catch(() => {})
+                  } else if (navigator.clipboard) {
+                    navigator.clipboard.writeText(shareUrl).catch(() => {})
+                  } else {
+                    window.open(shareUrl, '_blank')
+                  }
+                }
               }}
             >
               <MapPin className="h-4 w-4 mr-1" />

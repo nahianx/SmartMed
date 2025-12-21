@@ -1,12 +1,13 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { Search, MapPin, Star, SlidersHorizontal, Save } from "lucide-react"
+import { Search, MapPin, Star, SlidersHorizontal, Save, Calendar, Clock, X } from "lucide-react"
 import { Badge, Button, Card, Input, Skeleton } from "@smartmed/ui"
 import { useRouter } from "next/navigation"
 import { useAuthContext } from "../../../../context/AuthContext"
 import { useDoctorSearch, useSpecializations } from "../../../../hooks/useProfile"
 import type { Doctor } from "@smartmed/types"
+import { appointmentService } from "../../../../services/appointmentService"
 
 interface Preset {
   name: string
@@ -21,6 +22,12 @@ export default function DoctorFinderPage() {
   const [specialization, setSpecialization] = useState<string>("")
   const [debouncedQuery, setDebouncedQuery] = useState("")
   const [presets, setPresets] = useState<Preset[]>([])
+  const [bookingDoctor, setBookingDoctor] = useState<Doctor | null>(null)
+  const [bookDateTime, setBookDateTime] = useState("")
+  const [bookDuration, setBookDuration] = useState(30)
+  const [bookReason, setBookReason] = useState("")
+  const [bookError, setBookError] = useState<string | null>(null)
+  const [bookSubmitting, setBookSubmitting] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem("doctor-search-presets")
@@ -57,6 +64,44 @@ export default function DoctorFinderPage() {
   }
 
   const filtered = useMemo(() => doctors, [doctors])
+
+  const handleBook = async () => {
+    if (!bookingDoctor || !bookDateTime || !bookReason.trim()) {
+      setBookError("Select a time and add a reason to book.")
+      return
+    }
+    try {
+      setBookSubmitting(true)
+      setBookError(null)
+      const isoDate = new Date(bookDateTime).toISOString()
+      const validation = await appointmentService.validateAppointment({
+        patientId: user.id,
+        doctorId: bookingDoctor.id,
+        dateTime: isoDate,
+        duration: bookDuration,
+      })
+      if (validation && validation.valid === false) {
+        setBookError("Selected time conflicts with availability.")
+        setBookSubmitting(false)
+        return
+      }
+      await appointmentService.createAppointment({
+        patientId: user.id,
+        doctorId: bookingDoctor.id,
+        dateTime: isoDate,
+        duration: bookDuration,
+        reason: bookReason.trim(),
+        notes: undefined,
+      })
+      setBookingDoctor(null)
+      setBookDateTime("")
+      setBookReason("")
+    } catch (err: any) {
+      setBookError(err?.response?.data?.error || "Booking failed. Please try again.")
+    } finally {
+      setBookSubmitting(false)
+    }
+  }
 
   if (loading || !user) {
     return (
@@ -156,7 +201,12 @@ export default function DoctorFinderPage() {
                       <h3 className="font-semibold">Dr. {doctor.firstName} {doctor.lastName}</h3>
                       <p className="text-sm text-slate-600">{doctor.specialization}</p>
                     </div>
-                    <Badge variant="outline">{doctor.experience ? `${doctor.experience}+ yrs` : 'Experience'}</Badge>
+                    <div className="flex items-center gap-2">
+                      {typeof (doctor as any).relevanceScore === 'number' && (
+                        <Badge variant="secondary">{Math.round((doctor as any).relevanceScore * 100) / 100} score</Badge>
+                      )}
+                      <Badge variant="outline">{doctor.experience ? `${doctor.experience}+ yrs` : 'Experience'}</Badge>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-slate-600">
                     <MapPin className="h-4 w-4" />
@@ -173,7 +223,7 @@ export default function DoctorFinderPage() {
                     <Button size="sm" onClick={() => router.push(`/profile?userId=${doctor.userId || doctor.id}&role=DOCTOR`)}>
                       View Profile
                     </Button>
-                    <Button size="sm" variant="outline">
+                    <Button size="sm" variant="outline" onClick={() => setBookingDoctor(doctor)}>
                       Book
                     </Button>
                   </div>
@@ -183,6 +233,66 @@ export default function DoctorFinderPage() {
           )}
         </div>
       </div>
+
+      {bookingDoctor && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-slate-500">Booking</p>
+                <h3 className="text-lg font-semibold">Dr. {bookingDoctor.firstName} {bookingDoctor.lastName}</h3>
+              </div>
+              <button onClick={() => setBookingDoctor(null)} aria-label="Close" className="text-slate-500 hover:text-slate-700">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Date & Time</label>
+                <Input
+                  type="datetime-local"
+                  min={new Date().toISOString().slice(0,16)}
+                  value={bookDateTime}
+                  onChange={(e) => setBookDateTime(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Duration</label>
+                <select
+                  value={bookDuration}
+                  onChange={(e) => setBookDuration(Number(e.target.value))}
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {[15,30,45,60].map((d) => (
+                    <option key={d} value={d}>{d} minutes</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Reason</label>
+              <textarea
+                value={bookReason}
+                onChange={(e) => setBookReason(e.target.value)}
+                rows={3}
+                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Describe your visit reason"
+              />
+            </div>
+            {bookError && (
+              <div className="text-sm text-red-600">{bookError}</div>
+            )}
+            <div className="flex gap-3 pt-2">
+              <Button className="flex-1" onClick={handleBook} disabled={bookSubmitting}>
+                {bookSubmitting ? 'Booking...' : 'Confirm Booking'}
+              </Button>
+              <Button className="flex-1" variant="outline" onClick={() => setBookingDoctor(null)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

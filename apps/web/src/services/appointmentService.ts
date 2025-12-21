@@ -107,10 +107,27 @@ class AppointmentService {
 
   async updateAppointmentStatus(
     id: string,
-    status: 'COMPLETED' | 'NO_SHOW'
+    status: 'COMPLETED' | 'NO_SHOW',
+    reason?: string
   ): Promise<Appointment> {
-    const response = await apiClient.put(`/appointments/${id}`, { status })
+    const response = await apiClient.put(`/appointments/${id}`, { status, reason })
     return response.data.appointment
+  }
+
+  async validateAppointment(data: {
+    patientId: string
+    doctorId: string
+    dateTime: string
+    duration: number
+  }): Promise<{ valid: boolean; conflicts?: any[] }> {
+    try {
+      const response = await apiClient.post('/appointments/validate', data)
+      return response.data
+    } catch (error: any) {
+      // If endpoint missing, allow flow to continue
+      if (error?.response?.status === 404) return { valid: true }
+      throw error
+    }
   }
 
   async getPreviousVisits(patientId: string): Promise<PreviousVisit[]> {

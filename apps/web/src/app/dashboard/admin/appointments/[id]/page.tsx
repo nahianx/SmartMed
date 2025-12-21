@@ -85,13 +85,13 @@ export default function AdminAppointmentDetailPage() {
     }
   }
 
-  const handleStatusUpdate = async (status: 'COMPLETED' | 'NO_SHOW') => {
+  const handleStatusUpdate = async (status: 'COMPLETED' | 'NO_SHOW', reason?: string) => {
     if (!appointment) return
 
     try {
       setUpdating(true)
       setError(null)
-      await appointmentService.updateAppointmentStatus(appointment.id, status)
+      await appointmentService.updateAppointmentStatus(appointment.id, status, reason)
       await loadAppointmentData()
       setSuccess(`Appointment marked as ${status === 'COMPLETED' ? 'Completed' : 'No Show'}`)
     } catch (err) {
@@ -100,6 +100,7 @@ export default function AdminAppointmentDetailPage() {
     } finally {
       setUpdating(false)
       setPendingStatus(null)
+      setPendingReason('')
     }
   }
 
@@ -521,8 +522,13 @@ export default function AdminAppointmentDetailPage() {
         }
         confirmText={pendingStatus === 'COMPLETED' ? 'Mark Completed' : 'Mark No-show'}
         isDangerous={pendingStatus === 'NO_SHOW'}
-        onConfirm={() => pendingStatus && handleStatusUpdate(pendingStatus)}
-        onCancel={() => setPendingStatus(null)}
+        requireReason
+        reasonLabel="Reason (required for audit)"
+        placeholder="Add context for this status change"
+        onConfirm={(reason) => pendingStatus && handleStatusUpdate(pendingStatus, reason)}
+        onCancel={() => {
+          setPendingStatus(null)
+        }}
       />
     </div>
   )

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Badge, Button } from '@smartmed/ui'
 import { useAuthContext } from '../../../../context/AuthContext'
@@ -500,10 +500,46 @@ function UserDetailsModal({
   onRoleChange: (newRole: string) => void
 }) {
   const [newRole, setNewRole] = useState(user.role)
+  const modalRef = React.useRef<HTMLDivElement | null>(null)
+  const lastFocused = React.useRef<HTMLElement | null>(null)
+
+  React.useEffect(() => {
+    lastFocused.current = document.activeElement as HTMLElement
+    const first = modalRef.current?.querySelector<HTMLElement>('button, select')
+    first?.focus()
+    return () => {
+      lastFocused.current?.focus()
+    }
+  }, [])
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== 'Tab') return
+    const focusable = modalRef.current?.querySelectorAll<HTMLElement>('button, [href], select, [tabindex]:not([tabindex="-1"])')
+    if (!focusable || focusable.length === 0) return
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+    if (e.shiftKey) {
+      if (document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      }
+    } else {
+      if (document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-md w-full p-6">
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        onKeyDown={handleKeyDown}
+        className="bg-white rounded-lg max-w-md w-full p-6"
+      >
         <div className="flex justify-between items-start mb-4">
           <h2 className="text-2xl font-bold">User Details</h2>
           <button
