@@ -14,7 +14,6 @@ import { useProfile } from '@/hooks/useProfile';
 
 const tabs = [
   { id: 'profile', label: 'Profile', icon: User, forRole: 'all' },
-  { id: 'timeline', label: 'Timeline', icon: Clock3, forRole: 'all' },
   { id: 'availability', label: 'Availability', icon: Calendar, forRole: 'doctor' },
   { id: 'preferred-doctors', label: 'Preferred Doctors', icon: Heart, forRole: 'patient' },
   { id: 'security', label: 'Security', icon: Settings, forRole: 'all' },
