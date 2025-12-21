@@ -212,3 +212,116 @@ export async function searchDoctors(query: string) {
 
   return doctors
 }
+
+interface DoctorSearchFilters {
+  q?: string
+  specialty?: string
+  clinicId?: string
+  acceptingNew?: boolean
+  availableFrom?: Date
+  availableTo?: Date
+  visitType?: string[]
+  sortBy: 'name' | 'specialization' | 'availability' | 'createdAt'
+  sortOrder: 'asc' | 'desc'
+  limit: number
+  page: number
+}
+
+export async function searchDoctorsAdvanced(filters: DoctorSearchFilters) {
+  const {
+    q,
+    specialty,
+    clinicId,
+    // acceptingNew is reserved for future use when field exists
+    sortBy,
+    sortOrder,
+    limit,
+    page,
+  } = filters
+
+  const where: any = {}
+
+  if (q) {
+    const text = q.trim()
+    where.OR = [
+      { firstName: { contains: text, mode: 'insensitive' } },
+      { lastName: { contains: text, mode: 'insensitive' } },
+      { specialization: { contains: text, mode: 'insensitive' } },
+      {
+        clinic: {
+          name: { contains: text, mode: 'insensitive' },
+        },
+      },
+    ]
+  }
+
+  if (specialty) {
+    where.OR = [
+      ...(where.OR || []),
+      { specialization: { contains: specialty, mode: 'insensitive' } },
+      {
+        specializations: {
+          some: {
+            specialization: {
+              name: { contains: specialty, mode: 'insensitive' },
+            },
+          },
+        },
+      },
+    ]
+  }
+
+  if (clinicId) {
+    where.clinicId = clinicId
+  }
+
+  const orderBy: any[] = []
+  if (sortBy === 'name') {
+    orderBy.push({ firstName: sortOrder }, { lastName: sortOrder })
+  } else if (sortBy === 'specialization') {
+    orderBy.push({ specialization: sortOrder })
+  } else if (sortBy === 'availability') {
+    orderBy.push({ updatedAt: sortOrder })
+  } else if (sortBy === 'createdAt') {
+    orderBy.push({ createdAt: sortOrder })
+  }
+  if (orderBy.length === 0) {
+    orderBy.push({ firstName: 'asc' })
+  }
+
+  const take = Math.min(limit, 100)
+  const skip = Math.max(0, (page - 1) * take)
+
+  const [doctors, totalResults] = await Promise.all([
+    prisma.doctor.findMany({
+      where,
+      orderBy,
+      take,
+      skip,
+      include: {
+        clinic: {
+          select: { id: true, name: true, address: true },
+        },
+        specializations: {
+          include: { specialization: true },
+        },
+      },
+    }),
+    prisma.doctor.count({ where }),
+  ])
+
+  const totalPages = Math.max(1, Math.ceil(totalResults / take) || 1)
+  const currentPage = Math.min(page, totalPages)
+
+  return {
+    doctors,
+    pagination: {
+      currentPage,
+      totalPages,
+      totalResults,
+      limit: take,
+      hasNextPage: currentPage < totalPages,
+      hasPreviousPage: currentPage > 1,
+    },
+  }
+}

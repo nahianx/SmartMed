@@ -33,6 +33,7 @@ export {
   type UserSession,
   type PasswordReset,
   type EmailVerification,
+  type AuditLog,
 } from '@prisma/client'
 
 // SQLite-compatible enum values as constants (SQLite doesn't support native enums)
@@ -94,3 +95,34 @@ export const NotificationType = {
 // eslint-disable-next-line no-redeclare
 export type NotificationType =
   (typeof NotificationType)[keyof typeof NotificationType]
+
+// eslint-disable-next-line no-redeclare
+export const AuditAction = {
+  LOGIN: 'LOGIN',
+  LOGOUT: 'LOGOUT',
+  TOKEN_REFRESH: 'TOKEN_REFRESH',
+  FAILED_LOGIN: 'FAILED_LOGIN',
+  PATIENT_HISTORY_ACCESS: 'PATIENT_HISTORY_ACCESS',
+  DOCTOR_HISTORY_ACCESS: 'DOCTOR_HISTORY_ACCESS',
+  APPOINTMENT_VIEW: 'APPOINTMENT_VIEW',
+  MEDICAL_RECORD_VIEW: 'MEDICAL_RECORD_VIEW',
+  PRESCRIPTION_VIEW: 'PRESCRIPTION_VIEW',
+  PATIENT_CREATED: 'PATIENT_CREATED',
+  PATIENT_UPDATED: 'PATIENT_UPDATED',
+  PATIENT_DELETED: 'PATIENT_DELETED',
+  APPOINTMENT_CREATED: 'APPOINTMENT_CREATED',
+  APPOINTMENT_UPDATED: 'APPOINTMENT_UPDATED',
+  APPOINTMENT_CANCELLED: 'APPOINTMENT_CANCELLED',
+  PRESCRIPTION_CREATED: 'PRESCRIPTION_CREATED',
+  PRESCRIPTION_UPDATED: 'PRESCRIPTION_UPDATED',
+  DOCTOR_SEARCH: 'DOCTOR_SEARCH',
+  APPOINTMENT_SEARCH: 'APPOINTMENT_SEARCH',
+  PATIENT_SEARCH: 'PATIENT_SEARCH',
+  USER_ROLE_CHANGED: 'USER_ROLE_CHANGED',
+  PERMISSION_GRANTED: 'PERMISSION_GRANTED',
+  PERMISSION_REVOKED: 'PERMISSION_REVOKED',
+  UNAUTHORIZED_ACCESS_ATTEMPT: 'UNAUTHORIZED_ACCESS_ATTEMPT',
+  SUSPICIOUS_ACTIVITY: 'SUSPICIOUS_ACTIVITY',
+} as const
+// eslint-disable-next-line no-redeclare
+export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction]

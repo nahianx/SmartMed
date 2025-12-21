@@ -12,6 +12,11 @@ import {
   getPreferredDoctors,
   removePreferredDoctor,
 } from '../services/patient.service'
+import { validateSchema } from '../middleware/validation'
+import { patientHistorySchema } from '../schemas/search.schemas'
+import { getPatientHistory } from '../services/appointment.service'
+import { getOrCreateDoctor } from '../services/doctor.service'
+import { logPatientHistoryAccess } from '../utils/audit'
 
 const router = Router()
 
@@ -154,6 +159,68 @@ router.delete(
         .json({ error: error.message || 'Failed to remove preferred doctor' })
     }
   }
+)
+
+// Patient history with strict RBAC
+router.get(
+  '/:patientId/history',
+  requireAuth,
+  validateSchema({ query: patientHistorySchema }),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { patientId } = req.params
+      const filters = req.query as any
+
+      const patient = await prisma.patient.findUnique({ where: { id: patientId } })
+      if (!patient) {
+        return res.status(404).json({ error: 'Patient not found' })
+      }
+
+      if (!req.user) {
+        return res.status(401).json({ error: 'Unauthorized' })
+      }
+
+      // Patients can view only themselves
+      if (req.user.role === UserRole.PATIENT) {
+        const selfPatient = await prisma.patient.findUnique({
+          where: { userId: req.user.id },
+        })
+        if (!selfPatient || selfPatient.id !== patientId) {
+          return res
+            .status(403)
+            .json({ error: 'Unauthorized access to patient history' })
+        }
+      }
+
+      // Doctors can view only patients they have treated
+      if (req.user.role === UserRole.DOCTOR) {
+        const doctor = await getOrCreateDoctor(req.user.id)
+        const hasAccess = await prisma.appointment.findFirst({
+          where: { patientId, doctorId: doctor.id },
+        })
+        if (!hasAccess) {
+          return res
+            .status(403)
+            .json({ error: 'You have not treated this patient' })
+        }
+      }
+
+      const history = await getPatientHistory(patientId, filters)
+
+      await logPatientHistoryAccess(
+        req.user.id,
+        req.user.role,
+        patientId,
+        req,
+        filters,
+      )
+
+      res.json(history)
+    } catch (error) {
+      console.error('Error fetching patient history', error)
+      res.status(500).json({ error: 'Failed to fetch patient history' })
+    }
+  },
 )
 
 // Get patient by ID - must come AFTER specific routes

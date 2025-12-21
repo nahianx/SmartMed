@@ -10,8 +10,10 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:seed": "ts-node src/seed.ts",
+    "verify:schema": "ts-node scripts/verify-search-schema.ts",
     "lint": "eslint . --ext .ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "pretest": "npm run verify:schema"
   },
   "dependencies": {
     "@prisma/client": "^5.13.0",

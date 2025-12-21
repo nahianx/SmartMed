@@ -8,8 +8,45 @@ import {
   appointmentIdSchema,
   appointmentQuerySchema,
 } from '../schemas/appointment.schemas'
+import { appointmentSearchSchema } from '../schemas/search.schemas'
+import { searchAppointments } from '../services/appointment.service'
+import { logSearchOperation } from '../utils/audit'
 
 const router = Router()
+
+// Advanced appointment search with filters and RBAC
+router.get(
+  '/search',
+  validateSchema({ query: appointmentSearchSchema }),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: 'Unauthorized' })
+      }
+
+      const filters = req.query as any
+      const result = await searchAppointments({
+        ...filters,
+        userId: req.user.id,
+        userRole: req.user.role,
+      })
+
+      await logSearchOperation(
+        req.user.id,
+        req.user.role,
+        'APPOINTMENT_SEARCH',
+        filters,
+        result.pagination.totalResults,
+        req,
+      )
+
+      res.json(result)
+    } catch (error) {
+      console.error('Error searching appointments:', error)
+      res.status(500).json({ error: 'Failed to search appointments' })
+    }
+  },
+)
 
 // Get all appointments for authenticated user
 router.get(
