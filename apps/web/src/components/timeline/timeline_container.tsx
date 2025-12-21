@@ -146,6 +146,13 @@ export function TimelineContainer({
 
   const notifications = notificationsData?.items ?? []
   const unreadCount = notifications.filter((n) => !n.readAt).length
+  const stats = useMemo(() => {
+    const total = activities.length
+    const appointments = activities.filter((a) => a.type === 'appointment').length
+    const prescriptions = activities.filter((a) => a.type === 'prescription').length
+    const reports = activities.filter((a) => a.type === 'report').length
+    return { total, appointments, prescriptions, reports }
+  }, [activities])
 
   const handleFiltersChange = (nextFilters: FilterState) => {
     setFilters(lockRole ? { ...nextFilters, role: resolvedRole } : nextFilters)
@@ -300,6 +307,13 @@ export function TimelineContainer({
             Timeline is pinned to the {lockedRole} profile.
           </span>
         )}
+      </div>
+
+      <div className="flex flex-wrap gap-2 text-xs text-slate-600">
+        <Badge variant="secondary">Total {stats.total}</Badge>
+        <Badge variant="secondary">Appts {stats.appointments}</Badge>
+        <Badge variant="secondary">Rx {stats.prescriptions}</Badge>
+        <Badge variant="secondary">Reports {stats.reports}</Badge>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[280px,1fr]">

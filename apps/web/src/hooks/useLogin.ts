@@ -32,9 +32,9 @@ export function useLogin() {
       
       // Redirect based on role
       if (result.user.role === "DOCTOR") {
-        router.push("/profile?role=DOCTOR")
+        router.push("/dashboard/doctor")
       } else if (result.user.role === "PATIENT") {
-        router.push("/profile?role=PATIENT")
+        router.push("/dashboard/patient")
       } else if (result.user.role === "ADMIN") {
         router.push("/dashboard/admin")
       } else {

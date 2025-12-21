@@ -14,6 +14,7 @@ import {
   Search,
   ShieldCheck,
   ClipboardList,
+  LogOut,
 } from "lucide-react"
 import { Badge, Button } from "@smartmed/ui"
 import { TimelineContainer } from "@/components/timeline/timeline_container"
@@ -32,7 +33,7 @@ interface PatientDashboardData {
 }
 
 export default function PatientDashboardPage() {
-  const { user, loading } = useAuthContext()
+  const { user, loading, logout } = useAuthContext()
   const router = useRouter()
   const [data, setData] = useState<PatientDashboardData | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -110,6 +111,15 @@ export default function PatientDashboardPage() {
             >
               <Sparkles className={`h-4 w-4 ${refreshing ? "animate-pulse" : ""}`} />
               {refreshing ? "Refreshing..." : "Refresh data"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => logout()}
+              className="inline-flex items-center gap-2"
+            >
+              <LogOut className="h-4 w-4" />
+              Logout
             </Button>
           </div>
         </div>

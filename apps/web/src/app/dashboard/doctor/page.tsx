@@ -16,13 +16,14 @@ import {
   UserRound,
   Clock,
   ArrowUpRight,
+  LogOut,
 } from 'lucide-react'
 import { useAuthContext } from '../../../context/AuthContext'
 import { apiClient } from '../../../services/apiClient'
 import { TimelineContainer } from '@/components/timeline/timeline_container'
 
 export default function DoctorDashboardPage() {
-  const { user, loading } = useAuthContext()
+  const { user, loading, logout } = useAuthContext()
   const router = useRouter()
   const [data, setData] = useState<any | null>(null)
   const [refreshing, setRefreshing] = useState(false)
@@ -125,6 +126,14 @@ export default function DoctorDashboardPage() {
                 className={`h-4 w-4 ${refreshing ? 'animate-pulse' : ''}`}
               />
               {refreshing ? 'Refreshing...' : 'Refresh data'}
+            </button>
+            <button
+              type="button"
+              onClick={() => logout()}
+              className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-100"
+            >
+              <LogOut className="h-4 w-4" />
+              Logout
             </button>
           </div>
         </div>
