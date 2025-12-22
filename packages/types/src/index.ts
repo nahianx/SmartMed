@@ -63,6 +63,20 @@ export interface Doctor {
   createdAt: Date
   updatedAt: Date
   clinicId?: string
+  timezone?: string
+  availabilityStatus?: DoctorAvailabilityStatus
+  isAvailable?: boolean
+  currentPatientId?: string | null
+  currentQueueEntryId?: string | null
+  lastStatusChange?: Date | null
+  averageConsultationTime?: number
+  todayServed?: number
+  todayNoShows?: number
+  totalServed?: number
+  allowWalkIns?: boolean
+  allowOnlineBooking?: boolean
+  autoCallNext?: boolean
+  noShowTimeout?: number
 }
 
 export interface Clinic {
@@ -166,4 +180,45 @@ export interface PaginatedResponse<T> {
   page: number
   pageSize: number
   totalPages: number
+}
+
+// Queue types
+export enum QueueType {
+  WALK_IN = 'WALK_IN',
+  ONLINE_BOOKING = 'ONLINE_BOOKING',
+}
+
+export enum QueueStatus {
+  WAITING = 'WAITING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  NO_SHOW = 'NO_SHOW',
+}
+
+export enum DoctorAvailabilityStatus {
+  AVAILABLE = 'AVAILABLE',
+  BUSY = 'BUSY',
+  BREAK = 'BREAK',
+  OFF_DUTY = 'OFF_DUTY',
+}
+
+export interface QueueEntry {
+  id: string
+  serialNumber: string
+  doctorId: string
+  patientId: string
+  appointmentId?: string | null
+  queueType: QueueType
+  status: QueueStatus
+  priority: number
+  position: number
+  estimatedWaitTime?: number | null
+  checkInTime: Date
+  scheduledTime?: Date | null
+  calledTime?: Date | null
+  completedTime?: Date | null
+  notes?: string | null
+  createdAt: Date
+  updatedAt: Date
 }

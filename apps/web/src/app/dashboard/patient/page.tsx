@@ -18,6 +18,8 @@ import {
 } from "lucide-react"
 import { Badge, Button } from "@smartmed/ui"
 import { TimelineContainer } from "@/components/timeline/timeline_container"
+import { PatientQueueTracker } from "@/components/queue/PatientQueueTracker"
+import { DoctorAvailabilityList } from "@/components/queue/DoctorAvailabilityList"
 
 interface PatientDashboardData {
   upcomingAppointments?: Array<{
@@ -68,6 +70,7 @@ export default function PatientDashboardPage() {
   const upcoming = useMemo(() => data?.upcomingAppointments || [], [data])
   const preferredCount = data?.preferredDoctorsCount ?? 0
   const prescriptions = data?.recentPrescriptions || []
+  const patientId = data?.profile?.id as string | undefined
 
   if (loading || !user) {
     return <main className="min-h-screen flex items-center justify-center">Loading...</main>
@@ -157,6 +160,10 @@ export default function PatientDashboardPage() {
             onClick={() => router.push("/profile?role=PATIENT")}
           />
         </div>
+
+        {patientId && <PatientQueueTracker patientId={patientId} />}
+
+        <DoctorAvailabilityList />
 
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2 space-y-4">

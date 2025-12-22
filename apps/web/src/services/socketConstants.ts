@@ -1,0 +1,16 @@
+export const SOCKET_EVENTS = {
+  CONNECTION: 'connection',
+  DISCONNECT: 'disconnect',
+  QUEUE_JOIN: 'queue:join',
+  QUEUE_LEAVE: 'queue:leave',
+  QUEUE_UPDATED: 'queue:updated',
+  QUEUE_ENTRY_UPDATED: 'queue:entry_updated',
+  DOCTOR_STATUS_CHANGED: 'doctor:status_changed',
+  PATIENT_CALLED: 'queue:patient_called',
+  NOTIFY_PATIENT: 'notify:patient',
+  ADD_WALKIN: 'queue:add_walkin',
+  CHECK_IN: 'queue:check_in',
+  CALL_NEXT: 'queue:call_next',
+  COMPLETE_CONSULTATION: 'queue:complete',
+  UPDATE_POSITION: 'queue:update_position',
+} as const

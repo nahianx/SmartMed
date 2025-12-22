@@ -21,6 +21,7 @@ import {
 import { useAuthContext } from '../../../context/AuthContext'
 import { apiClient } from '../../../services/apiClient'
 import { TimelineContainer } from '@/components/timeline/timeline_container'
+import { DoctorQueuePanel } from '@/components/queue/DoctorQueuePanel'
 
 export default function DoctorDashboardPage() {
   const { user, loading, logout } = useAuthContext()
@@ -78,6 +79,7 @@ export default function DoctorDashboardPage() {
   const patientsToday =
     typeof data?.patientsToday === 'number' ? data.patientsToday : null
   const notes = Array.isArray(data?.notes) ? data.notes : []
+  const doctorId = data?.profile?.id as string | undefined
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -317,6 +319,8 @@ export default function DoctorDashboardPage() {
             )}
           </div>
         </div>
+
+        {doctorId && <DoctorQueuePanel doctorId={doctorId} />}
 
         <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-2">

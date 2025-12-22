@@ -1,9 +1,11 @@
 import { Router, Request, Response } from 'express'
+import { z } from 'zod'
 import { requireAuth, requireRole, AuthenticatedRequest } from '../middleware/auth'
 import { UserRole } from '@smartmed/types'
 import {
   getDoctorProfileByUserId,
   updateDoctorSpecializations,
+  updateDoctorStatus,
   upsertClinicForDoctor,
   getAvailability,
   setAvailability,
@@ -11,6 +13,7 @@ import {
   searchDoctors,
   searchDoctorsAdvanced,
 } from '../services/doctor.service'
+import { broadcastDoctorStatus } from '../services/queue.service'
 import { getDoctorHistory } from '../services/appointment.service'
 import {
   availabilityUpdateSchema,
@@ -18,7 +21,7 @@ import {
   specializationsUpdateSchema,
   validate,
 } from '../services/validation.service'
-import { prisma } from '@smartmed/database'
+import { prisma, DoctorAvailabilityStatus, QueueStatus, AuditAction } from '@smartmed/database'
 import { validateSchema } from '../middleware/validation'
 import {
   doctorHistorySchema,
@@ -27,9 +30,24 @@ import {
 import {
   logDoctorHistoryAccess,
   logSearchOperation,
+  logAuditEvent,
 } from '../utils/audit'
 
 const router = Router()
+
+const doctorStatusSchema = {
+  body: z.object({
+    status: z.enum([
+      DoctorAvailabilityStatus.AVAILABLE,
+      DoctorAvailabilityStatus.BUSY,
+      DoctorAvailabilityStatus.BREAK,
+      DoctorAvailabilityStatus.OFF_DUTY,
+    ]),
+    isAvailable: z.boolean().optional(),
+    currentPatientId: z.string().uuid().optional(),
+    currentQueueEntryId: z.string().uuid().optional(),
+  }),
+}
 
 // Public search endpoint used by patients to find doctors
 router.get('/search', async (req: Request, res: Response) => {
@@ -39,6 +57,55 @@ router.get('/search', async (req: Request, res: Response) => {
     res.json({ doctors })
   } catch (error) {
     res.status(500).json({ error: 'Failed to search doctors' })
+  }
+})
+
+// Available doctors list with queue stats
+router.get('/available', async (req: Request, res: Response) => {
+  try {
+    const specialization = req.query.specialization
+      ? String(req.query.specialization)
+      : undefined
+
+    const where: any = {
+      availabilityStatus: DoctorAvailabilityStatus.AVAILABLE,
+      isAvailable: true,
+    }
+    if (specialization) {
+      where.specialization = { contains: specialization, mode: 'insensitive' }
+    }
+
+    const doctors = await prisma.doctor.findMany({
+      where,
+      include: { clinic: true },
+      take: 50,
+    })
+
+    const queueCounts = await prisma.queueEntry.groupBy({
+      by: ['doctorId'],
+      where: { status: QueueStatus.WAITING },
+      _count: { _all: true },
+    })
+    const countMap = new Map(
+      queueCounts.map((item) => [item.doctorId, item._count._all])
+    )
+
+    const payload = doctors.map((doctor) => {
+      const waitingCount = countMap.get(doctor.id) || 0
+      const estimatedWait = Math.round(
+        waitingCount * (doctor.averageConsultationTime || 15)
+      )
+      return {
+        ...doctor,
+        queueLength: waitingCount,
+        estimatedWaitTime: estimatedWait,
+      }
+    })
+
+    res.json({ doctors: payload })
+  } catch (error) {
+    console.error('Error loading available doctors', error)
+    res.status(500).json({ error: 'Failed to load available doctors' })
   }
 })
 
@@ -115,6 +182,51 @@ router.get(
       res.status(500).json({ error: 'Failed to fetch doctor history' })
     }
   },
+)
+
+router.patch(
+  '/:doctorId/status',
+  requireAuth,
+  requireRole([UserRole.DOCTOR, UserRole.ADMIN]),
+  validateSchema(doctorStatusSchema),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { doctorId } = req.params
+      if (!req.user) {
+        return res.status(401).json({ error: 'Unauthorized' })
+      }
+
+      if (req.user.role === UserRole.DOCTOR) {
+        const self = await prisma.doctor.findUnique({
+          where: { userId: req.user.id },
+        })
+        if (!self || self.id !== doctorId) {
+          return res.status(403).json({ error: 'Unauthorized' })
+        }
+      }
+
+      const updated = await updateDoctorStatus(doctorId, req.body.status, {
+        isAvailable: req.body.isAvailable,
+        currentPatientId: req.body.currentPatientId,
+        currentQueueEntryId: req.body.currentQueueEntryId,
+      })
+
+      await logAuditEvent({
+        userId: req.user.id,
+        userRole: req.user.role,
+        action: AuditAction.DOCTOR_STATUS_CHANGED,
+        resourceType: 'Doctor',
+        resourceId: doctorId,
+        metadata: { status: req.body.status },
+      })
+
+      await broadcastDoctorStatus(doctorId)
+
+      res.json({ success: true, doctorStatus: updated })
+    } catch (error: any) {
+      res.status(error.status || 500).json({ error: error.message })
+    }
+  }
 )
 
 // Public list of specializations (for dropdowns/search)

@@ -81,6 +81,21 @@ model Doctor {
   availableDays      Json
   availableTimeSlots Json
   clinicId           String?
+  timezone           String                  @default("UTC")
+  availabilityStatus DoctorAvailabilityStatus @default(OFF_DUTY)
+  isAvailable        Boolean                 @default(false)
+  currentPatientId   String?
+  currentQueueEntryId String?
+  lastStatusChange   DateTime?
+  averageConsultationTime Int               @default(15)
+  todayServed        Int                     @default(0)
+  todayNoShows       Int                     @default(0)
+  totalServed        Int                     @default(0)
+  allowWalkIns       Boolean                 @default(true)
+  allowOnlineBooking Boolean                 @default(true)
+  autoCallNext       Boolean                 @default(false)
+  noShowTimeout      Int                     @default(30)
+  statsDate          String                  @default("")
   createdAt          DateTime                @default(now())
   updatedAt          DateTime                @updatedAt
   activities         Activity[]
@@ -92,6 +107,8 @@ model Doctor {
   availability       DoctorAvailability[]
   specializations    DoctorSpecialization[]
   preferredBy        PreferredDoctor[]
+  queueEntries       QueueEntry[]
+  queueCounters      QueueCounter[]
 
   @@map("doctors")
 }
@@ -327,6 +344,50 @@ model PreferredDoctor {
   @@map("preferred_doctors")
 }
 
+model QueueEntry {
+  id               String      @id @default(uuid())
+  serialNumber     String      @unique
+  doctorId         String
+  patientId        String
+  appointmentId    String?
+  queueType        QueueType
+  status           QueueStatus
+  priority         Int         @default(2)
+  position         Int
+  estimatedWaitTime Int?
+  checkInTime      DateTime
+  scheduledTime    DateTime?
+  calledTime       DateTime?
+  startTime        DateTime?
+  completedTime    DateTime?
+  notes            String?
+  version          Int         @default(0)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  doctor           Doctor      @relation(fields: [doctorId], references: [id])
+  patient          Patient     @relation(fields: [patientId], references: [id])
+  appointment      Appointment? @relation(fields: [appointmentId], references: [id])
+
+  @@index([doctorId, status, position])
+  @@index([patientId, status])
+  @@index([createdAt])
+  @@index([doctorId, createdAt])
+  @@unique([appointmentId])
+  @@map("queue_entries")
+}
+
+model QueueCounter {
+  id        String   @id @default(uuid())
+  doctorId  String
+  queueDate String
+  nextSerial Int     @default(1)
+  updatedAt DateTime @updatedAt
+  doctor    Doctor   @relation(fields: [doctorId], references: [id])
+
+  @@unique([doctorId, queueDate], map: "unique_queue_counter")
+  @@map("queue_counters")
+}
+
 enum ActivityType {
   APPOINTMENT
   PRESCRIPTION
@@ -352,6 +413,26 @@ enum NotificationType {
   APPOINTMENT_REMINDER_1H
   ACTIVITY_CREATED
   ACTIVITY_UPDATED
+}
+
+enum QueueType {
+  WALK_IN
+  ONLINE_BOOKING
+}
+
+enum QueueStatus {
+  WAITING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum DoctorAvailabilityStatus {
+  AVAILABLE
+  BUSY
+  BREAK
+  OFF_DUTY
 }
 
 enum AuditAction {
@@ -380,6 +461,13 @@ enum AuditAction {
   PERMISSION_REVOKED
   UNAUTHORIZED_ACCESS_ATTEMPT
   SUSPICIOUS_ACTIVITY
+  QUEUE_ENTRY_ADDED
+  QUEUE_ENTRY_REMOVED
+  QUEUE_ENTRY_STATUS_CHANGED
+  QUEUE_ENTRY_REORDERED
+  QUEUE_CALLED_NEXT
+  QUEUE_CHECK_IN
+  DOCTOR_STATUS_CHANGED
 }
 
 enum UserRole {

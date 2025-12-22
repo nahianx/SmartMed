@@ -19,6 +19,66 @@ SmartMed uses a secure token-based authentication system:
 
 ---
 
+## Queue Management (Real-time)
+
+### REST Endpoints
+
+- `POST /api/queue/walk-in`
+  - Body: `{ doctorId, patientId, priority? }`
+  - Roles: `DOCTOR`, `NURSE`, `ADMIN`
+- `POST /api/queue/check-in`
+  - Body: `{ appointmentId }`
+  - Roles: `DOCTOR`, `NURSE`, `ADMIN`
+- `GET /api/queue/doctor/:doctorId`
+  - Returns: `{ doctorStatus, queue }`
+  - Roles: authenticated users
+- `GET /api/queue/patient/:patientId`
+  - Returns: `{ activeQueues }`
+  - Roles: patient (self) or staff
+- `PATCH /api/queue/:queueId/status`
+  - Body: `{ status: "CANCELLED" | "NO_SHOW" }`
+  - Roles: `DOCTOR`, `NURSE`, `ADMIN`
+- `PATCH /api/queue/:queueId/position`
+  - Body: `{ newPosition }`
+  - Roles: `DOCTOR`, `NURSE`, `ADMIN`
+- `POST /api/queue/doctor/:doctorId/call`
+  - Calls next waiting patient
+  - Roles: `DOCTOR`, `NURSE`, `ADMIN`
+- `POST /api/queue/:queueId/complete`
+  - Body: `{ notes? }`
+  - Roles: `DOCTOR`
+- `DELETE /api/queue/:queueId`
+  - Cancels queue entry (patient self-service)
+  - Roles: authenticated users
+
+### Socket.IO
+
+Connect with the JWT access token:
+```json
+{
+  "auth": { "token": "<access_token>" }
+}
+```
+
+**Client → Server**
+- `queue:join` `{ doctorId }` (joins doctor queue room)
+- `queue:leave` `{ doctorId }`
+- `queue:add_walkin` `{ doctorId, patientId, priority? }`
+- `queue:check_in` `{ appointmentId }`
+- `queue:call_next` `{ doctorId }`
+- `queue:complete` `{ queueId, notes? }`
+- `queue:update_position` `{ queueId, newPosition }`
+- `queue:entry_status_changed` `{ queueId, status }`
+
+**Server → Client**
+- `queue:updated` `{ doctorStatus, queue }`
+- `queue:entry_updated` `{ id, status, position, estimatedWaitTime, serialNumber, queueType }`
+- `queue:patient_called` `{ ...queueEntry }`
+- `doctor:status_changed` `{ ...doctorStatus }`
+- `notify:patient` `{ message, queueEntryId, doctorId }`
+
+---
+
 ## Registration
 
 ### POST `/api/auth/register/doctor`

@@ -8,7 +8,7 @@ import { Request } from 'express'
 import { prisma, AuditAction } from '@smartmed/database'
 
 export interface AuditLogOptions {
-  userId: string
+  userId?: string
   userRole?: string
   action: AuditAction
   resourceType: string
@@ -43,7 +43,7 @@ export async function logAuditEvent(options: AuditLogOptions): Promise<void> {
 
     await prisma.auditLog.create({
       data: {
-        userId,
+        userId: userId || undefined,
         userRole,
         action,
         resourceType,
@@ -59,7 +59,7 @@ export async function logAuditEvent(options: AuditLogOptions): Promise<void> {
     if (process.env.NODE_ENV !== 'production') {
       // eslint-disable-next-line no-console
       console.log(
-        `[AUDIT] ${action}: ${resourceType}/${resourceId} by ${userId} (${userRole ?? 'unknown'})`
+        `[AUDIT] ${action}: ${resourceType}/${resourceId} by ${userId ?? 'system'} (${userRole ?? 'unknown'})`
       )
     }
   } catch (error) {

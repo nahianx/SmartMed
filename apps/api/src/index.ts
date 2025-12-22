@@ -3,14 +3,17 @@ import express, { Application, Request, Response } from 'express'
 import morgan from 'morgan'
 import dotenv from 'dotenv'
 import path from 'path'
+import http from 'http'
 import {
   csrfProtection,
   setCSRFToken,
   generateCSRFToken,
 } from './middleware/csrf'
 import { startReminderScheduler } from './scheduler/reminder_scheduler'
+import { startQueueScheduler } from './scheduler/queue_scheduler'
 import { setupSecurityMiddleware } from './middleware/security'
 import { authMiddleware } from './middleware/auth'
+import { initializeSocketIO } from './socket/socketServer'
 
 // Import routes
 import patientRoutes from './routes/patient.routes'
@@ -24,10 +27,12 @@ import reportRoutes from './routes/report.routes'
 import notificationRoutes from './routes/notification.routes'
 import adminRoutes from './routes/admin.routes'
 import { errorHandler } from './middleware/errorHandler'
+import queueRoutes from './routes/queue.routes'
 
 dotenv.config()
 
 const app: Application = express()
+const httpServer = http.createServer(app)
 const PORT = process.env.PORT || 4000
 
 // Middleware - Apply security middleware first (includes proper CORS config)
@@ -89,6 +94,7 @@ app.use('/api/patient', patientRoutes)
 app.use('/api/doctor', doctorRoutes)
 app.use('/api/doctors', doctorRoutes) // for /api/doctors/search
 app.use('/api/appointments', appointmentRoutes)
+app.use('/api/queue', queueRoutes)
 app.use('/api/dashboard', dashboardRoutes)
 app.use('/api/timeline', timelineRoutes)
 app.use('/api/reports', reportRoutes)
@@ -105,13 +111,17 @@ app.use(errorHandler)
 
 // Only start the server when not running tests
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, () => {
+  const io = initializeSocketIO(httpServer)
+  app.set('io', io)
+
+  httpServer.listen(PORT, () => {
     console.log(`🚀 SmartMed API server running on port ${PORT}`)
     console.log(`📍 Health check: http://localhost:${PORT}/health`)
   })
 
   // Start background reminder scheduler
   startReminderScheduler()
+  startQueueScheduler()
 }
 
 export default app

@@ -1,6 +1,7 @@
-import { prisma } from '@smartmed/database'
+import { prisma, DoctorAvailabilityStatus } from '@smartmed/database'
 import { DoctorAvailability } from '@smartmed/types'
 import { randomUUID } from 'crypto'
+import { getDefaultTimezone } from '../utils/time'
 
 export async function getOrCreateDoctor(userId: string) {
   const existing = await prisma.doctor.findUnique({ where: { userId } })
@@ -29,6 +30,18 @@ export async function getOrCreateDoctor(userId: string) {
       consultationFee: 0,
       availableDays: [],
       availableTimeSlots: [],
+      timezone: getDefaultTimezone(),
+      availabilityStatus: DoctorAvailabilityStatus.OFF_DUTY,
+      isAvailable: false,
+      averageConsultationTime: 15,
+      todayServed: 0,
+      todayNoShows: 0,
+      totalServed: 0,
+      allowWalkIns: true,
+      allowOnlineBooking: true,
+      autoCallNext: false,
+      noShowTimeout: 30,
+      statsDate: '',
     },
   })
 }
@@ -186,6 +199,55 @@ export async function removeAvailabilitySlot(userId: string, slotId: string) {
   }
 
   await prisma.doctorAvailability.delete({ where: { id: slotId } })
+}
+
+export async function updateDoctorStatus(
+  doctorId: string,
+  status: DoctorAvailabilityStatus,
+  options?: {
+    isAvailable?: boolean
+    currentPatientId?: string | null
+    currentQueueEntryId?: string | null
+  },
+) {
+  const data = {
+    availabilityStatus: status,
+    isAvailable:
+      typeof options?.isAvailable === 'boolean'
+        ? options.isAvailable
+        : status === DoctorAvailabilityStatus.AVAILABLE,
+    currentPatientId: options?.currentPatientId ?? null,
+    currentQueueEntryId: options?.currentQueueEntryId ?? null,
+    lastStatusChange: new Date(),
+  }
+
+  return prisma.doctor.update({
+    where: { id: doctorId },
+    data,
+  })
+}
+
+export async function getDoctorStatus(doctorId: string) {
+  return prisma.doctor.findUnique({
+    where: { id: doctorId },
+    select: {
+      id: true,
+      availabilityStatus: true,
+      isAvailable: true,
+      currentPatientId: true,
+      currentQueueEntryId: true,
+      lastStatusChange: true,
+      averageConsultationTime: true,
+      todayServed: true,
+      todayNoShows: true,
+      totalServed: true,
+      allowWalkIns: true,
+      allowOnlineBooking: true,
+      autoCallNext: true,
+      noShowTimeout: true,
+      timezone: true,
+    },
+  })
 }
 
 export async function searchDoctors(query: string) {

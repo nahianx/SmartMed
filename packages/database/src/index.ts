@@ -34,6 +34,8 @@ export {
   type PasswordReset,
   type EmailVerification,
   type AuditLog,
+  type QueueEntry,
+  type QueueCounter,
 } from '@prisma/client'
 
 // SQLite-compatible enum values as constants (SQLite doesn't support native enums)
@@ -97,6 +99,36 @@ export type NotificationType =
   (typeof NotificationType)[keyof typeof NotificationType]
 
 // eslint-disable-next-line no-redeclare
+export const QueueType = {
+  WALK_IN: 'WALK_IN',
+  ONLINE_BOOKING: 'ONLINE_BOOKING',
+} as const
+// eslint-disable-next-line no-redeclare
+export type QueueType = (typeof QueueType)[keyof typeof QueueType]
+
+// eslint-disable-next-line no-redeclare
+export const QueueStatus = {
+  WAITING: 'WAITING',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED',
+  NO_SHOW: 'NO_SHOW',
+} as const
+// eslint-disable-next-line no-redeclare
+export type QueueStatus = (typeof QueueStatus)[keyof typeof QueueStatus]
+
+// eslint-disable-next-line no-redeclare
+export const DoctorAvailabilityStatus = {
+  AVAILABLE: 'AVAILABLE',
+  BUSY: 'BUSY',
+  BREAK: 'BREAK',
+  OFF_DUTY: 'OFF_DUTY',
+} as const
+// eslint-disable-next-line no-redeclare
+export type DoctorAvailabilityStatus =
+  (typeof DoctorAvailabilityStatus)[keyof typeof DoctorAvailabilityStatus]
+
+// eslint-disable-next-line no-redeclare
 export const AuditAction = {
   LOGIN: 'LOGIN',
   LOGOUT: 'LOGOUT',
@@ -123,6 +155,13 @@ export const AuditAction = {
   PERMISSION_REVOKED: 'PERMISSION_REVOKED',
   UNAUTHORIZED_ACCESS_ATTEMPT: 'UNAUTHORIZED_ACCESS_ATTEMPT',
   SUSPICIOUS_ACTIVITY: 'SUSPICIOUS_ACTIVITY',
+  QUEUE_ENTRY_ADDED: 'QUEUE_ENTRY_ADDED',
+  QUEUE_ENTRY_REMOVED: 'QUEUE_ENTRY_REMOVED',
+  QUEUE_ENTRY_STATUS_CHANGED: 'QUEUE_ENTRY_STATUS_CHANGED',
+  QUEUE_ENTRY_REORDERED: 'QUEUE_ENTRY_REORDERED',
+  QUEUE_CALLED_NEXT: 'QUEUE_CALLED_NEXT',
+  QUEUE_CHECK_IN: 'QUEUE_CHECK_IN',
+  DOCTOR_STATUS_CHANGED: 'DOCTOR_STATUS_CHANGED',
 } as const
 // eslint-disable-next-line no-redeclare
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction]
