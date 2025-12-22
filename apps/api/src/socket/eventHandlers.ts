@@ -33,8 +33,14 @@ const statusSchema = z.object({
   status: z.enum(['CANCELLED', 'NO_SHOW']),
 })
 
+const STAFF_ROLES = new Set(['ADMIN', 'DOCTOR', 'NURSE'])
+
 function isDoctor(role: string) {
   return role.toUpperCase() === 'DOCTOR'
+}
+
+function isStaffRole(role: string) {
+  return STAFF_ROLES.has(role.toUpperCase())
 }
 
 export function registerEventHandlers(_io: Server, socket: Socket) {
@@ -61,6 +67,9 @@ export function registerEventHandlers(_io: Server, socket: Socket) {
   socket.on(SOCKET_EVENTS.QUEUE_JOIN, async (payload, ack) => {
     try {
       const { doctorId } = joinSchema.parse(payload)
+      if (!isStaffRole(actor.role)) {
+        return ack?.({ ok: false, error: 'Forbidden' })
+      }
       if (isDoctor(actor.role)) {
         const doctorIdForUser = socket.data.doctorId
         if (!doctorIdForUser || doctorIdForUser !== doctorId) {
@@ -69,7 +78,9 @@ export function registerEventHandlers(_io: Server, socket: Socket) {
       }
 
       socket.join(`doctor:${doctorId}:queue`)
-      const state = await getQueueState(doctorId)
+      const state = await getQueueState(doctorId, {
+        includePatientDetails: isStaffRole(actor.role),
+      })
       return ack?.({ ok: true, ...state })
     } catch (error: any) {
       return ack?.({ ok: false, error: error.message })

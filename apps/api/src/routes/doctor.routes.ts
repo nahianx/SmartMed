@@ -77,7 +77,15 @@ router.get('/available', async (req: Request, res: Response) => {
 
     const doctors = await prisma.doctor.findMany({
       where,
-      include: { clinic: true },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        specialization: true,
+        availabilityStatus: true,
+        isAvailable: true,
+        averageConsultationTime: true,
+      },
       take: 50,
     })
 

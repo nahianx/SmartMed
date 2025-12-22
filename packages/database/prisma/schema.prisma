@@ -63,6 +63,7 @@ model Patient {
   prescriptions    Prescription[]
   reports          Report[]
   preferredBy      PreferredDoctor[]
+  queueEntries     QueueEntry[]
 
   @@map("patients")
 }
@@ -143,6 +144,7 @@ model Appointment {
   notifications Notification[]
   prescriptions Prescription[]
   reports       Report[]
+  queueEntry    QueueEntry?
 
   @@map("appointments")
 }

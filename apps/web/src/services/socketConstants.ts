@@ -1,11 +1,12 @@
 export const SOCKET_EVENTS = {
-  CONNECTION: 'connection',
+  CONNECTION: 'connect',
   DISCONNECT: 'disconnect',
   QUEUE_JOIN: 'queue:join',
   QUEUE_LEAVE: 'queue:leave',
   QUEUE_UPDATED: 'queue:updated',
   QUEUE_ENTRY_UPDATED: 'queue:entry_updated',
   DOCTOR_STATUS_CHANGED: 'doctor:status_changed',
+  DOCTOR_STATUS_PUBLIC: 'doctor:status_public',
   PATIENT_CALLED: 'queue:patient_called',
   NOTIFY_PATIENT: 'notify:patient',
   ADD_WALKIN: 'queue:add_walkin',

@@ -58,16 +58,28 @@ export function DoctorQueuePanel({ doctorId }: { doctorId: string }) {
   useEffect(() => {
     if (!doctorId) return
     setLoading(true)
-    socketService.connect()
-    socketService.joinDoctorQueue(doctorId, (response) => {
-      if (response?.ok) {
-        setQueue(response.queue || [])
-        setDoctorStatus(response.doctorStatus || null)
-        setLoading(false)
-      } else {
-        fetchState()
-      }
-    })
+    const socket = socketService.connect()
+
+    const joinQueue = () => {
+      socketService.joinDoctorQueue(doctorId, (response) => {
+        if (response?.ok) {
+          setQueue(response.queue || [])
+          setDoctorStatus(response.doctorStatus || null)
+          setLoading(false)
+        } else {
+          fetchState()
+        }
+      })
+    }
+
+    if (socket?.connected) {
+      joinQueue()
+    }
+
+    const handleConnect = () => {
+      joinQueue()
+      fetchState()
+    }
 
     const handleQueueUpdated = (payload: any) => {
       setQueue(payload.queue || [])
@@ -84,11 +96,13 @@ export function DoctorQueuePanel({ doctorId }: { doctorId: string }) {
       toast('Patient called. Queue updated.')
     }
 
+    socketService.on(SOCKET_EVENTS.CONNECTION, handleConnect)
     socketService.on(SOCKET_EVENTS.QUEUE_UPDATED, handleQueueUpdated)
     socketService.on(SOCKET_EVENTS.DOCTOR_STATUS_CHANGED, handleDoctorStatus)
     socketService.on(SOCKET_EVENTS.PATIENT_CALLED, handlePatientCalled)
 
     return () => {
+      socketService.off(SOCKET_EVENTS.CONNECTION, handleConnect)
       socketService.off(SOCKET_EVENTS.QUEUE_UPDATED, handleQueueUpdated)
       socketService.off(SOCKET_EVENTS.DOCTOR_STATUS_CHANGED, handleDoctorStatus)
       socketService.off(SOCKET_EVENTS.PATIENT_CALLED, handlePatientCalled)

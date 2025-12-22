@@ -9,6 +9,7 @@ export const SOCKET_EVENTS = {
   QUEUE_ENTRY_STATUS_CHANGED: 'queue:entry_status_changed',
   QUEUE_ENTRY_UPDATED: 'queue:entry_updated',
   DOCTOR_STATUS_CHANGED: 'doctor:status_changed',
+  DOCTOR_STATUS_PUBLIC: 'doctor:status_public',
   PATIENT_CALLED: 'queue:patient_called',
   NOTIFY_PATIENT: 'notify:patient',
   ADD_WALKIN: 'queue:add_walkin',

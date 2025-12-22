@@ -239,6 +239,12 @@ export async function broadcastDoctorStatus(doctorId: string) {
     },
   })
   if (!doctor) return
+  const publicStatus = {
+    id: doctor.id,
+    availabilityStatus: doctor.availabilityStatus,
+    isAvailable: doctor.isAvailable,
+    lastStatusChange: doctor.lastStatusChange,
+  }
   io.to(getDoctorQueueRoom(doctorId)).emit(
     SOCKET_EVENTS.DOCTOR_STATUS_CHANGED,
     doctor
@@ -247,7 +253,7 @@ export async function broadcastDoctorStatus(doctorId: string) {
     SOCKET_EVENTS.DOCTOR_STATUS_CHANGED,
     doctor
   )
-  io.emit(SOCKET_EVENTS.DOCTOR_STATUS_CHANGED, doctor)
+  io.emit(SOCKET_EVENTS.DOCTOR_STATUS_PUBLIC, publicStatus)
 }
 
 async function notifyPatient(patientId: string, payload: unknown) {
@@ -289,7 +295,11 @@ async function emitQueueEntryUpdate(queueEntryId: string) {
   )
 }
 
-export async function getQueueState(doctorId: string) {
+export async function getQueueState(
+  doctorId: string,
+  options?: { includePatientDetails?: boolean }
+) {
+  const includePatientDetails = options?.includePatientDetails ?? true
   const [doctor, entries] = await Promise.all([
     prisma.doctor.findUnique({
       where: { id: doctorId },
@@ -316,11 +326,13 @@ export async function getQueueState(doctorId: string) {
         doctorId,
         status: { in: [QueueStatus.WAITING, QueueStatus.IN_PROGRESS] },
       },
-      include: {
-        patient: {
-          select: { id: true, firstName: true, lastName: true },
-        },
-      },
+      include: includePatientDetails
+        ? {
+            patient: {
+              select: { id: true, firstName: true, lastName: true },
+            },
+          }
+        : undefined,
     }),
   ])
 
@@ -331,10 +343,12 @@ export async function getQueueState(doctorId: string) {
     .filter((entry) => entry.status === QueueStatus.WAITING)
     .sort((a, b) => a.position - b.position)
 
-  return {
-    doctorStatus: doctor,
-    queue: [...inProgress, ...waiting],
+  const queue = [...inProgress, ...waiting]
+  if (!includePatientDetails) {
+    const redacted = queue.map(({ patient, ...entry }) => entry)
+    return { doctorStatus: doctor, queue: redacted }
   }
+  return { doctorStatus: doctor, queue }
 }
 
 export async function addWalkIn(
@@ -644,11 +658,6 @@ export async function updateQueuePosition(
       if (!entry) {
         const error: any = new Error('Queue entry not found')
         error.status = 404
-        throw error
-      }
-      if (entry.status !== QueueStatus.IN_PROGRESS) {
-        const error: any = new Error('Queue entry is not in progress')
-        error.status = 400
         throw error
       }
       if (entry.status !== QueueStatus.WAITING) {

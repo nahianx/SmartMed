@@ -52,9 +52,9 @@ export function DoctorAvailabilityList() {
       )
     }
 
-    socketService.on(SOCKET_EVENTS.DOCTOR_STATUS_CHANGED, handleStatusChange)
+    socketService.on(SOCKET_EVENTS.DOCTOR_STATUS_PUBLIC, handleStatusChange)
     return () => {
-      socketService.off(SOCKET_EVENTS.DOCTOR_STATUS_CHANGED, handleStatusChange)
+      socketService.off(SOCKET_EVENTS.DOCTOR_STATUS_PUBLIC, handleStatusChange)
     }
   }, [])
 

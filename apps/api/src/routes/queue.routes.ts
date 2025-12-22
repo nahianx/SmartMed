@@ -21,6 +21,12 @@ import {
 
 const router = Router()
 
+const STAFF_ROLES = new Set([UserRole.ADMIN, UserRole.DOCTOR, UserRole.NURSE])
+
+function isStaffRole(role?: UserRole) {
+  return role ? STAFF_ROLES.has(role) : false
+}
+
 const walkInSchema = z.object({
   doctorId: z.string().uuid(),
   patientId: z.string().uuid(),
@@ -72,10 +78,22 @@ router.post(
 router.get(
   '/doctor/:doctorId',
   requireAuth,
+  requireRole([UserRole.DOCTOR, UserRole.NURSE, UserRole.ADMIN]),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { doctorId } = req.params
-      const state = await getQueueState(doctorId)
+      if (req.user?.role === UserRole.DOCTOR) {
+        const self = await prisma.doctor.findUnique({
+          where: { userId: req.user.id },
+          select: { id: true },
+        })
+        if (!self || self.id !== doctorId) {
+          return res.status(403).json({ error: 'Unauthorized' })
+        }
+      }
+      const state = await getQueueState(doctorId, {
+        includePatientDetails: isStaffRole(req.user?.role),
+      })
       res.json({ success: true, ...state })
     } catch (error: any) {
       res.status(error.status || 500).json({ error: error.message })

@@ -1,6 +1,7 @@
 import { Server } from 'socket.io'
 import type { Server as HttpServer } from 'http'
 import { authenticateSocket } from './middlewares'
+import { attachSocketGuards, registerConnectionLimit } from './limits'
 import { registerEventHandlers } from './eventHandlers'
 import { setIO } from './io'
 
@@ -20,6 +21,10 @@ export function initializeSocketIO(httpServer: HttpServer) {
   io.use(authenticateSocket)
 
   io.on('connection', (socket) => {
+    if (!registerConnectionLimit(socket)) {
+      return
+    }
+    attachSocketGuards(socket)
     registerEventHandlers(io, socket)
   })
 
