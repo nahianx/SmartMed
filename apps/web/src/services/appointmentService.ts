@@ -110,7 +110,10 @@ class AppointmentService {
     status: 'COMPLETED' | 'NO_SHOW',
     reason?: string
   ): Promise<Appointment> {
-    const response = await apiClient.put(`/appointments/${id}`, { status, reason })
+    const response = await apiClient.put(`/appointments/${id}`, {
+      status,
+      reason,
+    })
     return response.data.appointment
   }
 
@@ -193,8 +196,13 @@ class AppointmentService {
     )
   }
 
-  async updateAppointmentNotes(id: string, notes: string): Promise<Appointment> {
-    const response = await apiClient.put(`/appointments/${id}/notes`, { notes })
+  async updateAppointmentNotes(
+    id: string,
+    notes: string
+  ): Promise<Appointment> {
+    // The backend exposes a PUT /appointments/:id endpoint that accepts notes in the body.
+    // Use that instead of a non-existent /appointments/:id/notes route which returns 404.
+    const response = await apiClient.put(`/appointments/${id}`, { notes })
     return response.data.appointment
   }
 }

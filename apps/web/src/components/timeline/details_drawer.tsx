@@ -1,4 +1,11 @@
-import { Calendar, MapPin, FileText, AlertTriangle, ExternalLink, Download } from 'lucide-react'
+import {
+  Calendar,
+  MapPin,
+  FileText,
+  AlertTriangle,
+  ExternalLink,
+  Download,
+} from 'lucide-react'
 import type { TimelineActivity } from '@/types/timeline'
 import {
   Sheet,
@@ -25,9 +32,7 @@ export function DetailsDrawer({ activity, open, onClose }: DetailsDrawerProps) {
     <Sheet open={open} onOpenChange={onClose}>
       <SheetContent className="w-full sm:max-w-xl overflow-y-auto">
         <SheetHeader>
-          <SheetTitle className="text-left pr-8">
-            {activity.title}
-          </SheetTitle>
+          <SheetTitle className="text-left pr-8">{activity.title}</SheetTitle>
           <SheetDescription className="flex items-center gap-2">
             <Calendar className="h-4 w-4" />
             {format(activity.date, 'EEEE, MMMM dd, yyyy at h:mm a')}
@@ -42,13 +47,14 @@ export function DetailsDrawer({ activity, open, onClose }: DetailsDrawerProps) {
                   activity.status === 'completed'
                     ? 'default'
                     : activity.status === 'cancelled'
-                    ? 'secondary'
-                    : 'destructive'
+                      ? 'secondary'
+                      : 'destructive'
                 }
               >
                 {activity.status === 'no-show'
                   ? 'No-show'
-                  : activity.status.charAt(0).toUpperCase() + activity.status.slice(1)}
+                  : activity.status.charAt(0).toUpperCase() +
+                    activity.status.slice(1)}
               </Badge>
             </div>
           )}
@@ -59,11 +65,15 @@ export function DetailsDrawer({ activity, open, onClose }: DetailsDrawerProps) {
                 <h3 className="mb-2">Visit Information</h3>
                 <div className="space-y-2 rounded-lg bg-gray-50 p-4">
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-gray-600 min-w-[100px]">Doctor:</span>
+                    <span className="text-sm text-gray-600 min-w-[100px]">
+                      Doctor:
+                    </span>
                     <span className="text-sm">{activity.doctorName}</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-gray-600 min-w-[100px]">Specialty:</span>
+                    <span className="text-sm text-gray-600 min-w-[100px]">
+                      Specialty:
+                    </span>
                     <span className="text-sm">{activity.specialty}</span>
                   </div>
                   {activity.clinic && (
@@ -81,8 +91,12 @@ export function DetailsDrawer({ activity, open, onClose }: DetailsDrawerProps) {
                   <div className="grid grid-cols-2 gap-3">
                     {activity.vitals.bloodPressure && (
                       <div className="rounded-lg border p-3">
-                        <div className="text-xs text-gray-600">Blood Pressure</div>
-                        <div className="mt-1">{activity.vitals.bloodPressure}</div>
+                        <div className="text-xs text-gray-600">
+                          Blood Pressure
+                        </div>
+                        <div className="mt-1">
+                          {activity.vitals.bloodPressure}
+                        </div>
                       </div>
                     )}
                     {activity.vitals.heartRate && (
@@ -94,7 +108,9 @@ export function DetailsDrawer({ activity, open, onClose }: DetailsDrawerProps) {
                     {activity.vitals.temperature && (
                       <div className="rounded-lg border p-3">
                         <div className="text-xs text-gray-600">Temperature</div>
-                        <div className="mt-1">{activity.vitals.temperature}</div>
+                        <div className="mt-1">
+                          {activity.vitals.temperature}
+                        </div>
                       </div>
                     )}
                     {activity.vitals.weight && (
@@ -227,12 +243,16 @@ export function DetailsDrawer({ activity, open, onClose }: DetailsDrawerProps) {
                 <h3 className="mb-2">File Information</h3>
                 <div className="space-y-2 rounded-lg bg-gray-50 p-4">
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-gray-600 min-w-[80px]">File name:</span>
+                    <span className="text-sm text-gray-600 min-w-[80px]">
+                      File name:
+                    </span>
                     <span className="text-sm">{activity.fileName}</span>
                   </div>
                   {activity.fileSize && (
                     <div className="flex items-start gap-2">
-                      <span className="text-sm text-gray-600 min-w-[80px]">File size:</span>
+                      <span className="text-sm text-gray-600 min-w-[80px]">
+                        File size:
+                      </span>
                       <span className="text-sm">{activity.fileSize}</span>
                     </div>
                   )}
@@ -242,8 +262,8 @@ export function DetailsDrawer({ activity, open, onClose }: DetailsDrawerProps) {
               <div>
                 <h3 className="mb-2">Preview</h3>
                 {activity.reportId ? (
-                  <PDFViewer 
-                    reportId={activity.reportId} 
+                  <PDFViewer
+                    reportId={activity.reportId}
                     fileName={activity.fileName}
                   />
                 ) : (

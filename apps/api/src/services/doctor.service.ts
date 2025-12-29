@@ -61,7 +61,7 @@ export async function getDoctorProfileByUserId(userId: string) {
 
 export async function updateDoctorSpecializations(
   userId: string,
-  names: string[],
+  names: string[]
 ) {
   const doctor = await prisma.doctor.findUnique({ where: { userId } })
   if (!doctor) {
@@ -74,8 +74,8 @@ export async function updateDoctorSpecializations(
         where: { name },
         update: {},
         create: { name },
-      }),
-    ),
+      })
+    )
   )
 
   // Remove existing links and recreate
@@ -143,7 +143,10 @@ export async function getAvailability(userId: string) {
 
 export async function setAvailability(
   userId: string,
-  slots: Omit<DoctorAvailability, 'id' | 'doctorId' | 'createdAt' | 'updatedAt'>[],
+  slots: Omit<
+    DoctorAvailability,
+    'id' | 'doctorId' | 'createdAt' | 'updatedAt'
+  >[]
 ) {
   const doctor = await getOrCreateDoctor(userId)
 
@@ -161,7 +164,9 @@ export async function setAvailability(
     list.push({ start: slot.startTime, end: slot.endTime })
 
     if (slot.hasBreak && slot.breakStart && slot.breakEnd) {
-      if (!(slot.startTime <= slot.breakStart && slot.breakEnd <= slot.endTime)) {
+      if (
+        !(slot.startTime <= slot.breakStart && slot.breakEnd <= slot.endTime)
+      ) {
         const error: any = new Error('Break must be within slot time range')
         error.status = 400
         throw error
@@ -208,7 +213,7 @@ export async function updateDoctorStatus(
     isAvailable?: boolean
     currentPatientId?: string | null
     currentQueueEntryId?: string | null
-  },
+  }
 ) {
   const data = {
     availabilityStatus: status,

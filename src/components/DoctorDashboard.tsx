@@ -1,28 +1,36 @@
-import { useState } from 'react';
-import { Calendar, Search, Pill, FileText, User, Settings, LogOut } from 'lucide-react';
-import { DashboardCard } from './DashboardCard';
-import { LogoutModal } from './LogoutModal';
+import { useState } from 'react'
+import {
+  Calendar,
+  Search,
+  Pill,
+  FileText,
+  User,
+  Settings,
+  LogOut,
+} from 'lucide-react'
+import { DashboardCard } from './DashboardCard'
+import { LogoutModal } from './LogoutModal'
 
 interface DoctorDashboardProps {
   user: {
-    name: string;
-    email: string;
-    role: 'patient' | 'doctor';
-    license?: string;
-    specialization?: string;
-    affiliation?: string;
-  };
-  onLogout: () => void;
+    name: string
+    email: string
+    role: 'patient' | 'doctor'
+    license?: string
+    specialization?: string
+    affiliation?: string
+  }
+  onLogout: () => void
 }
 
 export function DoctorDashboard({ user, onLogout }: DoctorDashboardProps) {
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false)
+  const [showDropdown, setShowDropdown] = useState(false)
 
   const handleLogout = () => {
-    setShowLogoutModal(false);
-    onLogout();
-  };
+    setShowLogoutModal(false)
+    onLogout()
+  }
 
   const cards = [
     {
@@ -53,7 +61,7 @@ export function DoctorDashboard({ user, onLogout }: DoctorDashboardProps) {
       color: 'orange',
       action: () => console.log('View history'),
     },
-  ];
+  ]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
@@ -76,7 +84,9 @@ export function DoctorDashboard({ user, onLogout }: DoctorDashboardProps) {
                 </div>
                 <div className="text-left hidden sm:block">
                   <p className="text-gray-900">{user.name}</p>
-                  <p className="text-gray-600">{user.specialization || user.email}</p>
+                  <p className="text-gray-600">
+                    {user.specialization || user.email}
+                  </p>
                 </div>
               </button>
 
@@ -93,8 +103,8 @@ export function DoctorDashboard({ user, onLogout }: DoctorDashboardProps) {
                   <hr className="my-1 border-gray-200" />
                   <button
                     onClick={() => {
-                      setShowDropdown(false);
-                      setShowLogoutModal(true);
+                      setShowDropdown(false)
+                      setShowLogoutModal(true)
                     }}
                     className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-red-600"
                   >
@@ -120,12 +130,14 @@ export function DoctorDashboard({ user, onLogout }: DoctorDashboardProps) {
             )}
             {user.specialization && (
               <span className="flex items-center gap-1">
-                Specialization: <span className="text-gray-900">{user.specialization}</span>
+                Specialization:{' '}
+                <span className="text-gray-900">{user.specialization}</span>
               </span>
             )}
             {user.affiliation && (
               <span className="flex items-center gap-1">
-                Affiliation: <span className="text-gray-900">{user.affiliation}</span>
+                Affiliation:{' '}
+                <span className="text-gray-900">{user.affiliation}</span>
               </span>
             )}
           </div>
@@ -165,5 +177,5 @@ export function DoctorDashboard({ user, onLogout }: DoctorDashboardProps) {
         />
       )}
     </div>
-  );
+  )
 }

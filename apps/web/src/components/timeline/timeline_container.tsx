@@ -1,10 +1,30 @@
-"use client"
+'use client'
 
-import { useEffect, useMemo, useRef, useState, type ChangeEventHandler } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ChangeEventHandler,
+} from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Bell, Filter as FilterIcon, Search as SearchIcon, Upload } from 'lucide-react'
+import {
+  Bell,
+  Filter as FilterIcon,
+  Search as SearchIcon,
+  Upload,
+} from 'lucide-react'
 import type { Patient } from '@smartmed/types'
-import { Button, Input, Badge, ScrollArea, Sheet, SheetContent, SheetHeader, SheetTitle } from '@smartmed/ui'
+import {
+  Button,
+  Input,
+  Badge,
+  ScrollArea,
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@smartmed/ui'
 import { handleApiError, showSuccess } from '@/lib/error_utils'
 import { apiClient } from '@/services/apiClient'
 import type { FilterState, TimelineActivity, UserRole } from '@/types/timeline'
@@ -61,7 +81,8 @@ export function TimelineContainer({
     }
   }, [filters.role, lockRole, resolvedRole])
 
-  const [selectedActivity, setSelectedActivity] = useState<TimelineActivity | null>(null)
+  const [selectedActivity, setSelectedActivity] =
+    useState<TimelineActivity | null>(null)
   const [detailsDrawerOpen, setDetailsDrawerOpen] = useState(false)
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
@@ -72,10 +93,12 @@ export function TimelineContainer({
   const queryParams = useMemo(() => {
     const params: Record<string, string> = {}
 
-    if (filters.dateRange.from) params.from = filters.dateRange.from.toISOString()
+    if (filters.dateRange.from)
+      params.from = filters.dateRange.from.toISOString()
     if (filters.dateRange.to) params.to = filters.dateRange.to.toISOString()
     if (filters.types.length > 0) params.types = filters.types.join(',')
-    if (filters.statuses.length > 0) params.statuses = filters.statuses.join(',')
+    if (filters.statuses.length > 0)
+      params.statuses = filters.statuses.join(',')
     if (filters.searchText) params.search = filters.searchText
 
     return params
@@ -104,32 +127,29 @@ export function TimelineContainer({
 
   const shouldFetchPatient = filters.role === 'patient' && !uploadPatientId
 
-  const {
-    data: currentPatientData,
-    isLoading: isLoadingCurrentPatient,
-  } = useQuery({
-    queryKey: ['currentPatient'],
-    queryFn: async () => {
-      try {
-        const resp = await apiClient.get('/patient/profile')
-        return resp.data as { patient: Patient }
-      } catch (error) {
-        handleApiError(error, 'Failed to load patient information')
-        throw error
-      }
-    },
-    enabled: shouldFetchPatient,
-    retry: 1,
-    staleTime: 5 * 60 * 1000,
-  })
+  const { data: currentPatientData, isLoading: isLoadingCurrentPatient } =
+    useQuery({
+      queryKey: ['currentPatient'],
+      queryFn: async () => {
+        try {
+          const resp = await apiClient.get('/patient/profile')
+          return resp.data as { patient: Patient }
+        } catch (error) {
+          handleApiError(error, 'Failed to load patient information')
+          throw error
+        }
+      },
+      enabled: shouldFetchPatient,
+      retry: 1,
+      staleTime: 5 * 60 * 1000,
+    })
 
   const currentPatient = currentPatientData?.patient
-  const resolvedPatientId = canUpload ? uploadPatientId || currentPatient?.id || envDemoPatientId : null
+  const resolvedPatientId = canUpload
+    ? uploadPatientId || currentPatient?.id || envDemoPatientId
+    : null
 
-  const {
-    data: notificationsData,
-    refetch: refetchNotifications,
-  } = useQuery({
+  const { data: notificationsData, refetch: refetchNotifications } = useQuery({
     queryKey: ['notifications'],
     queryFn: async () => {
       try {
@@ -148,8 +168,12 @@ export function TimelineContainer({
   const unreadCount = notifications.filter((n) => !n.readAt).length
   const stats = useMemo(() => {
     const total = activities.length
-    const appointments = activities.filter((a) => a.type === 'appointment').length
-    const prescriptions = activities.filter((a) => a.type === 'prescription').length
+    const appointments = activities.filter(
+      (a) => a.type === 'appointment'
+    ).length
+    const prescriptions = activities.filter(
+      (a) => a.type === 'prescription'
+    ).length
     const reports = activities.filter((a) => a.type === 'report').length
     return { total, appointments, prescriptions, reports }
   }, [activities])
@@ -223,7 +247,11 @@ export function TimelineContainer({
   const roleLabel = filters.role === 'doctor' ? 'doctor' : 'patient'
 
   const filterRail = (
-    <FilterRail filters={filters} onFiltersChange={handleFiltersChange} lockedRole={lockedRole} />
+    <FilterRail
+      filters={filters}
+      onFiltersChange={handleFiltersChange}
+      lockedRole={lockedRole}
+    />
   )
 
   const timelineBody = (
@@ -232,6 +260,7 @@ export function TimelineContainer({
       filters={filters}
       onOpenDetails={handleOpenDetails}
       isLoading={isLoading}
+      userRole={filters.role}
     />
   )
 
@@ -244,7 +273,8 @@ export function TimelineContainer({
             <Badge variant="outline">Linked to {roleLabel} profile</Badge>
           </div>
           <p className="text-sm text-slate-600">
-            {subheading || 'See appointments, prescriptions, and reports directly inside the profile.'}
+            {subheading ||
+              'See appointments, prescriptions, and reports directly inside the profile.'}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -257,7 +287,12 @@ export function TimelineContainer({
             <FilterIcon className="mr-2 h-4 w-4" />
             Filters
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setNotificationsOpen(true)} className="relative">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setNotificationsOpen(true)}
+            className="relative"
+          >
             <Bell className="h-4 w-4 mr-2" />
             Notifications
             {unreadCount > 0 && (
@@ -299,7 +334,9 @@ export function TimelineContainer({
             placeholder="Search doctors, meds, or files"
             className="pl-10"
             value={filters.searchText}
-            onChange={(e) => handleFiltersChange({ ...filters, searchText: e.target.value })}
+            onChange={(e) =>
+              handleFiltersChange({ ...filters, searchText: e.target.value })
+            }
           />
         </div>
         {lockedRole && (
@@ -318,7 +355,9 @@ export function TimelineContainer({
 
       <div className="grid gap-4 lg:grid-cols-[280px,1fr]">
         <div className="hidden lg:block">
-          <div className="rounded-lg border bg-white shadow-sm">{filterRail}</div>
+          <div className="rounded-lg border bg-white shadow-sm">
+            {filterRail}
+          </div>
         </div>
         <div className="rounded-lg border bg-white shadow-sm">
           <ScrollArea className="h-[32rem]">{timelineBody}</ScrollArea>
@@ -354,7 +393,11 @@ export function TimelineContainer({
         aria-label="Upload report PDF"
       />
 
-      <DetailsDrawer activity={selectedActivity} open={detailsDrawerOpen} onClose={handleCloseDetails} />
+      <DetailsDrawer
+        activity={selectedActivity}
+        open={detailsDrawerOpen}
+        onClose={handleCloseDetails}
+      />
 
       <NotificationsDrawer
         open={notificationsOpen}
@@ -396,7 +439,9 @@ export function TimelineContainer({
 
       <div className="flex flex-1 overflow-hidden">
         <div className="hidden lg:block">
-          <ScrollArea className="h-full w-72 border-r bg-gray-50">{filterRail}</ScrollArea>
+          <ScrollArea className="h-full w-72 border-r bg-gray-50">
+            {filterRail}
+          </ScrollArea>
         </div>
 
         <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
@@ -423,7 +468,11 @@ export function TimelineContainer({
           <ScrollArea className="h-full">{timelineBody}</ScrollArea>
         </main>
 
-        <DetailsDrawer activity={selectedActivity} open={detailsDrawerOpen} onClose={handleCloseDetails} />
+        <DetailsDrawer
+          activity={selectedActivity}
+          open={detailsDrawerOpen}
+          onClose={handleCloseDetails}
+        />
 
         <NotificationsDrawer
           open={notificationsOpen}

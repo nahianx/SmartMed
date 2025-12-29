@@ -270,7 +270,6 @@ export default function DoctorDashboardPage() {
                 />
               </div>
             </section>
-
           </div>
 
           <div className="space-y-4">
@@ -281,9 +280,16 @@ export default function DoctorDashboardPage() {
               </div>
               <div className="space-y-2">
                 <QuickLink
+                  label="View appointments"
+                  description="See all your scheduled appointments"
+                  onClick={() => router.push('/dashboard/doctor/appointments')}
+                />
+                <QuickLink
                   label="Manage availability"
                   description="Update weekly schedule and breaks"
-                  onClick={() => router.push('/profile?role=DOCTOR&tab=availability')}
+                  onClick={() =>
+                    router.push('/profile?role=DOCTOR&tab=availability')
+                  }
                 />
                 <QuickLink
                   label="View activity timeline"
@@ -355,10 +361,22 @@ function StatusCard({
   variant?: 'outline' | 'soft'
 }) {
   const tones: Record<string, { border: string; bg: string }> = {
-    neutral: { border: 'border-slate-200', bg: variant === 'soft' ? 'bg-slate-50' : 'bg-white' },
-    info: { border: 'border-blue-100', bg: variant === 'soft' ? 'bg-blue-50' : 'bg-white' },
-    success: { border: 'border-emerald-100', bg: variant === 'soft' ? 'bg-emerald-50' : 'bg-white' },
-    warning: { border: 'border-amber-100', bg: variant === 'soft' ? 'bg-amber-50' : 'bg-white' },
+    neutral: {
+      border: 'border-slate-200',
+      bg: variant === 'soft' ? 'bg-slate-50' : 'bg-white',
+    },
+    info: {
+      border: 'border-blue-100',
+      bg: variant === 'soft' ? 'bg-blue-50' : 'bg-white',
+    },
+    success: {
+      border: 'border-emerald-100',
+      bg: variant === 'soft' ? 'bg-emerald-50' : 'bg-white',
+    },
+    warning: {
+      border: 'border-amber-100',
+      bg: variant === 'soft' ? 'bg-amber-50' : 'bg-white',
+    },
   }
 
   return (

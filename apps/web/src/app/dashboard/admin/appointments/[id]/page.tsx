@@ -43,7 +43,10 @@ export default function AdminAppointmentDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [updating, setUpdating] = useState(false)
   const [success, setSuccess] = useState<string | null>(null)
-  const [pendingStatus, setPendingStatus] = useState<'COMPLETED' | 'NO_SHOW' | null>(null)
+  const [pendingStatus, setPendingStatus] = useState<
+    'COMPLETED' | 'NO_SHOW' | null
+  >(null)
+  const [pendingReason, setPendingReason] = useState('')
   const [notesDraft, setNotesDraft] = useState('')
   const [savingNotes, setSavingNotes] = useState(false)
 
@@ -87,15 +90,24 @@ export default function AdminAppointmentDetailPage() {
     }
   }
 
-  const handleStatusUpdate = async (status: 'COMPLETED' | 'NO_SHOW', reason?: string) => {
+  const handleStatusUpdate = async (
+    status: 'COMPLETED' | 'NO_SHOW',
+    reason?: string
+  ) => {
     if (!appointment) return
 
     try {
       setUpdating(true)
       setError(null)
-      await appointmentService.updateAppointmentStatus(appointment.id, status, reason)
+      await appointmentService.updateAppointmentStatus(
+        appointment.id,
+        status,
+        reason
+      )
       await loadAppointmentData()
-      setSuccess(`Appointment marked as ${status === 'COMPLETED' ? 'Completed' : 'No Show'}`)
+      setSuccess(
+        `Appointment marked as ${status === 'COMPLETED' ? 'Completed' : 'No Show'}`
+      )
     } catch (err) {
       setError(`Failed to update appointment status`)
       console.error(err)
@@ -110,7 +122,10 @@ export default function AdminAppointmentDetailPage() {
     if (!appointment) return
     try {
       setSavingNotes(true)
-      await appointmentService.updateAppointmentNotes(appointment.id, notesDraft)
+      await appointmentService.updateAppointmentNotes(
+        appointment.id,
+        notesDraft
+      )
       await loadAppointmentData()
       setNotesDraft('')
       setSuccess('Notes updated')
@@ -195,7 +210,11 @@ export default function AdminAppointmentDetailPage() {
             </div>
           )}
           {success && (
-            <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6" role="status" aria-live="polite">
+            <div
+              className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6"
+              role="status"
+              aria-live="polite"
+            >
               {success}
             </div>
           )}
@@ -390,31 +409,31 @@ export default function AdminAppointmentDetailPage() {
                     </p>
                   </div>
                   {appointment.notes && (
-                <div className="col-span-2">
-                  <label className="text-xs font-medium text-slate-500 uppercase">
-                    Notes
-                  </label>
-                  <p className="text-sm text-slate-900">
-                    {appointment.notes || '—'}
-                  </p>
-                  <div className="mt-2 space-y-2">
-                    <textarea
-                      value={notesDraft}
-                      onChange={(e) => setNotesDraft(e.target.value)}
-                      placeholder="Add or update appointment notes"
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      rows={3}
-                    />
-                    <button
-                      onClick={handleSaveNotes}
-                      disabled={savingNotes || !notesDraft.trim()}
-                      className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium disabled:opacity-50"
-                    >
-                      {savingNotes ? 'Saving...' : 'Save Notes'}
-                    </button>
-                  </div>
-                </div>
-              )}
+                    <div className="col-span-2">
+                      <label className="text-xs font-medium text-slate-500 uppercase">
+                        Notes
+                      </label>
+                      <p className="text-sm text-slate-900">
+                        {appointment.notes || '—'}
+                      </p>
+                      <div className="mt-2 space-y-2">
+                        <textarea
+                          value={notesDraft}
+                          onChange={(e) => setNotesDraft(e.target.value)}
+                          placeholder="Add or update appointment notes"
+                          className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          rows={3}
+                        />
+                        <button
+                          onClick={handleSaveNotes}
+                          disabled={savingNotes || !notesDraft.trim()}
+                          className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium disabled:opacity-50"
+                        >
+                          {savingNotes ? 'Saving...' : 'Save Notes'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -553,12 +572,16 @@ export default function AdminAppointmentDetailPage() {
             ? 'Mark this appointment as completed?'
             : 'Mark this appointment as no-show?'
         }
-        confirmText={pendingStatus === 'COMPLETED' ? 'Mark Completed' : 'Mark No-show'}
+        confirmText={
+          pendingStatus === 'COMPLETED' ? 'Mark Completed' : 'Mark No-show'
+        }
         isDangerous={pendingStatus === 'NO_SHOW'}
         requireReason
         reasonLabel="Reason (required for audit)"
         placeholder="Add context for this status change"
-        onConfirm={(reason) => pendingStatus && handleStatusUpdate(pendingStatus, reason)}
+        onConfirm={(reason) =>
+          pendingStatus && handleStatusUpdate(pendingStatus, reason)
+        }
         onCancel={() => {
           setPendingStatus(null)
         }}

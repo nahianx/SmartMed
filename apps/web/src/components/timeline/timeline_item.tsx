@@ -1,4 +1,12 @@
-import { Calendar, Eye, MapPin, Pill, FileText, Stethoscope } from 'lucide-react'
+import {
+  Calendar,
+  Eye,
+  MapPin,
+  Pill,
+  FileText,
+  Stethoscope,
+} from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import type { TimelineActivity } from '@/types/timeline'
 import { Badge, Button } from '@smartmed/ui'
 import { format } from 'date-fns'
@@ -6,10 +14,18 @@ import { format } from 'date-fns'
 interface TimelineItemProps {
   activity: TimelineActivity
   onOpenDetails: (activity: TimelineActivity) => void
+  userRole?: 'patient' | 'doctor' | 'admin'
 }
 
-export function TimelineItem({ activity, onOpenDetails }: TimelineItemProps) {
-  const apiBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api').replace(/\/$/, '')
+export function TimelineItem({
+  activity,
+  onOpenDetails,
+  userRole,
+}: TimelineItemProps) {
+  const router = useRouter()
+  const apiBase = (
+    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+  ).replace(/\/$/, '')
 
   const getIcon = () => {
     switch (activity.type) {
@@ -38,7 +54,10 @@ export function TimelineItem({ activity, onOpenDetails }: TimelineItemProps) {
   const getStatusBadge = () => {
     if (!activity.status) return null
 
-    const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+    const variants: Record<
+      string,
+      'default' | 'secondary' | 'destructive' | 'outline'
+    > = {
       completed: 'default',
       cancelled: 'secondary',
       'no-show': 'destructive',
@@ -58,7 +77,9 @@ export function TimelineItem({ activity, onOpenDetails }: TimelineItemProps) {
       className="group relative flex gap-4 rounded-lg border bg-white p-4 transition-all hover:shadow-md cursor-pointer"
       onClick={() => onOpenDetails(activity)}
     >
-      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${getIconBgColor()}`}>
+      <div
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${getIconBgColor()}`}
+      >
         {getIcon()}
       </div>
 
@@ -101,11 +122,23 @@ export function TimelineItem({ activity, onOpenDetails }: TimelineItemProps) {
               variant="outline"
               onClick={(e) => {
                 e.stopPropagation()
-                onOpenDetails(activity)
+                // Navigate to appointment detail page for appointments
+                if (activity.type === 'appointment' && activity.id) {
+                  const rolePath = userRole === 'doctor' ? 'doctor' : 'patient'
+                  router.push(
+                    `/dashboard/${rolePath}/appointments/${activity.id}`
+                  )
+                } else {
+                  onOpenDetails(activity)
+                }
               }}
             >
               <Eye className="h-4 w-4 mr-1" />
-              {activity.type === 'prescription' ? 'View Rx' : activity.type === 'report' ? 'Preview' : 'View'}
+              {activity.type === 'prescription'
+                ? 'View Rx'
+                : activity.type === 'report'
+                  ? 'Preview'
+                  : 'View'}
             </Button>
             {activity.type !== 'appointment' && (
               <Button
@@ -113,7 +146,11 @@ export function TimelineItem({ activity, onOpenDetails }: TimelineItemProps) {
                 variant="ghost"
                 onClick={(e) => {
                   e.stopPropagation()
-                  if (activity.type === 'report' && activity.reportId && typeof window !== 'undefined') {
+                  if (
+                    activity.type === 'report' &&
+                    activity.reportId &&
+                    typeof window !== 'undefined'
+                  ) {
                     const url = `${apiBase}/reports/${activity.reportId}/download`
                     window.open(url, '_blank')
                   }
@@ -131,7 +168,13 @@ export function TimelineItem({ activity, onOpenDetails }: TimelineItemProps) {
                 if (typeof window !== 'undefined') {
                   const shareUrl = `${window.location.origin}/timeline?id=${activity.id}`
                   if (navigator.share) {
-                    navigator.share({ title: activity.title, text: activity.subtitle, url: shareUrl }).catch(() => {})
+                    navigator
+                      .share({
+                        title: activity.title,
+                        text: activity.subtitle,
+                        url: shareUrl,
+                      })
+                      .catch(() => {})
                   } else if (navigator.clipboard) {
                     navigator.clipboard.writeText(shareUrl).catch(() => {})
                   } else {

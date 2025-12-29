@@ -25,6 +25,7 @@ import {
   Report,
   PreviousVisit,
 } from '../../../../../services/appointmentService'
+import PrescriptionModal from '../../../../../components/prescription/PrescriptionModal'
 
 export default function AppointmentDetailPage() {
   const { user, loading } = useAuthContext()
@@ -42,9 +43,13 @@ export default function AppointmentDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [updating, setUpdating] = useState(false)
   const [success, setSuccess] = useState<string | null>(null)
-  const [pendingStatus, setPendingStatus] = useState<'COMPLETED' | 'NO_SHOW' | null>(null)
+  const [pendingStatus, setPendingStatus] = useState<
+    'COMPLETED' | 'NO_SHOW' | null
+  >(null)
+  const [pendingReason, setPendingReason] = useState('')
   const [notesDraft, setNotesDraft] = useState('')
   const [savingNotes, setSavingNotes] = useState(false)
+  const [showPrescriptionModal, setShowPrescriptionModal] = useState(false)
 
   useEffect(() => {
     if (!loading) {
@@ -86,15 +91,24 @@ export default function AppointmentDetailPage() {
     }
   }
 
-  const handleStatusUpdate = async (status: 'COMPLETED' | 'NO_SHOW', reason?: string) => {
+  const handleStatusUpdate = async (
+    status: 'COMPLETED' | 'NO_SHOW',
+    reason?: string
+  ) => {
     if (!appointment) return
 
     try {
       setUpdating(true)
       setError(null)
-      await appointmentService.updateAppointmentStatus(appointment.id, status, reason)
+      await appointmentService.updateAppointmentStatus(
+        appointment.id,
+        status,
+        reason
+      )
       await loadAppointmentData()
-      setSuccess(`Appointment marked as ${status === 'COMPLETED' ? 'Completed' : 'No Show'}`)
+      setSuccess(
+        `Appointment marked as ${status === 'COMPLETED' ? 'Completed' : 'No Show'}`
+      )
     } catch (err) {
       setError(`Failed to update appointment status`)
       console.error(err)
@@ -109,7 +123,10 @@ export default function AppointmentDetailPage() {
     if (!appointment) return
     try {
       setSavingNotes(true)
-      await appointmentService.updateAppointmentNotes(appointment.id, notesDraft)
+      await appointmentService.updateAppointmentNotes(
+        appointment.id,
+        notesDraft
+      )
       await loadAppointmentData()
       setNotesDraft('')
       setSuccess('Notes updated')
@@ -197,7 +214,11 @@ export default function AppointmentDetailPage() {
             </div>
           )}
           {success && (
-            <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6" role="status" aria-live="polite">
+            <div
+              className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6"
+              role="status"
+              aria-live="polite"
+            >
               {success}
             </div>
           )}
@@ -367,41 +388,49 @@ export default function AppointmentDetailPage() {
                     </p>
                   </div>
                   {appointment.notes && (
-                <div className="col-span-2">
-                  <label className="text-xs font-medium text-slate-500 uppercase">
-                    Notes
-                  </label>
-                  <p className="text-sm text-slate-900">
-                    {appointment.notes || '—'}
-                  </p>
-                  <div className="mt-2 space-y-2">
-                    <textarea
-                      value={notesDraft}
-                      onChange={(e) => setNotesDraft(e.target.value)}
-                      placeholder="Add or update appointment notes"
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      rows={3}
-                    />
-                    <button
-                      onClick={handleSaveNotes}
-                      disabled={savingNotes || !notesDraft.trim()}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium disabled:opacity-50"
-                    >
-                      {savingNotes ? 'Saving...' : 'Save Notes'}
-                    </button>
-                  </div>
-                </div>
-              )}
+                    <div className="col-span-2">
+                      <label className="text-xs font-medium text-slate-500 uppercase">
+                        Notes
+                      </label>
+                      <p className="text-sm text-slate-900">
+                        {appointment.notes || '—'}
+                      </p>
+                      <div className="mt-2 space-y-2">
+                        <textarea
+                          value={notesDraft}
+                          onChange={(e) => setNotesDraft(e.target.value)}
+                          placeholder="Add or update appointment notes"
+                          className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          rows={3}
+                        />
+                        <button
+                          onClick={handleSaveNotes}
+                          disabled={savingNotes || !notesDraft.trim()}
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium disabled:opacity-50"
+                        >
+                          {savingNotes ? 'Saving...' : 'Save Notes'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Active Prescriptions */}
               <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Pill className="h-5 w-5 text-blue-600" />
-                  <h2 className="text-lg font-semibold text-slate-900">
-                    Active Prescriptions
-                  </h2>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Pill className="h-5 w-5 text-blue-600" />
+                    <h2 className="text-lg font-semibold text-slate-900">
+                      Active Prescriptions
+                    </h2>
+                  </div>
+                  <button
+                    onClick={() => setShowPrescriptionModal(true)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                  >
+                    Create Prescription
+                  </button>
                 </div>
                 {activePrescriptions.length > 0 ? (
                   <div className="space-y-3">
@@ -530,16 +559,34 @@ export default function AppointmentDetailPage() {
             ? 'Mark this appointment as completed?'
             : 'Mark this appointment as no-show?'
         }
-        confirmText={pendingStatus === 'COMPLETED' ? 'Mark Completed' : 'Mark No-show'}
+        confirmText={
+          pendingStatus === 'COMPLETED' ? 'Mark Completed' : 'Mark No-show'
+        }
         isDangerous={pendingStatus === 'NO_SHOW'}
         requireReason
         reasonLabel="Reason (required for audit)"
         placeholder="Add context for this status change"
-        onConfirm={(reason) => pendingStatus && handleStatusUpdate(pendingStatus, reason)}
+        onConfirm={(reason) =>
+          pendingStatus && handleStatusUpdate(pendingStatus, reason)
+        }
         onCancel={() => {
           setPendingStatus(null)
         }}
       />
+
+      {appointment && (
+        <PrescriptionModal
+          isOpen={showPrescriptionModal}
+          onClose={() => setShowPrescriptionModal(false)}
+          appointmentId={appointment.id}
+          patientId={appointment.patientId}
+          patientName={`${appointment.patient?.firstName || ''} ${appointment.patient?.lastName || ''}`.trim()}
+          onSuccess={() => {
+            setSuccess('Prescription created successfully')
+            loadAppointmentData()
+          }}
+        />
+      )}
     </div>
   )
 }

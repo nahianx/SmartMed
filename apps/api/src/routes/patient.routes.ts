@@ -98,7 +98,6 @@ router.get('/me', async (req: AuthenticatedRequest, res: Response) => {
 router.get(
   '/profile',
   requireAuth,
-  requireRole(UserRole.PATIENT),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const patient = await getPatientProfileByUserId(req.user!.id)
@@ -171,7 +170,9 @@ router.get(
       const { patientId } = req.params
       const filters = req.query as any
 
-      const patient = await prisma.patient.findUnique({ where: { id: patientId } })
+      const patient = await prisma.patient.findUnique({
+        where: { id: patientId },
+      })
       if (!patient) {
         return res.status(404).json({ error: 'Patient not found' })
       }
@@ -212,7 +213,7 @@ router.get(
         req.user.role,
         patientId,
         req,
-        filters,
+        filters
       )
 
       res.json(history)
@@ -220,7 +221,7 @@ router.get(
       console.error('Error fetching patient history', error)
       res.status(500).json({ error: 'Failed to fetch patient history' })
     }
-  },
+  }
 )
 
 // Get patient by ID - must come AFTER specific routes

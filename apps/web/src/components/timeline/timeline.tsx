@@ -11,9 +11,16 @@ interface TimelineProps {
   filters: FilterState
   onOpenDetails: (activity: TimelineActivity) => void
   isLoading?: boolean
+  userRole?: 'patient' | 'doctor' | 'admin'
 }
 
-export function Timeline({ activities, filters, onOpenDetails, isLoading = false }: TimelineProps) {
+export function Timeline({
+  activities,
+  filters,
+  onOpenDetails,
+  isLoading = false,
+  userRole,
+}: TimelineProps) {
   const filteredActivities = useMemo(() => {
     return activities.filter((activity) => {
       if (filters.types.length > 0 && !filters.types.includes(activity.type)) {
@@ -21,7 +28,11 @@ export function Timeline({ activities, filters, onOpenDetails, isLoading = false
       }
 
       if (filters.statuses.length > 0) {
-        if (activity.type !== 'appointment' || !activity.status || !filters.statuses.includes(activity.status)) {
+        if (
+          activity.type !== 'appointment' ||
+          !activity.status ||
+          !filters.statuses.includes(activity.status)
+        ) {
           if (activity.type === 'appointment') {
             return false
           }
@@ -85,10 +96,15 @@ export function Timeline({ activities, filters, onOpenDetails, isLoading = false
   }, [filteredActivities])
 
   const virtualRows = useMemo(() => {
-    const rows: Array<{ type: 'date'; date: Date } | { type: 'item'; activity: TimelineActivity }> = []
+    const rows: Array<
+      | { type: 'date'; date: Date }
+      | { type: 'item'; activity: TimelineActivity }
+    > = []
     groupedActivities.forEach((group) => {
       rows.push({ type: 'date', date: group.date })
-      group.activities.forEach((activity) => rows.push({ type: 'item', activity }))
+      group.activities.forEach((activity) =>
+        rows.push({ type: 'item', activity })
+      )
     })
     return rows
   }, [groupedActivities])
@@ -111,7 +127,9 @@ export function Timeline({ activities, filters, onOpenDetails, isLoading = false
 
   if (groupedActivities.length === 0) {
     const hasFilters =
-      !!filters.searchText || filters.types.length > 0 || filters.statuses.length > 0
+      !!filters.searchText ||
+      filters.types.length > 0 ||
+      filters.statuses.length > 0
 
     return (
       <div className="flex flex-col items-center justify-center p-12 text-center">
@@ -140,7 +158,13 @@ export function Timeline({ activities, filters, onOpenDetails, isLoading = false
     )
   }
 
-  const renderRow = ({ index, style }: { index: number; style: CSSProperties }) => {
+  const renderRow = ({
+    index,
+    style,
+  }: {
+    index: number
+    style: CSSProperties
+  }) => {
     const row = virtualRows[index]
     if (row.type === 'date') {
       return (
@@ -156,12 +180,17 @@ export function Timeline({ activities, filters, onOpenDetails, isLoading = false
     }
     return (
       <div style={style} className="px-2 pb-3">
-        <TimelineItem activity={row.activity} onOpenDetails={onOpenDetails} />
+        <TimelineItem
+          activity={row.activity}
+          onOpenDetails={onOpenDetails}
+          userRole={userRole}
+        />
       </div>
     )
   }
 
-  const shouldVirtualize = typeof window !== 'undefined' && virtualRows.length > 40
+  const shouldVirtualize =
+    typeof window !== 'undefined' && virtualRows.length > 40
 
   return shouldVirtualize ? (
     <div className="p-2">
@@ -194,6 +223,7 @@ export function Timeline({ activities, filters, onOpenDetails, isLoading = false
                 key={activity.id}
                 activity={activity}
                 onOpenDetails={onOpenDetails}
+                userRole={userRole}
               />
             ))}
           </div>

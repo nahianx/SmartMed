@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import { useEffect, useMemo, useState } from "react"
-import { useRouter } from "next/navigation"
-import { useAuthContext } from "../../../context/AuthContext"
-import { apiClient } from "../../../services/apiClient"
+import { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuthContext } from '../../../context/AuthContext'
+import { apiClient } from '../../../services/apiClient'
 import {
   Calendar,
   Clock,
@@ -15,11 +15,11 @@ import {
   ShieldCheck,
   ClipboardList,
   LogOut,
-} from "lucide-react"
-import { Badge, Button } from "@smartmed/ui"
-import { TimelineContainer } from "@/components/timeline/timeline_container"
-import { PatientQueueTracker } from "@/components/queue/PatientQueueTracker"
-import { DoctorAvailabilityList } from "@/components/queue/DoctorAvailabilityList"
+} from 'lucide-react'
+import { Badge, Button } from '@smartmed/ui'
+import { TimelineContainer } from '@/components/timeline/timeline_container'
+import { PatientQueueTracker } from '@/components/queue/PatientQueueTracker'
+import { DoctorAvailabilityList } from '@/components/queue/DoctorAvailabilityList'
 
 interface PatientDashboardData {
   upcomingAppointments?: Array<{
@@ -28,10 +28,21 @@ interface PatientDashboardData {
     doctorName?: string
     reason?: string
     status?: string
+    specialization?: string
   }>
   preferredDoctorsCount?: number
-  recentPrescriptions?: Array<{ id: string; diagnosis?: string; createdAt?: string }>
+  recentPrescriptions?: Array<{
+    id: string
+    diagnosis?: string
+    createdAt?: string
+  }>
   notes?: string[]
+  profile?: {
+    id: string
+    userId: string
+    firstName: string
+    lastName: string
+  }
 }
 
 export default function PatientDashboardPage() {
@@ -45,10 +56,10 @@ export default function PatientDashboardPage() {
     try {
       setRefreshing(true)
       setError(null)
-      const res = await apiClient.get("/dashboard/patient")
+      const res = await apiClient.get('/dashboard/patient')
       setData(res.data)
     } catch (err) {
-      setError("Failed to load dashboard data")
+      setError('Failed to load dashboard data')
       setData(null)
     } finally {
       setRefreshing(false)
@@ -58,9 +69,9 @@ export default function PatientDashboardPage() {
   useEffect(() => {
     if (!loading) {
       if (!user) {
-        router.replace("/auth/login")
-      } else if (user.role !== "PATIENT") {
-        router.replace("/")
+        router.replace('/auth/login')
+      } else if (user.role !== 'PATIENT') {
+        router.replace('/')
       } else {
         loadDashboard()
       }
@@ -70,13 +81,17 @@ export default function PatientDashboardPage() {
   const upcoming = useMemo(() => data?.upcomingAppointments || [], [data])
   const preferredCount = data?.preferredDoctorsCount ?? 0
   const prescriptions = data?.recentPrescriptions || []
-  const patientId = data?.profile?.id as string | undefined
+  const patientId = data?.profile?.id
 
   if (loading || !user) {
-    return <main className="min-h-screen flex items-center justify-center">Loading...</main>
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        Loading...
+      </main>
+    )
   }
 
-  const firstName = user.fullName?.split(" ")[0] || "Patient"
+  const firstName = user.fullName?.split(' ')[0] || 'Patient'
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -93,13 +108,14 @@ export default function PatientDashboardPage() {
               </Badge>
             </div>
             <p className="text-slate-600">
-              Welcome back, {firstName}. Track your upcoming visits, history, and preferred doctors.
+              Welcome back, {firstName}. Track your upcoming visits, history,
+              and preferred doctors.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"
-              onClick={() => router.push("/dashboard/patient/search")}
+              onClick={() => router.push('/dashboard/patient/search')}
               className="inline-flex items-center gap-2"
             >
               <Search className="h-4 w-4" />
@@ -112,8 +128,10 @@ export default function PatientDashboardPage() {
               className="inline-flex items-center gap-2"
               disabled={refreshing}
             >
-              <Sparkles className={`h-4 w-4 ${refreshing ? "animate-pulse" : ""}`} />
-              {refreshing ? "Refreshing..." : "Refresh data"}
+              <Sparkles
+                className={`h-4 w-4 ${refreshing ? 'animate-pulse' : ''}`}
+              />
+              {refreshing ? 'Refreshing...' : 'Refresh data'}
             </Button>
             <Button
               type="button"
@@ -139,7 +157,11 @@ export default function PatientDashboardPage() {
           <StatusCard
             icon={<Calendar className="h-5 w-5 text-blue-600" />}
             title="Upcoming visits"
-            value={upcoming.length ? `${upcoming.length} scheduled` : "No visits scheduled"}
+            value={
+              upcoming.length
+                ? `${upcoming.length} scheduled`
+                : 'No visits scheduled'
+            }
             hint="Quick view of your next appointments"
             tone="info"
           />
@@ -149,7 +171,9 @@ export default function PatientDashboardPage() {
             value={`${preferredCount} saved`}
             hint="Manage your go-to doctors"
             tone="success"
-            onClick={() => router.push("/profile?role=PATIENT&tab=preferred-doctors")}
+            onClick={() =>
+              router.push('/profile?role=PATIENT&tab=preferred-doctors')
+            }
           />
           <StatusCard
             icon={<ShieldCheck className="h-5 w-5 text-emerald-600" />}
@@ -157,7 +181,7 @@ export default function PatientDashboardPage() {
             value="Manage info & security"
             hint="Update details and MFA"
             tone="neutral"
-            onClick={() => router.push("/profile?role=PATIENT")}
+            onClick={() => router.push('/profile?role=PATIENT')}
           />
         </div>
 
@@ -171,9 +195,15 @@ export default function PatientDashboardPage() {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Clock className="h-5 w-5 text-slate-600" />
-                  <h2 className="text-lg font-semibold">Upcoming appointments</h2>
+                  <h2 className="text-lg font-semibold">
+                    Upcoming appointments
+                  </h2>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => router.push("/dashboard/patient/search")}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => router.push('/dashboard/patient/search')}
+                >
                   Book new
                 </Button>
               </div>
@@ -189,15 +219,19 @@ export default function PatientDashboardPage() {
                       className="rounded-lg border border-slate-200 bg-slate-50 p-4 flex items-center justify-between"
                     >
                       <div className="space-y-1">
-                        <p className="font-semibold text-slate-900">{apt.doctorName || "Doctor visit"}</p>
-                        <p className="text-sm text-slate-600">{apt.reason || "General consultation"}</p>
+                        <p className="font-semibold text-slate-900">
+                          {apt.doctorName || 'Doctor visit'}
+                        </p>
+                        <p className="text-sm text-slate-600">
+                          {apt.reason || 'General consultation'}
+                        </p>
                         <p className="text-xs text-slate-500 flex items-center gap-1">
                           <Calendar className="h-3.5 w-3.5" />
                           {new Date(apt.dateTime).toLocaleString()}
                         </p>
                       </div>
                       <Badge variant="outline" className="text-xs uppercase">
-                        {apt.status || "SCHEDULED"}
+                        {apt.status || 'SCHEDULED'}
                       </Badge>
                     </div>
                   ))}
@@ -206,9 +240,22 @@ export default function PatientDashboardPage() {
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex items-center gap-2 mb-3">
-                <ClipboardList className="h-5 w-5 text-slate-600" />
-                <h2 className="text-lg font-semibold">Recent prescriptions</h2>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <ClipboardList className="h-5 w-5 text-slate-600" />
+                  <h2 className="text-lg font-semibold">
+                    Recent prescriptions
+                  </h2>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    router.push('/dashboard/patient/prescriptions')
+                  }
+                >
+                  View All
+                </Button>
               </div>
               {prescriptions.length === 0 ? (
                 <div className="rounded-lg border border-dashed border-slate-200 p-6 text-center text-slate-600">
@@ -217,10 +264,17 @@ export default function PatientDashboardPage() {
               ) : (
                 <div className="space-y-3">
                   {prescriptions.slice(0, 4).map((rx) => (
-                    <div key={rx.id} className="rounded-lg border border-slate-200 p-3">
-                      <p className="font-medium text-slate-900">{rx.diagnosis || "Prescription"}</p>
+                    <div
+                      key={rx.id}
+                      className="rounded-lg border border-slate-200 p-3"
+                    >
+                      <p className="font-medium text-slate-900">
+                        {rx.diagnosis || 'Prescription'}
+                      </p>
                       <p className="text-xs text-slate-500">
-                        {rx.createdAt ? new Date(rx.createdAt).toLocaleDateString() : "Recent"}
+                        {rx.createdAt
+                          ? new Date(rx.createdAt).toLocaleDateString()
+                          : 'Recent'}
                       </p>
                     </div>
                   ))}
@@ -239,17 +293,19 @@ export default function PatientDashboardPage() {
                 <QuickLink
                   label="View timeline"
                   description="See appointments, prescriptions, and reports"
-                  onClick={() => router.push("/timeline")}
+                  onClick={() => router.push('/timeline')}
                 />
                 <QuickLink
                   label="Manage preferred doctors"
                   description="Save or remove your go-to providers"
-                  onClick={() => router.push("/profile?role=PATIENT&tab=preferred-doctors")}
+                  onClick={() =>
+                    router.push('/profile?role=PATIENT&tab=preferred-doctors')
+                  }
                 />
                 <QuickLink
                   label="Update profile & security"
                   description="Contact info, MFA, and password"
-                  onClick={() => router.push("/profile?role=PATIENT")}
+                  onClick={() => router.push('/profile?role=PATIENT')}
                 />
               </div>
             </div>
@@ -261,7 +317,12 @@ export default function PatientDashboardPage() {
             <Stethoscope className="h-5 w-5 text-slate-600" />
             <h2 className="text-lg font-semibold">Recent activity</h2>
           </div>
-          <TimelineContainer variant="embedded" initialRole="patient" lockRole heading="Activity timeline" />
+          <TimelineContainer
+            variant="embedded"
+            initialRole="patient"
+            lockRole
+            heading="Activity timeline"
+          />
         </section>
       </div>
     </main>
@@ -273,25 +334,27 @@ function StatusCard({
   title,
   value,
   hint,
-  tone = "neutral",
+  tone = 'neutral',
   onClick,
 }: {
   icon: React.ReactNode
   title: string
   value: string
   hint: string
-  tone?: "neutral" | "info" | "success" | "warning"
+  tone?: 'neutral' | 'info' | 'success' | 'warning'
   onClick?: () => void
 }) {
   const tones: Record<string, string> = {
-    neutral: "border-slate-200 bg-white",
-    info: "border-blue-100 bg-blue-50",
-    success: "border-emerald-100 bg-emerald-50",
-    warning: "border-amber-100 bg-amber-50",
+    neutral: 'border-slate-200 bg-white',
+    info: 'border-blue-100 bg-blue-50',
+    success: 'border-emerald-100 bg-emerald-50',
+    warning: 'border-amber-100 bg-amber-50',
   }
 
   const body = (
-    <div className={`rounded-xl border p-4 shadow-sm ${tones[tone] || tones.neutral}`}>
+    <div
+      className={`rounded-xl border p-4 shadow-sm ${tones[tone] || tones.neutral}`}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="rounded-lg bg-white/70 p-2 shadow-sm">{icon}</div>

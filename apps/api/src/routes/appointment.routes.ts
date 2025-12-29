@@ -37,7 +37,7 @@ router.get(
         'APPOINTMENT_SEARCH',
         filters,
         result.pagination.totalResults,
-        req,
+        req
       )
 
       res.json(result)
@@ -45,7 +45,7 @@ router.get(
       console.error('Error searching appointments:', error)
       res.status(500).json({ error: 'Failed to search appointments' })
     }
-  },
+  }
 )
 
 // Get all appointments for authenticated user
@@ -235,6 +235,63 @@ router.get(
     }
   }
 )
+
+// Validate appointment availability
+router.post('/validate', async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+    const { doctorId, dateTime, duration } = req.body
+
+    if (!doctorId || !dateTime || !duration) {
+      return res.status(400).json({
+        error: 'Missing required fields: doctorId, dateTime, duration',
+      })
+    }
+
+    // Check for conflicting appointments for the doctor
+    const appointmentDate = new Date(dateTime)
+    const appointmentEnd = new Date(
+      appointmentDate.getTime() + duration * 60000
+    )
+
+    const conflicts = await prisma.appointment.findMany({
+      where: {
+        doctorId,
+        status: {
+          not: AppointmentStatus.CANCELLED,
+        },
+        OR: [
+          {
+            // Existing appointment overlaps with requested time
+            AND: [
+              {
+                dateTime: {
+                  lte: appointmentEnd,
+                },
+              },
+              {
+                dateTime: {
+                  gte: new Date(appointmentDate.getTime() - 30 * 60000), // 30 min buffer
+                },
+              },
+            ],
+          },
+        ],
+      },
+    })
+
+    res.json({
+      valid: conflicts.length === 0,
+      conflicts: conflicts.length > 0 ? conflicts : undefined,
+    })
+  } catch (error) {
+    console.error('Error validating appointment:', error)
+    res.status(500).json({ error: 'Failed to validate appointment' })
+  }
+})
 
 // Create appointment
 router.post(

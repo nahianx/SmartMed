@@ -185,6 +185,43 @@ export default function UserManagementPage() {
     setDialog({ isOpen: false, type: null, userId: null, userName: null })
   }
 
+  // Multi-select toggle
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const selectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(new Set(users.map((u) => u.id)))
+    } else {
+      setSelectedIds(new Set())
+    }
+  }
+
+  const bulkUpdate = async (action: 'activate' | 'deactivate') => {
+    if (selectedIds.size === 0) return
+    try {
+      setError(null)
+      setSuccess(null)
+      for (const id of Array.from(selectedIds)) {
+        if (action === 'activate') await adminService.activateUser(id)
+        else await adminService.deactivateUser(id)
+      }
+      setSuccess(`Selected users ${action}d`)
+      setSelectedIds(new Set())
+      loadUsers(stats.page, searchTerm, roleFilter)
+      setTimeout(() => setSuccess(null), 3000)
+    } catch (err) {
+      setError(`Bulk ${action} failed`)
+      console.error(err)
+    }
+  }
+
   if (loading || !user) {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -326,7 +363,10 @@ export default function UserManagementPage() {
                         <input
                           type="checkbox"
                           aria-label="Select all"
-                          checked={users.length > 0 && selectedIds.size === users.length}
+                          checked={
+                            users.length > 0 &&
+                            selectedIds.size === users.length
+                          }
                           onChange={(e) => selectAll(e.target.checked)}
                         />
                       </th>
@@ -547,7 +587,9 @@ function UserDetailsModal({
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key !== 'Tab') return
-    const focusable = modalRef.current?.querySelectorAll<HTMLElement>('button, [href], select, [tabindex]:not([tabindex="-1"])')
+    const focusable = modalRef.current?.querySelectorAll<HTMLElement>(
+      'button, [href], select, [tabindex]:not([tabindex="-1"])'
+    )
     if (!focusable || focusable.length === 0) return
     const first = focusable[0]
     const last = focusable[focusable.length - 1]
@@ -561,39 +603,6 @@ function UserDetailsModal({
         e.preventDefault()
         first.focus()
       }
-    }
-  }
-
-  const toggleSelect = (id: string) => {
-    const next = new Set(selectedIds)
-    if (next.has(id)) next.delete(id)
-    else next.add(id)
-    setSelectedIds(next)
-  }
-
-  const selectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedIds(new Set(users.map((u) => u.id)))
-    } else {
-      setSelectedIds(new Set())
-    }
-  }
-
-  const bulkUpdate = async (action: 'activate' | 'deactivate') => {
-    if (selectedIds.size === 0) return
-    try {
-      setError(null)
-      setSuccess(null)
-      for (const id of selectedIds) {
-        if (action === 'activate') await adminService.activateUser(id)
-        else await adminService.deactivateUser(id)
-      }
-      setSuccess(`Selected users ${action}d`)
-      setSelectedIds(new Set())
-      loadUsers(stats.page, searchTerm, roleFilter)
-      setTimeout(() => setSuccess(null), 3000)
-    } catch (err) {
-      setError(`Bulk ${action} failed`)
     }
   }
 

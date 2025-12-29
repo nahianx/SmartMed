@@ -8,7 +8,9 @@ import { getOrCreatePatient } from '../services/patient.service'
 const router = Router()
 router.use(requireAuth)
 
-function mapActivityTypeToClient(type: string): 'appointment' | 'prescription' | 'report' {
+function mapActivityTypeToClient(
+  type: string
+): 'appointment' | 'prescription' | 'report' {
   switch (type) {
     case ActivityType.APPOINTMENT:
       return 'appointment'
@@ -20,7 +22,9 @@ function mapActivityTypeToClient(type: string): 'appointment' | 'prescription' |
   }
 }
 
-function mapStatusToClient(status: string | null): 'completed' | 'cancelled' | 'no-show' | null {
+function mapStatusToClient(
+  status: string | null
+): 'completed' | 'cancelled' | 'no-show' | null {
   if (!status) return null
   switch (status) {
     case AppointmentStatus.COMPLETED:
@@ -50,7 +54,9 @@ router.get('/', async (req: AuthenticatedRequest, res: Response) => {
       const doctor = await getOrCreateDoctor(req.user.id)
       where.doctorId = doctor.id
     } else {
-      return res.status(403).json({ error: 'Timeline is only available for patients and doctors' })
+      return res
+        .status(403)
+        .json({ error: 'Timeline is only available for patients and doctors' })
     }
 
     if (from) {
@@ -75,8 +81,10 @@ router.get('/', async (req: AuthenticatedRequest, res: Response) => {
 
       if (typesArray.length > 0) {
         const mappedTypes: ActivityType[] = []
-        if (typesArray.includes('appointment')) mappedTypes.push(ActivityType.APPOINTMENT)
-        if (typesArray.includes('prescription')) mappedTypes.push(ActivityType.PRESCRIPTION)
+        if (typesArray.includes('appointment'))
+          mappedTypes.push(ActivityType.APPOINTMENT)
+        if (typesArray.includes('prescription'))
+          mappedTypes.push(ActivityType.PRESCRIPTION)
         if (typesArray.includes('report')) mappedTypes.push(ActivityType.REPORT)
         if (mappedTypes.length > 0) {
           where.type = { in: mappedTypes }
@@ -92,9 +100,12 @@ router.get('/', async (req: AuthenticatedRequest, res: Response) => {
 
       if (statusesArray.length > 0) {
         const mappedStatuses: AppointmentStatus[] = []
-        if (statusesArray.includes('completed')) mappedStatuses.push(AppointmentStatus.COMPLETED)
-        if (statusesArray.includes('cancelled')) mappedStatuses.push(AppointmentStatus.CANCELLED)
-        if (statusesArray.includes('no-show')) mappedStatuses.push(AppointmentStatus.NO_SHOW)
+        if (statusesArray.includes('completed'))
+          mappedStatuses.push(AppointmentStatus.COMPLETED)
+        if (statusesArray.includes('cancelled'))
+          mappedStatuses.push(AppointmentStatus.CANCELLED)
+        if (statusesArray.includes('no-show'))
+          mappedStatuses.push(AppointmentStatus.NO_SHOW)
         if (mappedStatuses.length > 0) {
           where.status = { in: mappedStatuses }
         }
@@ -166,14 +177,17 @@ router.get('/', async (req: AuthenticatedRequest, res: Response) => {
       }
 
       return {
-        id: activity.id,
+        // For appointments, use appointmentId; for other types, use activity.id
+        id: type === 'appointment' ? activity.appointmentId : activity.id,
         type,
         date: activity.occurredAt,
         title: activity.title,
         subtitle: activity.subtitle ?? '',
         tags,
         status,
-        doctorName: doctor ? `Dr. ${doctor.firstName} ${doctor.lastName}` : undefined,
+        doctorName: doctor
+          ? `Dr. ${doctor.firstName} ${doctor.lastName}`
+          : undefined,
         specialty: doctor?.specialization,
         clinic: undefined,
         medications: medications.map((m: any) => ({
@@ -184,7 +198,9 @@ router.get('/', async (req: AuthenticatedRequest, res: Response) => {
         })),
         warnings: undefined,
         fileName: activity.report?.fileName,
-        fileSize: activity.report?.fileSize ? `${activity.report.fileSize} bytes` : undefined,
+        fileSize: activity.report?.fileSize
+          ? `${activity.report.fileSize} bytes`
+          : undefined,
         reportId: activity.report?.id,
         notes: activity.notes ?? undefined,
         vitals: activity.vitals ?? undefined,
