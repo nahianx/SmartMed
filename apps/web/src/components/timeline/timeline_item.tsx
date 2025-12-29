@@ -1,3 +1,4 @@
+import { useState, type MouseEvent } from 'react'
 import {
   Calendar,
   Eye,
@@ -10,6 +11,8 @@ import { useRouter } from 'next/navigation'
 import type { TimelineActivity } from '@/types/timeline'
 import { Badge, Button } from '@smartmed/ui'
 import { format } from 'date-fns'
+import { apiClient } from '@/services/apiClient'
+import { handleApiError } from '@/lib/error_utils'
 
 interface TimelineItemProps {
   activity: TimelineActivity
@@ -23,9 +26,7 @@ export function TimelineItem({
   userRole,
 }: TimelineItemProps) {
   const router = useRouter()
-  const apiBase = (
-    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
-  ).replace(/\/$/, '')
+  const [isDownloading, setIsDownloading] = useState(false)
 
   const getIcon = () => {
     switch (activity.type) {
@@ -70,6 +71,51 @@ export function TimelineItem({
           : activity.status.charAt(0).toUpperCase() + activity.status.slice(1)}
       </Badge>
     )
+  }
+
+  const getFilenameFromDisposition = (disposition?: string) => {
+    if (!disposition) return null
+    const utf8Match = /filename\*=UTF-8''([^;]+)/i.exec(disposition)
+    if (utf8Match?.[1]) {
+      return decodeURIComponent(utf8Match[1])
+    }
+    const match = /filename="([^"]+)"/i.exec(disposition)
+    if (match?.[1]) {
+      return decodeURIComponent(match[1])
+    }
+    return null
+  }
+
+  const handleDownload = async (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    if (!activity.reportId || isDownloading) return
+    try {
+      setIsDownloading(true)
+      const response = await apiClient.get(
+        `/reports/${activity.reportId}/download`,
+        {
+          params: { disposition: 'attachment' },
+          responseType: 'blob',
+        },
+      )
+
+      if (typeof window === 'undefined') return
+      const blobUrl = window.URL.createObjectURL(response.data)
+      const link = document.createElement('a')
+      const headerName = getFilenameFromDisposition(
+        response.headers['content-disposition'],
+      )
+      link.href = blobUrl
+      link.download = headerName || activity.fileName || 'report'
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(blobUrl)
+    } catch (error) {
+      handleApiError(error, 'Failed to download report')
+    } finally {
+      setIsDownloading(false)
+    }
   }
 
   return (
@@ -146,18 +192,16 @@ export function TimelineItem({
                 variant="ghost"
                 onClick={(e) => {
                   e.stopPropagation()
-                  if (
-                    activity.type === 'report' &&
-                    activity.reportId &&
-                    typeof window !== 'undefined'
-                  ) {
-                    const url = `${apiBase}/reports/${activity.reportId}/download`
-                    window.open(url, '_blank')
+                  if (activity.type === 'report') {
+                    handleDownload(e)
                   }
                 }}
+                disabled={activity.type === 'report' ? isDownloading : false}
               >
                 <FileText className="h-4 w-4 mr-1" />
-                Download
+                {isDownloading && activity.type === 'report'
+                  ? 'Downloading...'
+                  : 'Download'}
               </Button>
             )}
             <Button

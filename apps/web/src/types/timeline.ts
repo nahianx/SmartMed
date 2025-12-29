@@ -28,6 +28,7 @@ export interface TimelineActivity {
   // Report-specific
   fileName?: string
   fileSize?: string
+  mimeType?: string
   reportId?: string
 
   // Details

@@ -2,6 +2,7 @@ import { Request, Response, NextFunction, Application } from 'express'
 import helmet from 'helmet'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
+import { MAX_UPLOAD_SIZE_BYTES } from '../config/upload'
 
 export function setupSecurityMiddleware(app: Application) {
   // Helmet for security headers
@@ -42,8 +43,7 @@ export function setupSecurityMiddleware(app: Application) {
   app.use((req: Request, res: Response, next: NextFunction) => {
     if (req.headers['content-length']) {
       const size = parseInt(req.headers['content-length'])
-      if (size > 10 * 1024 * 1024) {
-        // 10MB limit
+      if (size > MAX_UPLOAD_SIZE_BYTES) {
         return res.status(413).json({ error: 'Request too large' })
       }
     }

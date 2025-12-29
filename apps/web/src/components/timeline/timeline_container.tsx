@@ -35,6 +35,13 @@ import { TopAppBar } from './top_app_bar'
 import { DetailsDrawer } from './details_drawer'
 import { NotificationsDrawer } from '@/components/notifications/notifications_drawer'
 
+const DEFAULT_MAX_UPLOAD_MB = 20
+const ALLOWED_UPLOAD_MIME_TYPES = new Set([
+  'application/pdf',
+  'image/jpeg',
+  'image/png',
+])
+
 interface TimelineContainerProps {
   variant?: 'standalone' | 'embedded'
   initialRole?: UserRole
@@ -89,6 +96,14 @@ export function TimelineContainer({
   const [uploading, setUploading] = useState(false)
   const envDemoPatientId = process.env.NEXT_PUBLIC_DEMO_PATIENT_ID || null
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const maxUploadSizeMb = Number(
+    process.env.NEXT_PUBLIC_MAX_UPLOAD_SIZE_MB || DEFAULT_MAX_UPLOAD_MB,
+  )
+  const safeMaxUploadMb =
+    Number.isFinite(maxUploadSizeMb) && maxUploadSizeMb > 0
+      ? maxUploadSizeMb
+      : DEFAULT_MAX_UPLOAD_MB
+  const maxUploadBytes = safeMaxUploadMb * 1024 * 1024
 
   const queryParams = useMemo(() => {
     const params: Record<string, string> = {}
@@ -210,14 +225,19 @@ export function TimelineContainer({
     const file = e.target.files?.[0]
     if (!file || !resolvedPatientId) return
 
-    if (file.type !== 'application/pdf') {
-      handleApiError(new Error('Please select a PDF file'))
+    const isAllowedType =
+      ALLOWED_UPLOAD_MIME_TYPES.has(file.type) ||
+      /\.(pdf|jpe?g|png)$/i.test(file.name)
+    if (!isAllowedType) {
+      handleApiError(new Error('Please select a PDF, JPG, or PNG file'))
       e.target.value = ''
       return
     }
 
-    if (file.size > 20 * 1024 * 1024) {
-      handleApiError(new Error('File size must be less than 20MB'))
+    if (file.size > maxUploadBytes) {
+      handleApiError(
+        new Error(`File size must be less than ${safeMaxUploadMb}MB`),
+      )
       e.target.value = ''
       return
     }
@@ -390,7 +410,7 @@ export function TimelineContainer({
         accept="application/pdf"
         className="hidden"
         onChange={handleFileChange}
-        aria-label="Upload report PDF"
+        aria-label="Upload report file"
       />
 
       <DetailsDrawer
@@ -434,7 +454,7 @@ export function TimelineContainer({
         accept="application/pdf"
         className="hidden"
         onChange={handleFileChange}
-        aria-label="Upload report PDF"
+        aria-label="Upload report file"
       />
 
       <div className="flex flex-1 overflow-hidden">

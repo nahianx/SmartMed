@@ -1,26 +1,26 @@
 -- DropIndex
-DROP INDEX "idx_appointments_datetime";
+DROP INDEX IF EXISTS "idx_appointments_datetime";
 
 -- DropIndex
-DROP INDEX "idx_appointments_doctor";
+DROP INDEX IF EXISTS "idx_appointments_doctor";
 
 -- DropIndex
-DROP INDEX "idx_appointments_doctor_datetime_status";
+DROP INDEX IF EXISTS "idx_appointments_doctor_datetime_status";
 
 -- DropIndex
-DROP INDEX "idx_appointments_patient";
+DROP INDEX IF EXISTS "idx_appointments_patient";
 
 -- DropIndex
-DROP INDEX "idx_appointments_status";
+DROP INDEX IF EXISTS "idx_appointments_status";
 
 -- DropIndex
-DROP INDEX "idx_doctors_clinic";
+DROP INDEX IF EXISTS "idx_doctors_clinic";
 
 -- DropIndex
-DROP INDEX "idx_doctors_first_name";
+DROP INDEX IF EXISTS "idx_doctors_first_name";
 
 -- DropIndex
-DROP INDEX "idx_doctors_last_name";
+DROP INDEX IF EXISTS "idx_doctors_last_name";
 
 -- DropIndex
-DROP INDEX "idx_doctors_specialization";
+DROP INDEX IF EXISTS "idx_doctors_specialization";

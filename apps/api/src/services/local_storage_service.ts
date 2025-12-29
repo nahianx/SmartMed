@@ -3,84 +3,94 @@ import path from 'path'
 import { Readable } from 'stream'
 import { createReadStream } from 'fs'
 
-const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(process.cwd(), 'uploads')
+const STORAGE_ROOT =
+  process.env.LOCAL_STORAGE_ROOT || path.join(process.cwd(), 'uploads', 'reports')
+const RESOLVED_ROOT = path.resolve(STORAGE_ROOT)
 
-// Ensure upload directory exists
 async function ensureUploadDir() {
   try {
-    await fs.access(UPLOAD_DIR)
+    await fs.access(RESOLVED_ROOT)
   } catch {
-    await fs.mkdir(UPLOAD_DIR, { recursive: true })
-    console.log(`📁 Created upload directory: ${UPLOAD_DIR}`)
+    await fs.mkdir(RESOLVED_ROOT, { recursive: true })
+    console.log(`Created upload directory: ${RESOLVED_ROOT}`)
   }
 }
 
-// Initialize upload directory on service load
 ensureUploadDir()
+
+function resolveStoragePath(key: string) {
+  const normalizedKey = key.replace(/\//g, path.sep)
+  const fullPath = path.resolve(RESOLVED_ROOT, normalizedKey)
+  const rootPrefix = RESOLVED_ROOT.endsWith(path.sep)
+    ? RESOLVED_ROOT
+    : `${RESOLVED_ROOT}${path.sep}`
+  if (!fullPath.startsWith(rootPrefix)) {
+    throw new Error('Invalid storage path')
+  }
+  return fullPath
+}
 
 export async function uploadBufferToLocal(
   key: string,
   body: Buffer,
   contentType: string,
 ): Promise<void> {
-  const filePath = path.join(UPLOAD_DIR, key.replace(/\//g, path.sep))
+  const filePath = resolveStoragePath(key)
   const directory = path.dirname(filePath)
-  
-  // Ensure directory exists
+
   await fs.mkdir(directory, { recursive: true })
-  
-  // Write file
   await fs.writeFile(filePath, body)
-  
-  // Store metadata alongside file
+
   const metadata = {
     contentType,
     size: body.length,
-    uploadedAt: new Date().toISOString()
+    uploadedAt: new Date().toISOString(),
   }
   await fs.writeFile(filePath + '.meta.json', JSON.stringify(metadata, null, 2))
-  
-  console.log(`📄 File uploaded locally: ${filePath}`)
+
+  console.log(`File uploaded locally: ${filePath}`)
 }
 
 export async function getObjectStreamFromLocal(key: string): Promise<{
   stream: Readable
   contentType: string
 }> {
-  const filePath = path.join(UPLOAD_DIR, key.replace(/\//g, path.sep))
+  const filePath = resolveStoragePath(key)
   const metaPath = filePath + '.meta.json'
-  
-  // Check if file exists
+
   try {
     await fs.access(filePath)
   } catch {
-    throw new Error('File not found')
+    const error = new Error('File not found')
+    ;(error as NodeJS.ErrnoException).code = 'ENOENT'
+    throw error
   }
-  
-  // Get metadata
+
   let contentType = 'application/octet-stream'
   try {
     const metadata = JSON.parse(await fs.readFile(metaPath, 'utf8'))
     contentType = metadata.contentType || contentType
   } catch {
-    // Fallback if metadata doesn't exist
+    // ignore missing metadata
   }
-  
+
   const stream = createReadStream(filePath)
-  
+
   return { stream, contentType }
 }
 
 export async function deleteFileFromLocal(key: string): Promise<void> {
-  const filePath = path.join(UPLOAD_DIR, key.replace(/\//g, path.sep))
+  const filePath = resolveStoragePath(key)
   const metaPath = filePath + '.meta.json'
-  
+
   try {
     await fs.unlink(filePath)
-    await fs.unlink(metaPath).catch(() => {}) // Ignore if metadata doesn't exist
-    console.log(`🗑️ File deleted: ${filePath}`)
+    await fs.unlink(metaPath).catch(() => {})
+    console.log(`File deleted: ${filePath}`)
   } catch {
-    throw new Error('File not found')
+    const error = new Error('File not found')
+    ;(error as NodeJS.ErrnoException).code = 'ENOENT'
+    throw error
   }
 }
 
@@ -89,26 +99,29 @@ export async function getFileInfo(key: string): Promise<{
   contentType: string
   uploadedAt: string
 } | null> {
-  const filePath = path.join(UPLOAD_DIR, key.replace(/\//g, path.sep))
+  let filePath: string
+  try {
+    filePath = resolveStoragePath(key)
+  } catch {
+    return null
+  }
   const metaPath = filePath + '.meta.json'
-  
+
   try {
     const stats = await fs.stat(filePath)
-    
-    // Try to get metadata
+
     try {
       const metadata = JSON.parse(await fs.readFile(metaPath, 'utf8'))
       return {
         size: stats.size,
         contentType: metadata.contentType || 'application/octet-stream',
-        uploadedAt: metadata.uploadedAt || stats.mtime.toISOString()
+        uploadedAt: metadata.uploadedAt || stats.mtime.toISOString(),
       }
     } catch {
-      // Fallback to file stats
       return {
         size: stats.size,
         contentType: 'application/octet-stream',
-        uploadedAt: stats.mtime.toISOString()
+        uploadedAt: stats.mtime.toISOString(),
       }
     }
   } catch {
@@ -116,6 +129,5 @@ export async function getFileInfo(key: string): Promise<{
   }
 }
 
-// Export with S3-compatible names for drop-in replacement
 export const uploadBufferToS3 = uploadBufferToLocal
 export const getObjectStreamFromS3 = getObjectStreamFromLocal

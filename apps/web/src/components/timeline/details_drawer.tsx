@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import {
   Calendar,
   MapPin,
@@ -18,6 +19,8 @@ import {
 } from '@smartmed/ui'
 import { format } from 'date-fns'
 import { PDFViewer } from './pdf_viewer'
+import { apiClient } from '@/services/apiClient'
+import { handleApiError } from '@/lib/error_utils'
 
 interface DetailsDrawerProps {
   activity: TimelineActivity | null
@@ -25,8 +28,102 @@ interface DetailsDrawerProps {
   onClose: () => void
 }
 
+function isPdfFile(mimeType?: string, fileName?: string) {
+  return (
+    mimeType === 'application/pdf' || (!!fileName && fileName.toLowerCase().endsWith('.pdf'))
+  )
+}
+
+function isImageFile(mimeType?: string, fileName?: string) {
+  if (mimeType?.startsWith('image/')) return true
+  return !!fileName && /\.(png|jpe?g)$/i.test(fileName)
+}
+
+function ImageViewer({ reportId, fileName }: { reportId: string; fileName?: string }) {
+  const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    let previewUrl: string | null = null
+    const fetchPreview = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        setImageUrl(null)
+        const response = await apiClient.get(`/reports/${reportId}/download`, {
+          params: { disposition: 'inline' },
+          responseType: 'blob',
+        })
+        if (cancelled) return
+        previewUrl = window.URL.createObjectURL(response.data)
+        setImageUrl(previewUrl)
+      } catch (err) {
+        if (cancelled) return
+        setError('Failed to load image preview')
+        handleApiError(err, 'Failed to load image preview')
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    fetchPreview()
+
+    return () => {
+      cancelled = true
+      if (previewUrl) {
+        window.URL.revokeObjectURL(previewUrl)
+      }
+    }
+  }, [reportId])
+
+  if (loading) {
+    return (
+      <div className="aspect-[8.5/11] rounded-lg border bg-gray-100 flex items-center justify-center">
+        <p className="text-sm text-gray-500">Loading image preview...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="aspect-[8.5/11] rounded-lg border bg-gray-100 flex items-center justify-center">
+        <div className="text-center text-red-500">
+          <AlertTriangle className="h-8 w-8 mx-auto mb-2" />
+          <p className="text-sm">{error}</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!imageUrl) {
+    return (
+      <div className="aspect-[8.5/11] rounded-lg border bg-gray-100 flex items-center justify-center">
+        <div className="text-center text-gray-500">
+          <FileText className="h-12 w-12 mx-auto mb-2" />
+          <p className="text-sm">Image Preview Unavailable</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="rounded-lg border bg-white overflow-hidden">
+      <img
+        src={imageUrl}
+        alt={fileName || 'Report image'}
+        className="w-full h-auto"
+      />
+    </div>
+  )
+}
+
 export function DetailsDrawer({ activity, open, onClose }: DetailsDrawerProps) {
   if (!activity) return null
+
+  const isPdf = isPdfFile(activity.mimeType, activity.fileName)
+  const isImage = isImageFile(activity.mimeType, activity.fileName)
 
   return (
     <Sheet open={open} onOpenChange={onClose}>
@@ -262,10 +359,24 @@ export function DetailsDrawer({ activity, open, onClose }: DetailsDrawerProps) {
               <div>
                 <h3 className="mb-2">Preview</h3>
                 {activity.reportId ? (
-                  <PDFViewer
-                    reportId={activity.reportId}
-                    fileName={activity.fileName}
-                  />
+                  isPdf ? (
+                    <PDFViewer
+                      reportId={activity.reportId}
+                      fileName={activity.fileName}
+                    />
+                  ) : isImage ? (
+                    <ImageViewer
+                      reportId={activity.reportId}
+                      fileName={activity.fileName}
+                    />
+                  ) : (
+                    <div className="aspect-[8.5/11] rounded-lg border bg-gray-100 flex items-center justify-center">
+                      <div className="text-center text-gray-500">
+                        <FileText className="h-12 w-12 mx-auto mb-2" />
+                        <p className="text-sm">Preview Unavailable</p>
+                      </div>
+                    </div>
+                  )
                 ) : (
                   <div className="aspect-[8.5/11] rounded-lg border bg-gray-100 flex items-center justify-center">
                     <div className="text-center text-gray-500">

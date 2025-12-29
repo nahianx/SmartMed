@@ -4,11 +4,20 @@ import { Readable } from 'stream'
 const bucket = process.env.S3_BUCKET_NAME
 const useLocalStorage = process.env.USE_LOCAL_STORAGE === 'true'
 
-// Check configuration and provide appropriate messaging
 if (useLocalStorage) {
-  console.log('📁 Using local file storage for uploads (FREE)')
+  console.log('Using local file storage for uploads')
 } else if (!bucket) {
-  console.warn('S3_BUCKET_NAME is not set. Report upload/download will not work until configured.')
+  console.warn(
+    'Storage is not configured. Set USE_LOCAL_STORAGE=true or S3_BUCKET_NAME to enable report uploads.',
+  )
+}
+
+function assertStorageConfigured() {
+  if (useLocalStorage) return
+  if (bucket) return
+  throw new Error(
+    'Storage is not configured. Set USE_LOCAL_STORAGE=true or S3_BUCKET_NAME.',
+  )
 }
 
 const s3 = new S3Client({
@@ -22,13 +31,14 @@ export async function uploadBufferToS3(
   body: Buffer,
   contentType: string,
 ): Promise<void> {
-  // Use local storage if enabled or S3 not configured
-  if (useLocalStorage || !bucket) {
+  // Use local storage if enabled
+  if (useLocalStorage) {
     const { uploadBufferToLocal } = await import('./local_storage_service')
     return uploadBufferToLocal(key, body, contentType)
   }
 
   // Use S3
+  assertStorageConfigured()
   await s3.send(
     new PutObjectCommand({
       Bucket: bucket,
@@ -40,13 +50,14 @@ export async function uploadBufferToS3(
 }
 
 export async function getObjectStreamFromS3(key: string): Promise<{ stream: Readable; contentType?: string }> {
-  // Use local storage if enabled or S3 not configured
-  if (useLocalStorage || !bucket) {
+  // Use local storage if enabled
+  if (useLocalStorage) {
     const { getObjectStreamFromLocal } = await import('./local_storage_service')
     return getObjectStreamFromLocal(key)
   }
 
   // Use S3
+  assertStorageConfigured()
 
   const result = await s3.send(
     new GetObjectCommand({

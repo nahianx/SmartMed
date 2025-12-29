@@ -201,6 +201,7 @@ router.get('/', async (req: AuthenticatedRequest, res: Response) => {
         fileSize: activity.report?.fileSize
           ? `${activity.report.fileSize} bytes`
           : undefined,
+        mimeType: activity.report?.mimeType,
         reportId: activity.report?.id,
         notes: activity.notes ?? undefined,
         vitals: activity.vitals ?? undefined,
