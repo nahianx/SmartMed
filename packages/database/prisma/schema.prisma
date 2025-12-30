@@ -8,43 +8,43 @@ datasource db {
 }
 
 model User {
-  id              String         @id @default(uuid())
-  email           String         @unique
-  fullName        String?
-  passwordHash    String?
-  role            UserRole
-  authProvider    AuthProvider   @default(LOCAL)
-  googleId        String?        @unique
-  emailVerified   Boolean        @default(false)
-  isActive        Boolean        @default(true)
-  lastLogin       DateTime?
-  phoneNumber     String?
-  dateOfBirth     DateTime?
-  gender          Gender?
-  addressLine1    String?
-  addressLine2    String?
-  city            String?
-  region          String?
-  postalCode      String?
-  country         String?
-  profilePhotoUrl String?
-  isMfaEnabled    Boolean        @default(false)
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  doctor          Doctor?
-  notifications   Notification[]
-  patient         Patient?
-  sessions        UserSession[]
-  passwordResets  PasswordReset[]
+  id                 String              @id @default(uuid())
+  email              String              @unique
+  fullName           String?
+  passwordHash       String?
+  role               UserRole
+  authProvider       AuthProvider        @default(LOCAL)
+  googleId           String?             @unique
+  emailVerified      Boolean             @default(false)
+  isActive           Boolean             @default(true)
+  lastLogin          DateTime?
+  phoneNumber        String?
+  dateOfBirth        DateTime?
+  gender             Gender?
+  addressLine1       String?
+  addressLine2       String?
+  city               String?
+  region             String?
+  postalCode         String?
+  country            String?
+  profilePhotoUrl    String?
+  isMfaEnabled       Boolean             @default(false)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  doctor             Doctor?
+  notifications      Notification[]
+  patient            Patient?
+  sessions           UserSession[]
+  passwordResets     PasswordReset[]
   emailVerifications EmailVerification[]
-  auditLogs       AuditLog[]
+  auditLogs          AuditLog[]
 
   @@map("users")
 }
 
 model Patient {
-  id               String         @id @default(uuid())
-  userId           String         @unique
+  id               String            @id @default(uuid())
+  userId           String            @unique
   firstName        String
   lastName         String
   dateOfBirth      DateTime
@@ -55,11 +55,11 @@ model Patient {
   bloodGroup       String?
   allergies        Json?
   medicalHistory   String?
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
   activities       Activity[]
   appointments     Appointment[]
-  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   prescriptions    Prescription[]
   reports          Report[]
   preferredBy      PreferredDoctor[]
@@ -69,60 +69,60 @@ model Patient {
 }
 
 model Doctor {
-  id                 String                  @id @default(uuid())
-  userId             String                  @unique
-  firstName          String
-  lastName           String
-  specialization     String
-  qualification      String
-  experience         Int
-  phoneNumber        String
-  licenseNumber      String                  @unique
-  consultationFee    Float
-  availableDays      Json
-  availableTimeSlots Json
-  clinicId           String?
-  timezone           String                  @default("UTC")
-  availabilityStatus DoctorAvailabilityStatus @default(OFF_DUTY)
-  isAvailable        Boolean                 @default(false)
-  currentPatientId   String?
-  currentQueueEntryId String?
-  lastStatusChange   DateTime?
-  averageConsultationTime Int               @default(15)
-  todayServed        Int                     @default(0)
-  todayNoShows       Int                     @default(0)
-  totalServed        Int                     @default(0)
-  allowWalkIns       Boolean                 @default(true)
-  allowOnlineBooking Boolean                 @default(true)
-  autoCallNext       Boolean                 @default(false)
-  noShowTimeout      Int                     @default(30)
-  statsDate          String                  @default("")
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
-  activities         Activity[]
-  appointments       Appointment[]
-  user               User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  prescriptions      Prescription[]
-  reports            Report[]
-  clinic             Clinic?                 @relation(fields: [clinicId], references: [id])
-  availability       DoctorAvailability[]
-  specializations    DoctorSpecialization[]
-  preferredBy        PreferredDoctor[]
-  queueEntries       QueueEntry[]
-  queueCounters      QueueCounter[]
+  id                      String                   @id @default(uuid())
+  userId                  String                   @unique
+  firstName               String
+  lastName                String
+  specialization          String
+  qualification           String
+  experience              Int
+  phoneNumber             String
+  licenseNumber           String                   @unique
+  consultationFee         Float
+  availableDays           Json
+  availableTimeSlots      Json
+  clinicId                String?
+  timezone                String                   @default("UTC")
+  availabilityStatus      DoctorAvailabilityStatus @default(OFF_DUTY)
+  isAvailable             Boolean                  @default(false)
+  currentPatientId        String?
+  currentQueueEntryId     String?
+  lastStatusChange        DateTime?
+  averageConsultationTime Int                      @default(15)
+  todayServed             Int                      @default(0)
+  todayNoShows            Int                      @default(0)
+  totalServed             Int                      @default(0)
+  allowWalkIns            Boolean                  @default(true)
+  allowOnlineBooking      Boolean                  @default(true)
+  autoCallNext            Boolean                  @default(false)
+  noShowTimeout           Int                      @default(30)
+  statsDate               String                   @default("")
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  activities              Activity[]
+  appointments            Appointment[]
+  user                    User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prescriptions           Prescription[]
+  reports                 Report[]
+  clinic                  Clinic?                  @relation(fields: [clinicId], references: [id])
+  availability            DoctorAvailability[]
+  specializations         DoctorSpecialization[]
+  preferredBy             PreferredDoctor[]
+  queueEntries            QueueEntry[]
+  queueCounters           QueueCounter[]
 
   @@map("doctors")
 }
 
 model Clinic {
-  id               String   @id @default(uuid())
-  name             String
-  address          String
-  phone            String
-  consultationFee  Float
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  doctors          Doctor[]
+  id              String   @id @default(uuid())
+  name            String
+  address         String
+  phone           String
+  consultationFee Float
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  doctors         Doctor[]
 
   @@map("clinics")
 }
@@ -150,26 +150,26 @@ model Appointment {
 }
 
 model Prescription {
-  id            String      @id @default(uuid())
-  appointmentId String
-  patientId     String
-  doctorId      String
-  medications   Json        // Legacy field for backward compatibility
-  diagnosis     String
-  notes         String?
+  id                        String                   @id @default(uuid())
+  appointmentId             String
+  patientId                 String
+  doctorId                  String
+  medications               Json // Legacy field for backward compatibility
+  diagnosis                 String
+  notes                     String?
   // Interaction check results
-  interactionCheckStatus InteractionCheckStatus @default(NOT_CHECKED)
+  interactionCheckStatus    InteractionCheckStatus   @default(NOT_CHECKED)
   interactionOverrideReason String?
   interactionOverrideAt     DateTime?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  activities    Activity[]
-  appointment   Appointment @relation(fields: [appointmentId], references: [id])
-  doctor        Doctor      @relation(fields: [doctorId], references: [id])
-  patient       Patient     @relation(fields: [patientId], references: [id])
+  createdAt                 DateTime                 @default(now())
+  updatedAt                 DateTime                 @updatedAt
+  activities                Activity[]
+  appointment               Appointment              @relation(fields: [appointmentId], references: [id])
+  doctor                    Doctor                   @relation(fields: [doctorId], references: [id])
+  patient                   Patient                  @relation(fields: [patientId], references: [id])
   // New structured medications relation
-  prescriptionMedications PrescriptionMedication[]
-  interactionChecks       InteractionCheck[]
+  prescriptionMedications   PrescriptionMedication[]
+  interactionChecks         InteractionCheck[]
 
   @@map("prescriptions")
 }
@@ -179,26 +179,26 @@ model Prescription {
 // ==========================================
 
 model Drug {
-  id            String    @id @default(uuid())
-  rxcui         String    @unique
-  name          String
-  genericName   String?
-  brandNames    String[]  @default([])
-  tty           String    // Term Type (IN, BN, SCD, SBD, etc.)
-  synonyms      String[]  @default([])
-  strength      String?
-  dosageForm    String?
-  route         String?
-  drugClass     String[]  @default([])
+  id                String   @id @default(uuid())
+  rxcui             String   @unique
+  name              String
+  genericName       String?
+  brandNames        String[] @default([])
+  tty               String // Term Type (IN, BN, SCD, SBD, etc.)
+  synonyms          String[] @default([])
+  strength          String?
+  dosageForm        String?
+  route             String?
+  drugClass         String[] @default([])
   activeIngredients String[] @default([])
-  lastVerified  DateTime  @default(now())
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  lastVerified      DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   // Relations
   prescriptionMedications PrescriptionMedication[]
-  interactionsAsDrug1     DrugInteraction[] @relation("Drug1Interactions")
-  interactionsAsDrug2     DrugInteraction[] @relation("Drug2Interactions")
+  interactionsAsDrug1     DrugInteraction[]        @relation("Drug1Interactions")
+  interactionsAsDrug2     DrugInteraction[]        @relation("Drug2Interactions")
 
   @@index([name])
   @@index([genericName])
@@ -207,21 +207,21 @@ model Drug {
 }
 
 model DrugInteraction {
-  id            String              @id @default(uuid())
-  drug1Rxcui    String
-  drug2Rxcui    String
-  severity      InteractionSeverity
-  description   String
+  id             String              @id @default(uuid())
+  drug1Rxcui     String
+  drug2Rxcui     String
+  severity       InteractionSeverity
+  description    String
   clinicalEffect String?
-  source        String              @default("RxNav")
-  evidenceLevel String?
-  lastVerified  DateTime            @default(now())
-  createdAt     DateTime            @default(now())
-  updatedAt     DateTime            @updatedAt
+  source         String              @default("RxNav")
+  evidenceLevel  String?
+  lastVerified   DateTime            @default(now())
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
 
   // Relations
-  drug1         Drug                @relation("Drug1Interactions", fields: [drug1Rxcui], references: [rxcui])
-  drug2         Drug                @relation("Drug2Interactions", fields: [drug2Rxcui], references: [rxcui])
+  drug1 Drug @relation("Drug1Interactions", fields: [drug1Rxcui], references: [rxcui])
+  drug2 Drug @relation("Drug2Interactions", fields: [drug2Rxcui], references: [rxcui])
 
   @@unique([drug1Rxcui, drug2Rxcui])
   @@index([drug1Rxcui])
@@ -231,29 +231,29 @@ model DrugInteraction {
 }
 
 model PrescriptionMedication {
-  id              String       @id @default(uuid())
+  id              String          @id @default(uuid())
   prescriptionId  String
-  drugRxcui       String?      // Nullable for backward compatibility with unresolved drugs
-  medicineName    String       // User-entered or resolved drug name
+  drugRxcui       String? // Nullable for backward compatibility with unresolved drugs
+  medicineName    String // User-entered or resolved drug name
   genericName     String?
-  dosage          String       // Display format: "500mg"
-  dosageValue     Float?       // Numeric value: 500
-  dosageUnit      String?      // Unit: "mg", "g", "ml", etc.
-  frequency       String       // Display format: "1-0-1"
-  frequencyTimes  Int?         // Times per period: 2
-  frequencyPeriod String?      // Period: "day", "week", etc.
-  duration        String       // Display format: "7 days"
-  durationValue   Int?         // Numeric value: 7
-  durationUnit    String?      // Unit: "days", "weeks", "months"
+  dosage          String // Display format: "500mg"
+  dosageValue     Float? // Numeric value: 500
+  dosageUnit      String? // Unit: "mg", "g", "ml", etc.
+  frequency       String // Display format: "1-0-1"
+  frequencyTimes  Int? // Times per period: 2
+  frequencyPeriod String? // Period: "day", "week", etc.
+  duration        String // Display format: "7 days"
+  durationValue   Int? // Numeric value: 7
+  durationUnit    String? // Unit: "days", "weeks", "months"
   route           MedicationRoute @default(ORAL)
   instructions    String?
-  isResolved      Boolean      @default(false) // Whether drug was resolved to RxCUI
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  isResolved      Boolean         @default(false) // Whether drug was resolved to RxCUI
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 
   // Relations
-  prescription    Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
-  drug            Drug?        @relation(fields: [drugRxcui], references: [rxcui])
+  prescription Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+  drug         Drug?        @relation(fields: [drugRxcui], references: [rxcui])
 
   @@index([prescriptionId])
   @@index([drugRxcui])
@@ -261,22 +261,22 @@ model PrescriptionMedication {
 }
 
 model InteractionCheck {
-  id              String              @id @default(uuid())
-  prescriptionId  String
-  drug1Rxcui      String
-  drug1Name       String
-  drug2Rxcui      String
-  drug2Name       String
-  severity        InteractionSeverity
-  description     String
-  wasOverridden   Boolean             @default(false)
-  overrideReason  String?
-  overriddenBy    String?             // Doctor ID who overrode
-  overriddenAt    DateTime?
-  checkedAt       DateTime            @default(now())
-  
+  id             String              @id @default(uuid())
+  prescriptionId String
+  drug1Rxcui     String
+  drug1Name      String
+  drug2Rxcui     String
+  drug2Name      String
+  severity       InteractionSeverity
+  description    String
+  wasOverridden  Boolean             @default(false)
+  overrideReason String?
+  overriddenBy   String? // Doctor ID who overrode
+  overriddenAt   DateTime?
+  checkedAt      DateTime            @default(now())
+
   // Relations
-  prescription    Prescription        @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+  prescription Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
 
   @@index([prescriptionId])
   @@index([severity])
@@ -284,20 +284,20 @@ model InteractionCheck {
 }
 
 model PatientAllergy {
-  id              String          @id @default(uuid())
-  patientId       String
-  allergenName    String          // e.g., "Penicillin", "Aspirin"
-  allergenType    AllergenType    // DRUG, DRUG_CLASS, INGREDIENT, FOOD, OTHER
-  allergenRxcui   String?         // RxCUI if it's a drug
-  reaction        String?         // Description of reaction
-  severity        AllergySeverity @default(MODERATE)
-  onsetDate       DateTime?
-  verifiedBy      String?         // Doctor ID who verified
-  verifiedAt      DateTime?
-  isActive        Boolean         @default(true)
-  notes           String?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  id            String          @id @default(uuid())
+  patientId     String
+  allergenName  String // e.g., "Penicillin", "Aspirin"
+  allergenType  AllergenType // DRUG, DRUG_CLASS, INGREDIENT, FOOD, OTHER
+  allergenRxcui String? // RxCUI if it's a drug
+  reaction      String? // Description of reaction
+  severity      AllergySeverity @default(MODERATE)
+  onsetDate     DateTime?
+  verifiedBy    String? // Doctor ID who verified
+  verifiedAt    DateTime?
+  isActive      Boolean         @default(true)
+  notes         String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 
   @@index([patientId])
   @@index([allergenRxcui])
@@ -306,20 +306,20 @@ model PatientAllergy {
 }
 
 model AllergyCheck {
-  id              String          @id @default(uuid())
-  prescriptionId  String?
-  patientId       String
-  drugRxcui       String
-  drugName        String
-  allergyId       String
-  allergenName    String
-  matchType       String          // EXACT, DRUG_CLASS, INGREDIENT
-  severity        AllergySeverity
-  wasOverridden   Boolean         @default(false)
-  overrideReason  String?
-  overriddenBy    String?
-  overriddenAt    DateTime?
-  checkedAt       DateTime        @default(now())
+  id             String          @id @default(uuid())
+  prescriptionId String?
+  patientId      String
+  drugRxcui      String
+  drugName       String
+  allergyId      String
+  allergenName   String
+  matchType      String // EXACT, DRUG_CLASS, INGREDIENT
+  severity       AllergySeverity
+  wasOverridden  Boolean         @default(false)
+  overrideReason String?
+  overriddenBy   String?
+  overriddenAt   DateTime?
+  checkedAt      DateTime        @default(now())
 
   @@index([prescriptionId])
   @@index([patientId])
@@ -328,9 +328,9 @@ model AllergyCheck {
 
 // Drug-related Enums
 enum InteractionSeverity {
-  HIGH      // Contraindicated, avoid combination
-  MODERATE  // Use with caution, monitor
-  LOW       // Minor interaction, minimal clinical significance
+  HIGH // Contraindicated, avoid combination
+  MODERATE // Use with caution, monitor
+  LOW // Minor interaction, minimal clinical significance
 }
 
 enum InteractionCheckStatus {
@@ -441,18 +441,18 @@ model Notification {
 }
 
 model AuditLog {
-  id            String       @id @default(uuid())
+  id            String      @id @default(uuid())
   userId        String?
-  user          User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user          User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
   userRole      String?
   action        AuditAction
   resourceType  String
   resourceId    String
-  timestamp     DateTime     @default(now())
+  timestamp     DateTime    @default(now())
   metadata      Json?
   ipAddress     String?
   userAgent     String?
-  success       Boolean      @default(true)
+  success       Boolean     @default(true)
   errorMessage  String?
   retentionDate DateTime?
 
@@ -503,37 +503,37 @@ model EmailVerification {
 }
 
 model Specialization {
-  id    String   @id @default(uuid())
-  name  String   @unique
+  id                    String                 @id @default(uuid())
+  name                  String                 @unique
   doctorSpecializations DoctorSpecialization[]
 
   @@map("specializations")
 }
 
 model DoctorSpecialization {
-  id               String          @id @default(uuid())
+  id               String         @id @default(uuid())
   doctorId         String
   specializationId String
-  doctor           Doctor          @relation(fields: [doctorId], references: [id], onDelete: Cascade)
-  specialization   Specialization  @relation(fields: [specializationId], references: [id], onDelete: Cascade)
+  doctor           Doctor         @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  specialization   Specialization @relation(fields: [specializationId], references: [id], onDelete: Cascade)
 
   @@unique([doctorId, specializationId], map: "unique_doctor_specialization")
   @@map("doctor_specializations")
 }
 
 model DoctorAvailability {
-  id         String   @id @default(uuid())
-  doctorId   String
-  dayOfWeek  Int
-  startTime  String
-  endTime    String
-  hasBreak   Boolean  @default(false)
-  breakStart String?
-  breakEnd   String?
-  isAvailable Boolean @default(true)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  doctor     Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  id          String   @id @default(uuid())
+  doctorId    String
+  dayOfWeek   Int
+  startTime   String
+  endTime     String
+  hasBreak    Boolean  @default(false)
+  breakStart  String?
+  breakEnd    String?
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  doctor      Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 
   @@index([doctorId, dayOfWeek])
   @@map("doctor_availability")
@@ -552,44 +552,44 @@ model PreferredDoctor {
 }
 
 model QueueEntry {
-  id               String      @id @default(uuid())
-  serialNumber     String      @unique
-  doctorId         String
-  patientId        String
-  appointmentId    String?
-  queueType        QueueType
-  status           QueueStatus
-  priority         Int         @default(2)
-  position         Int
+  id                String       @id @default(uuid())
+  serialNumber      String       @unique
+  doctorId          String
+  patientId         String
+  appointmentId     String?
+  queueType         QueueType
+  status            QueueStatus
+  priority          Int          @default(2)
+  position          Int
   estimatedWaitTime Int?
-  checkInTime      DateTime
-  scheduledTime    DateTime?
-  calledTime       DateTime?
-  startTime        DateTime?
-  completedTime    DateTime?
-  notes            String?
-  version          Int         @default(0)
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
-  doctor           Doctor      @relation(fields: [doctorId], references: [id])
-  patient          Patient     @relation(fields: [patientId], references: [id])
-  appointment      Appointment? @relation(fields: [appointmentId], references: [id])
+  checkInTime       DateTime
+  scheduledTime     DateTime?
+  calledTime        DateTime?
+  startTime         DateTime?
+  completedTime     DateTime?
+  notes             String?
+  version           Int          @default(0)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  doctor            Doctor       @relation(fields: [doctorId], references: [id])
+  patient           Patient      @relation(fields: [patientId], references: [id])
+  appointment       Appointment? @relation(fields: [appointmentId], references: [id])
 
+  @@unique([appointmentId])
   @@index([doctorId, status, position])
   @@index([patientId, status])
   @@index([createdAt])
   @@index([doctorId, createdAt])
-  @@unique([appointmentId])
   @@map("queue_entries")
 }
 
 model QueueCounter {
-  id        String   @id @default(uuid())
-  doctorId  String
-  queueDate String
-  nextSerial Int     @default(1)
-  updatedAt DateTime @updatedAt
-  doctor    Doctor   @relation(fields: [doctorId], references: [id])
+  id         String   @id @default(uuid())
+  doctorId   String
+  queueDate  String
+  nextSerial Int      @default(1)
+  updatedAt  DateTime @updatedAt
+  doctor     Doctor   @relation(fields: [doctorId], references: [id])
 
   @@unique([doctorId, queueDate], map: "unique_queue_counter")
   @@map("queue_counters")
