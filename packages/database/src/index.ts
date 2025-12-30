@@ -36,6 +36,13 @@ export {
   type AuditLog,
   type QueueEntry,
   type QueueCounter,
+  // New drug-related models
+  type Drug,
+  type DrugInteraction,
+  type PrescriptionMedication,
+  type InteractionCheck,
+  type PatientAllergy,
+  type AllergyCheck,
 } from '@prisma/client'
 
 // SQLite-compatible enum values as constants (SQLite doesn't support native enums)
@@ -164,6 +171,77 @@ export const AuditAction = {
   QUEUE_CALLED_NEXT: 'QUEUE_CALLED_NEXT',
   QUEUE_CHECK_IN: 'QUEUE_CHECK_IN',
   DOCTOR_STATUS_CHANGED: 'DOCTOR_STATUS_CHANGED',
+  // Drug-related audit actions
+  DRUG_SEARCH: 'DRUG_SEARCH',
+  DRUG_LOOKUP: 'DRUG_LOOKUP',
+  INTERACTION_CHECK: 'INTERACTION_CHECK',
+  INTERACTION_OVERRIDE: 'INTERACTION_OVERRIDE',
+  ALLERGY_CHECK: 'ALLERGY_CHECK',
+  ALLERGY_CONFLICT_OVERRIDE: 'ALLERGY_CONFLICT_OVERRIDE',
+  ALLERGY_ADDED: 'ALLERGY_ADDED',
+  ALLERGY_UPDATED: 'ALLERGY_UPDATED',
+  ALLERGY_DELETED: 'ALLERGY_DELETED',
 } as const
 // eslint-disable-next-line no-redeclare
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction]
+
+// =============================================================================
+// Drug-related enums
+// =============================================================================
+
+// eslint-disable-next-line no-redeclare
+export const InteractionSeverity = {
+  CONTRAINDICATED: 'CONTRAINDICATED',
+  SEVERE: 'SEVERE',
+  MODERATE: 'MODERATE',
+  MINOR: 'MINOR',
+} as const
+// eslint-disable-next-line no-redeclare
+export type InteractionSeverity = (typeof InteractionSeverity)[keyof typeof InteractionSeverity]
+
+// eslint-disable-next-line no-redeclare
+export const InteractionCheckStatus = {
+  PENDING: 'PENDING',
+  CHECKED: 'CHECKED',
+  OVERRIDDEN: 'OVERRIDDEN',
+  NOT_APPLICABLE: 'NOT_APPLICABLE',
+} as const
+// eslint-disable-next-line no-redeclare
+export type InteractionCheckStatus = (typeof InteractionCheckStatus)[keyof typeof InteractionCheckStatus]
+
+// eslint-disable-next-line no-redeclare
+export const MedicationRoute = {
+  ORAL: 'ORAL',
+  TOPICAL: 'TOPICAL',
+  INTRAVENOUS: 'INTRAVENOUS',
+  INTRAMUSCULAR: 'INTRAMUSCULAR',
+  SUBCUTANEOUS: 'SUBCUTANEOUS',
+  INHALATION: 'INHALATION',
+  SUBLINGUAL: 'SUBLINGUAL',
+  RECTAL: 'RECTAL',
+  OPHTHALMIC: 'OPHTHALMIC',
+  OTIC: 'OTIC',
+  NASAL: 'NASAL',
+  OTHER: 'OTHER',
+} as const
+// eslint-disable-next-line no-redeclare
+export type MedicationRoute = (typeof MedicationRoute)[keyof typeof MedicationRoute]
+
+// eslint-disable-next-line no-redeclare
+export const AllergenType = {
+  MEDICATION: 'MEDICATION',
+  FOOD: 'FOOD',
+  ENVIRONMENTAL: 'ENVIRONMENTAL',
+  OTHER: 'OTHER',
+} as const
+// eslint-disable-next-line no-redeclare
+export type AllergenType = (typeof AllergenType)[keyof typeof AllergenType]
+
+// eslint-disable-next-line no-redeclare
+export const AllergySeverity = {
+  MILD: 'MILD',
+  MODERATE: 'MODERATE',
+  SEVERE: 'SEVERE',
+} as const
+// eslint-disable-next-line no-redeclare
+export type AllergySeverity = (typeof AllergySeverity)[keyof typeof AllergySeverity]

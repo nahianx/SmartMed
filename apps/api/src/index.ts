@@ -29,6 +29,7 @@ import adminRoutes from './routes/admin.routes'
 import { errorHandler } from './middleware/errorHandler'
 import queueRoutes from './routes/queue.routes'
 import prescriptionRoutes from './routes/prescription.routes'
+import drugRoutes from './routes/drug.routes'
 
 dotenv.config()
 
@@ -102,6 +103,7 @@ app.use('/api/reports', reportRoutes)
 app.use('/api/notifications', notificationRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/prescriptions', prescriptionRoutes)
+app.use('/api/drugs', drugRoutes)
 
 // 404 handler
 app.use((_req: Request, res: Response) => {

@@ -154,17 +154,222 @@ model Prescription {
   appointmentId String
   patientId     String
   doctorId      String
-  medications   Json
+  medications   Json        // Legacy field for backward compatibility
   diagnosis     String
   notes         String?
+  // Interaction check results
+  interactionCheckStatus InteractionCheckStatus @default(NOT_CHECKED)
+  interactionOverrideReason String?
+  interactionOverrideAt     DateTime?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   activities    Activity[]
   appointment   Appointment @relation(fields: [appointmentId], references: [id])
   doctor        Doctor      @relation(fields: [doctorId], references: [id])
   patient       Patient     @relation(fields: [patientId], references: [id])
+  // New structured medications relation
+  prescriptionMedications PrescriptionMedication[]
+  interactionChecks       InteractionCheck[]
 
   @@map("prescriptions")
+}
+
+// ==========================================
+// Drug Database Models (RxNav Integration)
+// ==========================================
+
+model Drug {
+  id            String    @id @default(uuid())
+  rxcui         String    @unique
+  name          String
+  genericName   String?
+  brandNames    String[]  @default([])
+  tty           String    // Term Type (IN, BN, SCD, SBD, etc.)
+  synonyms      String[]  @default([])
+  strength      String?
+  dosageForm    String?
+  route         String?
+  drugClass     String[]  @default([])
+  activeIngredients String[] @default([])
+  lastVerified  DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  prescriptionMedications PrescriptionMedication[]
+  interactionsAsDrug1     DrugInteraction[] @relation("Drug1Interactions")
+  interactionsAsDrug2     DrugInteraction[] @relation("Drug2Interactions")
+
+  @@index([name])
+  @@index([genericName])
+  @@index([rxcui])
+  @@map("drugs")
+}
+
+model DrugInteraction {
+  id            String              @id @default(uuid())
+  drug1Rxcui    String
+  drug2Rxcui    String
+  severity      InteractionSeverity
+  description   String
+  clinicalEffect String?
+  source        String              @default("RxNav")
+  evidenceLevel String?
+  lastVerified  DateTime            @default(now())
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  // Relations
+  drug1         Drug                @relation("Drug1Interactions", fields: [drug1Rxcui], references: [rxcui])
+  drug2         Drug                @relation("Drug2Interactions", fields: [drug2Rxcui], references: [rxcui])
+
+  @@unique([drug1Rxcui, drug2Rxcui])
+  @@index([drug1Rxcui])
+  @@index([drug2Rxcui])
+  @@index([severity])
+  @@map("drug_interactions")
+}
+
+model PrescriptionMedication {
+  id              String       @id @default(uuid())
+  prescriptionId  String
+  drugRxcui       String?      // Nullable for backward compatibility with unresolved drugs
+  medicineName    String       // User-entered or resolved drug name
+  genericName     String?
+  dosage          String       // Display format: "500mg"
+  dosageValue     Float?       // Numeric value: 500
+  dosageUnit      String?      // Unit: "mg", "g", "ml", etc.
+  frequency       String       // Display format: "1-0-1"
+  frequencyTimes  Int?         // Times per period: 2
+  frequencyPeriod String?      // Period: "day", "week", etc.
+  duration        String       // Display format: "7 days"
+  durationValue   Int?         // Numeric value: 7
+  durationUnit    String?      // Unit: "days", "weeks", "months"
+  route           MedicationRoute @default(ORAL)
+  instructions    String?
+  isResolved      Boolean      @default(false) // Whether drug was resolved to RxCUI
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  // Relations
+  prescription    Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+  drug            Drug?        @relation(fields: [drugRxcui], references: [rxcui])
+
+  @@index([prescriptionId])
+  @@index([drugRxcui])
+  @@map("prescription_medications")
+}
+
+model InteractionCheck {
+  id              String              @id @default(uuid())
+  prescriptionId  String
+  drug1Rxcui      String
+  drug1Name       String
+  drug2Rxcui      String
+  drug2Name       String
+  severity        InteractionSeverity
+  description     String
+  wasOverridden   Boolean             @default(false)
+  overrideReason  String?
+  overriddenBy    String?             // Doctor ID who overrode
+  overriddenAt    DateTime?
+  checkedAt       DateTime            @default(now())
+  
+  // Relations
+  prescription    Prescription        @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+
+  @@index([prescriptionId])
+  @@index([severity])
+  @@map("interaction_checks")
+}
+
+model PatientAllergy {
+  id              String          @id @default(uuid())
+  patientId       String
+  allergenName    String          // e.g., "Penicillin", "Aspirin"
+  allergenType    AllergenType    // DRUG, DRUG_CLASS, INGREDIENT, FOOD, OTHER
+  allergenRxcui   String?         // RxCUI if it's a drug
+  reaction        String?         // Description of reaction
+  severity        AllergySeverity @default(MODERATE)
+  onsetDate       DateTime?
+  verifiedBy      String?         // Doctor ID who verified
+  verifiedAt      DateTime?
+  isActive        Boolean         @default(true)
+  notes           String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([patientId])
+  @@index([allergenRxcui])
+  @@index([allergenName])
+  @@map("patient_allergies")
+}
+
+model AllergyCheck {
+  id              String          @id @default(uuid())
+  prescriptionId  String?
+  patientId       String
+  drugRxcui       String
+  drugName        String
+  allergyId       String
+  allergenName    String
+  matchType       String          // EXACT, DRUG_CLASS, INGREDIENT
+  severity        AllergySeverity
+  wasOverridden   Boolean         @default(false)
+  overrideReason  String?
+  overriddenBy    String?
+  overriddenAt    DateTime?
+  checkedAt       DateTime        @default(now())
+
+  @@index([prescriptionId])
+  @@index([patientId])
+  @@map("allergy_checks")
+}
+
+// Drug-related Enums
+enum InteractionSeverity {
+  HIGH      // Contraindicated, avoid combination
+  MODERATE  // Use with caution, monitor
+  LOW       // Minor interaction, minimal clinical significance
+}
+
+enum InteractionCheckStatus {
+  NOT_CHECKED
+  PASSED
+  WARNINGS_ACKNOWLEDGED
+  FAILED
+}
+
+enum MedicationRoute {
+  ORAL
+  IV
+  IM
+  SUBCUTANEOUS
+  TOPICAL
+  INHALATION
+  SUBLINGUAL
+  RECTAL
+  TRANSDERMAL
+  OPHTHALMIC
+  OTIC
+  NASAL
+  OTHER
+}
+
+enum AllergenType {
+  DRUG
+  DRUG_CLASS
+  INGREDIENT
+  FOOD
+  ENVIRONMENTAL
+  OTHER
+}
+
+enum AllergySeverity {
+  MILD
+  MODERATE
+  SEVERE
+  LIFE_THREATENING
 }
 
 model Report {
@@ -472,6 +677,16 @@ enum AuditAction {
   QUEUE_CALLED_NEXT
   QUEUE_CHECK_IN
   DOCTOR_STATUS_CHANGED
+  // Drug-related audit actions
+  DRUG_SEARCH
+  DRUG_LOOKUP
+  INTERACTION_CHECK
+  INTERACTION_OVERRIDE
+  ALLERGY_CHECK
+  ALLERGY_CONFLICT_OVERRIDE
+  ALLERGY_ADDED
+  ALLERGY_UPDATED
+  ALLERGY_DELETED
 }
 
 enum UserRole {
