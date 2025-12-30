@@ -11,6 +11,7 @@ import {
 } from './middleware/csrf'
 import { startReminderScheduler } from './scheduler/reminder_scheduler'
 import { startQueueScheduler } from './scheduler/queue_scheduler'
+import { startHealthTipsScheduler } from './scheduler/healthTips_scheduler'
 import { setupSecurityMiddleware } from './middleware/security'
 import { authMiddleware } from './middleware/auth'
 import { initializeSocketIO } from './socket/socketServer'
@@ -30,6 +31,7 @@ import { errorHandler } from './middleware/errorHandler'
 import queueRoutes from './routes/queue.routes'
 import prescriptionRoutes from './routes/prescription.routes'
 import drugRoutes from './routes/drug.routes'
+import healthTipsRoutes from './routes/healthTips.routes'
 
 dotenv.config()
 
@@ -104,6 +106,7 @@ app.use('/api/notifications', notificationRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/prescriptions', prescriptionRoutes)
 app.use('/api/drugs', drugRoutes)
+app.use('/api/health-tips', healthTipsRoutes)
 
 // 404 handler
 app.use((_req: Request, res: Response) => {
@@ -126,6 +129,7 @@ if (process.env.NODE_ENV !== 'test') {
   // Start background reminder scheduler
   startReminderScheduler()
   startQueueScheduler()
+  startHealthTipsScheduler()
 }
 
 export default app

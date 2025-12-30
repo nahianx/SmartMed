@@ -1,7 +1,7 @@
 "use client"
 
 import { formatDistanceToNow } from 'date-fns'
-import { Bell } from 'lucide-react'
+import { Bell, Lightbulb, Calendar, Activity } from 'lucide-react'
 import { NotificationItem } from '@/types/notification'
 import {
   Sheet,
@@ -17,6 +17,35 @@ interface NotificationsDrawerProps {
   onClose: () => void
   notifications: NotificationItem[]
   onMarkRead: (id: string) => void
+}
+
+function getNotificationIcon(type: NotificationItem['type']) {
+  switch (type) {
+    case 'HEALTH_TIP_GENERATED':
+      return <Lightbulb className="h-4 w-4 text-amber-500" />
+    case 'APPOINTMENT_REMINDER_24H':
+    case 'APPOINTMENT_REMINDER_1H':
+      return <Calendar className="h-4 w-4 text-blue-500" />
+    case 'ACTIVITY_CREATED':
+    case 'ACTIVITY_UPDATED':
+      return <Activity className="h-4 w-4 text-green-500" />
+    default:
+      return <Bell className="h-4 w-4 text-gray-500" />
+  }
+}
+
+function getNotificationStyle(type: NotificationItem['type'], isUnread: boolean) {
+  if (!isUnread) return 'border-gray-200 bg-white'
+  
+  switch (type) {
+    case 'HEALTH_TIP_GENERATED':
+      return 'border-amber-300 bg-amber-50'
+    case 'APPOINTMENT_REMINDER_24H':
+    case 'APPOINTMENT_REMINDER_1H':
+      return 'border-blue-300 bg-blue-50'
+    default:
+      return 'border-blue-500 bg-white'
+  }
 }
 
 export function NotificationsDrawer({
@@ -49,24 +78,28 @@ export function NotificationsDrawer({
             {notifications.map((n) => {
               const created = new Date(n.createdAt)
               const isUnread = !n.readAt
+              const notificationStyle = getNotificationStyle(n.type, isUnread)
 
               return (
                 <div
                   key={n.id}
-                  className={`rounded-lg border p-3 text-sm bg-white flex items-start justify-between gap-2 ${
-                    isUnread ? 'border-blue-500' : 'border-gray-200'
-                  }`}
+                  className={`rounded-lg border p-3 text-sm flex items-start justify-between gap-2 ${notificationStyle}`}
                 >
-                  <div>
-                    <p className="font-medium">
-                      {n.title}
-                    </p>
-                    {n.body && (
-                      <p className="text-gray-600 mt-1 text-xs">{n.body}</p>
-                    )}
-                    <p className="mt-1 text-xs text-gray-400">
-                      {formatDistanceToNow(created, { addSuffix: true })}
-                    </p>
+                  <div className="flex gap-3">
+                    <div className="mt-0.5">
+                      {getNotificationIcon(n.type)}
+                    </div>
+                    <div>
+                      <p className="font-medium">
+                        {n.title}
+                      </p>
+                      {(n.body || n.message) && (
+                        <p className="text-gray-600 mt-1 text-xs">{n.body || n.message}</p>
+                      )}
+                      <p className="mt-1 text-xs text-gray-400">
+                        {formatDistanceToNow(created, { addSuffix: true })}
+                      </p>
+                    </div>
                   </div>
                   {isUnread && (
                     <Button

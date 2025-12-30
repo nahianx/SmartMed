@@ -38,6 +38,8 @@ model User {
   passwordResets     PasswordReset[]
   emailVerifications EmailVerification[]
   auditLogs          AuditLog[]
+  healthTips         HealthTip[]
+  healthTipPreference HealthTipPreference?
 
   @@map("users")
 }
@@ -598,6 +600,79 @@ model QueueCounter {
   @@map("queue_counters")
 }
 
+// ==========================================
+// Health Tips Models
+// ==========================================
+
+model HealthTip {
+  id           String           @id @default(uuid())
+  userId       String
+  tipText      String
+  category     HealthTipCategory
+  source       HealthTipSource
+  metadata     Json? // Model version, confidence, input context hash
+  isRead       Boolean          @default(false)
+  isArchived   Boolean          @default(false)
+  expiresAt    DateTime
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tipText], map: "unique_user_tip")
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, isRead, isArchived])
+  @@index([expiresAt])
+  @@map("health_tips")
+}
+
+model HealthTipPreference {
+  id               String                   @id @default(uuid())
+  userId           String                   @unique
+  enabled          Boolean                  @default(true)
+  categories       HealthTipCategory[]
+  frequency        HealthTipFrequency       @default(DAILY)
+  deliveryMethod   HealthTipDeliveryMethod  @default(IN_APP)
+  lastGeneratedAt  DateTime?
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("health_tip_preferences")
+}
+
+enum HealthTipCategory {
+  GENERAL_WELLNESS
+  NUTRITION
+  EXERCISE
+  MENTAL_HEALTH
+  SLEEP
+  MEDICATION
+  PREVENTIVE_CARE
+  CHRONIC_CONDITION
+  LIFESTYLE
+}
+
+enum HealthTipSource {
+  ML_GENERATED
+  STATIC_FALLBACK
+  CURATED
+}
+
+enum HealthTipFrequency {
+  DAILY
+  WEEKLY
+  BI_WEEKLY
+  MONTHLY
+}
+
+enum HealthTipDeliveryMethod {
+  IN_APP
+  EMAIL
+  BOTH
+}
+
 enum ActivityType {
   APPOINTMENT
   PRESCRIPTION
@@ -626,6 +701,7 @@ enum NotificationType {
   APPOINTMENT_REMINDER_1H
   ACTIVITY_CREATED
   ACTIVITY_UPDATED
+  HEALTH_TIP_GENERATED
 }
 
 enum QueueType {
