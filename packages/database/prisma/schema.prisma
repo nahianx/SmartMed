@@ -8,37 +8,37 @@ datasource db {
 }
 
 model User {
-  id                 String              @id @default(uuid())
-  email              String              @unique
-  fullName           String?
-  passwordHash       String?
-  role               UserRole
-  authProvider       AuthProvider        @default(LOCAL)
-  googleId           String?             @unique
-  emailVerified      Boolean             @default(false)
-  isActive           Boolean             @default(true)
-  lastLogin          DateTime?
-  phoneNumber        String?
-  dateOfBirth        DateTime?
-  gender             Gender?
-  addressLine1       String?
-  addressLine2       String?
-  city               String?
-  region             String?
-  postalCode         String?
-  country            String?
-  profilePhotoUrl    String?
-  isMfaEnabled       Boolean             @default(false)
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  doctor             Doctor?
-  notifications      Notification[]
-  patient            Patient?
-  sessions           UserSession[]
-  passwordResets     PasswordReset[]
-  emailVerifications EmailVerification[]
-  auditLogs          AuditLog[]
-  healthTips         HealthTip[]
+  id                  String               @id @default(uuid())
+  email               String               @unique
+  fullName            String?
+  passwordHash        String?
+  role                UserRole
+  authProvider        AuthProvider         @default(LOCAL)
+  googleId            String?              @unique
+  emailVerified       Boolean              @default(false)
+  isActive            Boolean              @default(true)
+  lastLogin           DateTime?
+  phoneNumber         String?
+  dateOfBirth         DateTime?
+  gender              Gender?
+  addressLine1        String?
+  addressLine2        String?
+  city                String?
+  region              String?
+  postalCode          String?
+  country             String?
+  profilePhotoUrl     String?
+  isMfaEnabled        Boolean              @default(false)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  doctor              Doctor?
+  notifications       Notification[]
+  patient             Patient?
+  sessions            UserSession[]
+  passwordResets      PasswordReset[]
+  emailVerifications  EmailVerification[]
+  auditLogs           AuditLog[]
+  healthTips          HealthTip[]
   healthTipPreference HealthTipPreference?
 
   @@map("users")
@@ -605,17 +605,17 @@ model QueueCounter {
 // ==========================================
 
 model HealthTip {
-  id           String           @id @default(uuid())
-  userId       String
-  tipText      String
-  category     HealthTipCategory
-  source       HealthTipSource
-  metadata     Json? // Model version, confidence, input context hash
-  isRead       Boolean          @default(false)
-  isArchived   Boolean          @default(false)
-  expiresAt    DateTime
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
+  id         String            @id @default(uuid())
+  userId     String
+  tipText    String
+  category   HealthTipCategory
+  source     HealthTipSource
+  metadata   Json? // Model version, confidence, input context hash
+  isRead     Boolean           @default(false)
+  isArchived Boolean           @default(false)
+  expiresAt  DateTime
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -627,15 +627,15 @@ model HealthTip {
 }
 
 model HealthTipPreference {
-  id               String                   @id @default(uuid())
-  userId           String                   @unique
-  enabled          Boolean                  @default(true)
-  categories       HealthTipCategory[]
-  frequency        HealthTipFrequency       @default(DAILY)
-  deliveryMethod   HealthTipDeliveryMethod  @default(IN_APP)
-  lastGeneratedAt  DateTime?
-  createdAt        DateTime                 @default(now())
-  updatedAt        DateTime                 @updatedAt
+  id              String                  @id @default(uuid())
+  userId          String                  @unique
+  enabled         Boolean                 @default(true)
+  categories      HealthTipCategory[]
+  frequency       HealthTipFrequency      @default(DAILY)
+  deliveryMethod  HealthTipDeliveryMethod @default(IN_APP)
+  lastGeneratedAt DateTime?
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
