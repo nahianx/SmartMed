@@ -67,6 +67,9 @@ export type Gender = (typeof Gender)[keyof typeof Gender]
 
 // eslint-disable-next-line no-redeclare
 export const AppointmentStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED',
   SCHEDULED: 'SCHEDULED',
   CONFIRMED: 'CONFIRMED',
   COMPLETED: 'COMPLETED',

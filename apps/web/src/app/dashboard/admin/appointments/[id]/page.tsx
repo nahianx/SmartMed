@@ -12,13 +12,10 @@ import {
   FileText,
   Pill,
   Activity,
-  CheckCircle,
-  XCircle,
   Stethoscope,
 } from 'lucide-react'
 import { Badge, Button } from '@smartmed/ui'
 import { useAuthContext } from '../../../../../context/AuthContext'
-import { ConfirmDialog } from '../../../../../components/ConfirmDialog'
 import {
   appointmentService,
   Appointment,
@@ -41,12 +38,7 @@ export default function AdminAppointmentDetailPage() {
   const [medicalReports, setMedicalReports] = useState<Report[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [updating, setUpdating] = useState(false)
   const [success, setSuccess] = useState<string | null>(null)
-  const [pendingStatus, setPendingStatus] = useState<
-    'COMPLETED' | 'NO_SHOW' | null
-  >(null)
-  const [pendingReason, setPendingReason] = useState('')
   const [notesDraft, setNotesDraft] = useState('')
   const [savingNotes, setSavingNotes] = useState(false)
 
@@ -87,34 +79,6 @@ export default function AdminAppointmentDetailPage() {
       console.error(err)
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  const handleStatusUpdate = async (
-    status: 'COMPLETED' | 'NO_SHOW',
-    reason?: string
-  ) => {
-    if (!appointment) return
-
-    try {
-      setUpdating(true)
-      setError(null)
-      await appointmentService.updateAppointmentStatus(
-        appointment.id,
-        status,
-        reason
-      )
-      await loadAppointmentData()
-      setSuccess(
-        `Appointment marked as ${status === 'COMPLETED' ? 'Completed' : 'No Show'}`
-      )
-    } catch (err) {
-      setError(`Failed to update appointment status`)
-      console.error(err)
-    } finally {
-      setUpdating(false)
-      setPendingStatus(null)
-      setPendingReason('')
     }
   }
 
@@ -176,9 +140,6 @@ export default function AdminAppointmentDetailPage() {
     }
     return age
   }
-
-  const canUpdateStatus =
-    appointment.status === 'SCHEDULED' || appointment.status === 'CONFIRMED'
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -331,33 +292,14 @@ export default function AdminAppointmentDetailPage() {
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              {canUpdateStatus && (
-                <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
-                  <h3 className="font-semibold text-slate-900 mb-4">
-                    Update Status
-                  </h3>
-                  <div className="space-y-3">
-                    <button
-                      onClick={() => setPendingStatus('COMPLETED')}
-                      disabled={updating}
-                      className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-medium py-3 px-4 rounded-lg transition-colors"
-                    >
-                      <CheckCircle className="h-5 w-5" />
-                      {updating ? 'Updating...' : 'Complete'}
-                    </button>
-
-                    <button
-                      onClick={() => setPendingStatus('NO_SHOW')}
-                      disabled={updating}
-                      className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white font-medium py-3 px-4 rounded-lg transition-colors"
-                    >
-                      <XCircle className="h-5 w-5" />
-                      {updating ? 'Updating...' : 'No Show'}
-                    </button>
-                  </div>
-                </div>
-              )}
+              <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+                <h3 className="font-semibold text-slate-900 mb-2">
+                  Appointment Status
+                </h3>
+                <p className="text-sm text-slate-600">
+                  Status updates are managed by the assigned doctor.
+                </p>
+              </div>
             </div>
 
             {/* Right Column - Medical Info */}
@@ -414,7 +356,7 @@ export default function AdminAppointmentDetailPage() {
                         Notes
                       </label>
                       <p className="text-sm text-slate-900">
-                        {appointment.notes || '—'}
+                        {appointment.notes || '-'}
                       </p>
                       <div className="mt-2 space-y-2">
                         <textarea
@@ -531,7 +473,7 @@ export default function AdminAppointmentDetailPage() {
                             {report.fileName}
                           </p>
                           <p className="text-xs text-slate-500">
-                            {formatDate(report.uploadedAt)} •{' '}
+                            {formatDate(report.uploadedAt)} -{' '}
                             {(report.fileSize / 1024).toFixed(2)} KB
                           </p>
                         </div>
@@ -564,28 +506,6 @@ export default function AdminAppointmentDetailPage() {
         </main>
       </div>
 
-      <ConfirmDialog
-        isOpen={pendingStatus !== null}
-        title="Confirm status change"
-        message={
-          pendingStatus === 'COMPLETED'
-            ? 'Mark this appointment as completed?'
-            : 'Mark this appointment as no-show?'
-        }
-        confirmText={
-          pendingStatus === 'COMPLETED' ? 'Mark Completed' : 'Mark No-show'
-        }
-        isDangerous={pendingStatus === 'NO_SHOW'}
-        requireReason
-        reasonLabel="Reason (required for audit)"
-        placeholder="Add context for this status change"
-        onConfirm={(reason) =>
-          pendingStatus && handleStatusUpdate(pendingStatus, reason)
-        }
-        onCancel={() => {
-          setPendingStatus(null)
-        }}
-      />
     </div>
   )
 }

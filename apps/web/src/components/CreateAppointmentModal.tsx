@@ -114,7 +114,6 @@ export default function CreateAppointmentModal({
       const isoDate = new Date(dateTime).toISOString()
 
       const validation = await appointmentService.validateAppointment({
-        patientId: selectedPatient.id,
         doctorId: selectedDoctor.id,
         dateTime: isoDate,
         duration,
@@ -126,7 +125,6 @@ export default function CreateAppointmentModal({
       }
 
       await appointmentService.createAppointment({
-        patientId: selectedPatient.id,
         doctorId: selectedDoctor.id,
         dateTime: isoDate,
         duration,
@@ -256,7 +254,7 @@ export default function CreateAppointmentModal({
                           {patient.phoneNumber}
                           {patient.dateOfBirth && (
                             <span className="ml-2">
-                              •{' '}
+                              -{' '}
                               {new Date(
                                 patient.dateOfBirth
                               ).toLocaleDateString()}

@@ -24,6 +24,11 @@ export function rateLimiter(maxAttempts: number, windowMs: number) {
     }
 
     if (existing.count >= maxAttempts) {
+      const retryAfterSeconds = Math.max(
+        1,
+        Math.ceil((windowMs - (now - existing.firstRequestAt)) / 1000)
+      )
+      res.setHeader('Retry-After', retryAfterSeconds.toString())
       return res.status(429).json({ error: 'Too many requests. Please try again later.' })
     }
 

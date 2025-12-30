@@ -12,7 +12,8 @@ export const queryKeys = {
   patientProfile: ['patient', 'profile'] as const,
   doctorAvailability: ['doctor', 'availability'] as const,
   preferredDoctors: ['patient', 'preferred-doctors'] as const,
-  doctorSearch: (query?: string, specialization?: string) => ['doctor', 'search', query, specialization] as const,
+  doctorSearch: (query?: string, specialization?: string, location?: string) =>
+    ['doctor', 'search', query, specialization, location] as const,
   specializations: ['specializations'] as const
 }
 
@@ -131,11 +132,15 @@ export const useDoctorProfile = (userId?: string, enabled = true) => {
   })
 }
 
-export const useDoctorSearch = (query?: string, specialization?: string) => {
+export const useDoctorSearch = (
+  query?: string,
+  specialization?: string,
+  location?: string
+) => {
   return useQuery({
-    queryKey: queryKeys.doctorSearch(query, specialization),
-    queryFn: () => doctorApi.searchDoctors(query, specialization),
-    enabled: !!(query || specialization), // Only fetch if there's a search term
+    queryKey: queryKeys.doctorSearch(query, specialization, location),
+    queryFn: () => doctorApi.searchDoctors(query, specialization, location),
+    enabled: !!(query || specialization || location), // Only fetch if there's a search term
     staleTime: 2 * 60 * 1000, // 2 minutes
   })
 }

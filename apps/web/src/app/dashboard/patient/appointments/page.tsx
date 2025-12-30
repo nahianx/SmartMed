@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Calendar, Clock, User, ArrowLeft, Filter } from 'lucide-react'
+import { Calendar, Clock, Filter, ArrowLeft, Stethoscope } from 'lucide-react'
+import { Badge, Button } from '@smartmed/ui'
 import { useAuthContext } from '../../../../context/AuthContext'
 import {
   appointmentService,
   Appointment,
 } from '../../../../services/appointmentService'
 
-export default function AppointmentsPage() {
+export default function PatientAppointmentsPage() {
   const { user, loading } = useAuthContext()
   const router = useRouter()
   const [appointments, setAppointments] = useState<Appointment[]>([])
@@ -21,15 +22,13 @@ export default function AppointmentsPage() {
   const [filter, setFilter] = useState<
     'all' | 'pending' | 'accepted' | 'past'
   >('all')
-  const [decisionLoadingId, setDecisionLoadingId] = useState<string | null>(
-    null
-  )
+  const [cancelingId, setCancelingId] = useState<string | null>(null)
 
   useEffect(() => {
     if (!loading) {
       if (!user) {
         router.replace('/auth/login')
-      } else if (user.role !== 'DOCTOR') {
+      } else if (user.role !== 'PATIENT') {
         router.replace('/')
       } else {
         loadAppointments()
@@ -49,25 +48,6 @@ export default function AppointmentsPage() {
       console.error(err)
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  const handleDecision = async (
-    appointmentId: string,
-    decision: 'accept' | 'reject'
-  ) => {
-    try {
-      setDecisionLoadingId(appointmentId)
-      if (decision === 'accept') {
-        await appointmentService.acceptAppointment(appointmentId)
-      } else {
-        await appointmentService.rejectAppointment(appointmentId)
-      }
-      await loadAppointments()
-    } catch (err: any) {
-      setError(err?.response?.data?.error || 'Failed to update appointment')
-    } finally {
-      setDecisionLoadingId(null)
     }
   }
 
@@ -94,7 +74,7 @@ export default function AppointmentsPage() {
 
   if (loading || isLoading) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-cyan-50">
+      <main className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-gray-600">Loading...</div>
       </main>
     )
@@ -137,6 +117,7 @@ export default function AppointmentsPage() {
   }
 
   const acceptedStatuses = ['ACCEPTED', 'CONFIRMED', 'SCHEDULED']
+  const cancellableStatuses = ['PENDING', ...acceptedStatuses]
   const pendingCount = appointments.filter(
     (apt) => apt.status === 'PENDING'
   ).length
@@ -146,18 +127,26 @@ export default function AppointmentsPage() {
       new Date(apt.dateTime) > new Date()
   ).length
 
-  const todayCount = appointments.filter((apt) => {
-    const aptDate = new Date(apt.dateTime)
-    const today = new Date()
-    return (
-      aptDate.toDateString() === today.toDateString() &&
-      acceptedStatuses.includes(apt.status)
+  const handleCancel = async (appointment: Appointment) => {
+    if (!cancellableStatuses.includes(appointment.status)) return
+    const confirmed = window.confirm(
+      'Cancel this appointment? This cannot be undone.'
     )
-  }).length
+    if (!confirmed) return
 
-  const completedCount = appointments.filter(
-    (apt) => apt.status === 'COMPLETED'
-  ).length
+    try {
+      setCancelingId(appointment.id)
+      setError(null)
+      await appointmentService.cancelAppointment(appointment.id)
+      await loadAppointments()
+    } catch (err: any) {
+      setError(
+        err?.response?.data?.error || 'Failed to cancel appointment'
+      )
+    } finally {
+      setCancelingId(null)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -167,7 +156,7 @@ export default function AppointmentsPage() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
               <button
-                onClick={() => router.push('/dashboard/doctor')}
+                onClick={() => router.push('/dashboard/patient')}
                 className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
                 aria-label="Back to dashboard"
               >
@@ -175,19 +164,26 @@ export default function AppointmentsPage() {
               </button>
               <div>
                 <h1 className="text-xl font-semibold text-slate-900">
-                  Appointments
+                  My Appointments
                 </h1>
                 <p className="text-sm text-slate-600">
-                  View and manage patient appointments
+                  Track requests, confirmations, and visit history
                 </p>
               </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => router.push('/dashboard/patient/search')}
+              >
+                Book appointment
+              </Button>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-blue-50 via-white to-cyan-50 min-h-[calc(100vh-4rem)]">
-        {/* Main Content */}
+      <div className="bg-slate-50 min-h-[calc(100vh-4rem)]">
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
@@ -196,7 +192,7 @@ export default function AppointmentsPage() {
           )}
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
               <div className="text-3xl font-bold text-blue-600 mb-1">
                 {appointments.length}
@@ -210,16 +206,10 @@ export default function AppointmentsPage() {
               <div className="text-sm text-slate-600">Pending Requests</div>
             </div>
             <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
-              <div className="text-3xl font-bold text-orange-600 mb-1">
+              <div className="text-3xl font-bold text-emerald-600 mb-1">
                 {upcomingCount}
               </div>
               <div className="text-sm text-slate-600">Upcoming Accepted</div>
-            </div>
-            <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
-              <div className="text-3xl font-bold text-gray-600 mb-1">
-                {completedCount}
-              </div>
-              <div className="text-sm text-slate-600">Completed</div>
             </div>
           </div>
 
@@ -236,7 +226,7 @@ export default function AppointmentsPage() {
                       : 'text-slate-600 hover:bg-slate-100'
                   }`}
                 >
-                  All Appointments
+                  All
                 </button>
                 <button
                   onClick={() => setFilter('pending')}
@@ -276,37 +266,39 @@ export default function AppointmentsPage() {
               {filteredAppointments.length === 0 ? (
                 <div className="px-6 py-12 text-center">
                   <Calendar className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-                  <p className="text-slate-600">No appointments found</p>
+                  <p className="text-slate-600">
+                    No appointments found for this view
+                  </p>
                 </div>
               ) : (
                 filteredAppointments.map((appointment) => (
                   <div
                     key={appointment.id}
-                    onClick={() =>
-                      router.push(
-                        `/dashboard/doctor/appointments/${appointment.id}`
-                      )
-                    }
-                    className="px-6 py-4 hover:bg-slate-50 cursor-pointer transition-colors"
+                    className="px-6 py-4 hover:bg-slate-50 transition-colors"
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-4">
                       <div className="flex items-center gap-4 flex-1">
                         <div className="bg-blue-100 rounded-full p-3">
-                          <User className="h-6 w-6 text-blue-600" />
+                          <Stethoscope className="h-6 w-6 text-blue-600" />
                         </div>
                         <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-1">
+                          <div className="flex items-center gap-3 mb-1 flex-wrap">
                             <h3 className="font-semibold text-slate-900">
-                              {appointment.patient?.firstName}{' '}
-                              {appointment.patient?.lastName}
+                              Dr. {appointment.doctor?.firstName}{' '}
+                              {appointment.doctor?.lastName}
                             </h3>
                             <span
                               className={`px-2 py-1 text-xs font-medium rounded-md border ${getStatusBadge(appointment.status)}`}
                             >
                               {appointment.status.replace('_', ' ')}
                             </span>
+                            {appointment.status === 'PENDING' && (
+                              <Badge variant="secondary" className="text-xs">
+                                Awaiting approval
+                              </Badge>
+                            )}
                           </div>
-                          <div className="flex items-center gap-4 text-sm text-slate-600">
+                          <div className="flex items-center gap-4 text-sm text-slate-600 flex-wrap">
                             <div className="flex items-center gap-1">
                               <Calendar className="h-4 w-4" />
                               <span>{formatDate(appointment.dateTime)}</span>
@@ -318,6 +310,11 @@ export default function AppointmentsPage() {
                                 {appointment.duration} min)
                               </span>
                             </div>
+                            {appointment.doctor?.specialization && (
+                              <span className="text-xs text-slate-500">
+                                {appointment.doctor.specialization}
+                              </span>
+                            )}
                           </div>
                           <p className="text-sm text-slate-600 mt-1">
                             <span className="font-medium">Reason:</span>{' '}
@@ -325,33 +322,16 @@ export default function AppointmentsPage() {
                           </p>
                         </div>
                       </div>
-                      {appointment.status === 'PENDING' ? (
-                        <div className="flex gap-2">
-                          <button
-                            onClick={(event) => {
-                              event.stopPropagation()
-                              handleDecision(appointment.id, 'accept')
-                            }}
-                            disabled={decisionLoadingId === appointment.id}
-                            className="rounded-md bg-green-600 px-3 py-1 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-50"
-                          >
-                            Accept
-                          </button>
-                          <button
-                            onClick={(event) => {
-                              event.stopPropagation()
-                              handleDecision(appointment.id, 'reject')
-                            }}
-                            disabled={decisionLoadingId === appointment.id}
-                            className="rounded-md border border-rose-200 px-3 py-1 text-xs font-medium text-rose-700 hover:bg-rose-50 disabled:opacity-50"
-                          >
-                            Reject
-                          </button>
-                        </div>
-                      ) : (
-                        <span className="text-blue-600 font-medium text-sm">
-                          View Details
-                        </span>
+                      {cancellableStatuses.includes(appointment.status) && (
+                        <button
+                          onClick={() => handleCancel(appointment)}
+                          disabled={cancelingId === appointment.id}
+                          className="rounded-md border border-rose-200 px-3 py-1 text-xs font-medium text-rose-700 hover:bg-rose-50 disabled:opacity-50"
+                        >
+                          {cancelingId === appointment.id
+                            ? 'Cancelling...'
+                            : 'Cancel'}
+                        </button>
                       )}
                     </div>
                   </div>

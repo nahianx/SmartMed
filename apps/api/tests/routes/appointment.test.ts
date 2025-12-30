@@ -1,7 +1,14 @@
 import request from 'supertest'
 import express from 'express'
 import appointmentRoutes from '../../src/routes/appointment.routes'
-import { validateSchema } from '../../src/middleware/validation'
+
+class PrismaClientKnownRequestError extends Error {
+  code: string
+  constructor(message: string, code: string) {
+    super(message)
+    this.code = code
+  }
+}
 
 // Mock the prisma client
 const mockPrisma = {
@@ -10,6 +17,9 @@ const mockPrisma = {
   },
   doctor: {
     findUnique: jest.fn()
+  },
+  doctorAvailability: {
+    findMany: jest.fn()
   },
   appointment: {
     findMany: jest.fn(),
@@ -22,19 +32,27 @@ const mockPrisma = {
   activity: {
     create: jest.fn(),
     updateMany: jest.fn()
-  }
+  },
+  $transaction: jest.fn()
 }
 
 jest.mock('@smartmed/database', () => ({
   prisma: mockPrisma,
   AppointmentStatus: {
+    PENDING: 'PENDING',
+    ACCEPTED: 'ACCEPTED',
+    REJECTED: 'REJECTED',
     SCHEDULED: 'SCHEDULED',
     CONFIRMED: 'CONFIRMED',
     COMPLETED: 'COMPLETED',
-    CANCELLED: 'CANCELLED'
+    CANCELLED: 'CANCELLED',
+    NO_SHOW: 'NO_SHOW'
   },
   ActivityType: {
     APPOINTMENT: 'APPOINTMENT'
+  },
+  Prisma: {
+    PrismaClientKnownRequestError
   }
 }))
 
@@ -57,6 +75,7 @@ app.use('/api/appointments', appointmentRoutes)
 describe('Appointment API Routes', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockPrisma.$transaction.mockImplementation(async (fn: any) => fn(mockPrisma))
   })
 
   describe('GET /api/appointments', () => {
@@ -109,29 +128,48 @@ describe('Appointment API Routes', () => {
   })
 
   describe('POST /api/appointments', () => {
+    const futureDate = new Date()
+    futureDate.setDate(futureDate.getDate() + 7)
+
     const validAppointmentData = {
-      patientId: '550e8400-e29b-41d4-a716-446655440000',
       doctorId: '550e8400-e29b-41d4-a716-446655440001',
-      dateTime: '2024-12-31T14:00:00.000Z',
+      dateTime: futureDate.toISOString(),
+      duration: 30,
       reason: 'Regular checkup'
     }
 
     it('creates appointment successfully', async () => {
+      const mockPatient = {
+        id: 'patient-1',
+        firstName: 'John',
+        lastName: 'Doe'
+      }
+      const mockDoctor = { 
+        id: 'doctor-1', 
+        firstName: 'Dr.', 
+        lastName: 'Smith', 
+        specialization: 'Cardiology' 
+      }
       const mockCreatedAppointment = {
         id: 'apt-123',
         ...validAppointmentData,
-        status: 'SCHEDULED',
-        duration: 30,
-        patient: { id: 'patient-1', firstName: 'John', lastName: 'Doe' },
-        doctor: { 
-          id: 'doctor-1', 
-          firstName: 'Dr.', 
-          lastName: 'Smith', 
-          specialization: 'Cardiology' 
-        }
+        status: 'PENDING',
+        patient: mockPatient,
+        doctor: mockDoctor
       }
 
-      mockPrisma.appointment.findFirst.mockResolvedValueOnce(null) // No conflicts
+      mockPrisma.patient.findUnique.mockResolvedValueOnce(mockPatient)
+      mockPrisma.doctor.findUnique.mockResolvedValueOnce(mockDoctor)
+      mockPrisma.doctorAvailability.findMany.mockResolvedValueOnce([
+        {
+          startTime: '09:00',
+          endTime: '17:00',
+          hasBreak: false,
+          breakStart: null,
+          breakEnd: null
+        }
+      ])
+      mockPrisma.appointment.findMany.mockResolvedValueOnce([]) // No conflicts
       mockPrisma.appointment.create.mockResolvedValueOnce(mockCreatedAppointment)
       mockPrisma.activity.create.mockResolvedValueOnce({})
 
@@ -140,13 +178,13 @@ describe('Appointment API Routes', () => {
         .send(validAppointmentData)
         .expect(201)
 
-      expect(response.body.message).toBe('Appointment created successfully')
+      expect(response.body.message).toBe('Appointment request created successfully')
       expect(response.body.appointment).toEqual(mockCreatedAppointment)
     })
 
     it('validates required fields', async () => {
       const invalidData = { ...validAppointmentData }
-      delete (invalidData as any).patientId
+      delete (invalidData as any).doctorId
 
       const response = await request(app)
         .post('/api/appointments')
@@ -157,8 +195,32 @@ describe('Appointment API Routes', () => {
     })
 
     it('prevents appointment conflicts', async () => {
-      const conflictingAppointment = { id: 'existing-apt' }
-      mockPrisma.appointment.findFirst.mockResolvedValueOnce(conflictingAppointment)
+      const conflictingAppointment = {
+        id: 'existing-apt',
+        dateTime: new Date(validAppointmentData.dateTime),
+        duration: 30,
+        status: 'PENDING'
+      }
+
+      mockPrisma.patient.findUnique.mockResolvedValueOnce({ id: 'patient-1' })
+      mockPrisma.doctor.findUnique.mockResolvedValueOnce({
+        id: 'doctor-1',
+        firstName: 'Dr.',
+        lastName: 'Smith',
+        specialization: 'Cardiology'
+      })
+      mockPrisma.doctorAvailability.findMany.mockResolvedValueOnce([
+        {
+          startTime: '09:00',
+          endTime: '17:00',
+          hasBreak: false,
+          breakStart: null,
+          breakEnd: null
+        }
+      ])
+      mockPrisma.appointment.findMany.mockResolvedValueOnce([
+        conflictingAppointment
+      ])
 
       await request(app)
         .post('/api/appointments')
@@ -192,6 +254,7 @@ describe('Appointment API Routes', () => {
         id: appointmentId,
         patientId: 'patient-123',
         doctorId: 'doctor-123',
+        status: 'PENDING',
         dateTime: new Date('2024-12-31T14:00:00.000Z'),
         reason: 'Original reason',
         patient: { id: 'patient-123' },
@@ -258,6 +321,7 @@ describe('Appointment API Routes', () => {
         patientId: 'patient-123',
         doctorId: 'doctor-123',
         dateTime: futureDate,
+        status: 'PENDING',
         patient: { id: 'patient-123' },
         doctor: { 
           id: 'doctor-123', 

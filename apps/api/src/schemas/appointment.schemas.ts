@@ -4,7 +4,6 @@ import { uuidSchema, notesSchema, paginationQuerySchema, dateRangeQuerySchema, i
 
 // Base appointment data that can be used for both create and update
 const appointmentBaseSchema = z.object({
-  patientId: uuidSchema.optional(),
   doctorId: uuidSchema.optional(),
   dateTime: z.string()
     .datetime('Invalid datetime format. Use ISO 8601 format (YYYY-MM-DDTHH:mm:ss.sssZ)')
@@ -23,14 +22,10 @@ const appointmentBaseSchema = z.object({
     .trim()
     .optional(),
   notes: notesSchema,
-  status: z.nativeEnum(AppointmentStatus, {
-    errorMap: () => ({ message: 'Invalid appointment status' })
-  }).optional()
 })
 
 // Schema for creating a new appointment
 export const createAppointmentSchema = appointmentBaseSchema.extend({
-  patientId: uuidSchema,
   doctorId: uuidSchema,
   dateTime: z.string()
     .datetime('Invalid datetime format. Use ISO 8601 format (YYYY-MM-DDTHH:mm:ss.sssZ)')
@@ -49,7 +44,14 @@ export const createAppointmentSchema = appointmentBaseSchema.extend({
 }).strict()
 
 // Schema for updating an appointment
-export const updateAppointmentSchema = appointmentBaseSchema.strict()
+export const updateAppointmentSchema = z.object({
+  reason: z.string()
+    .min(3, 'Reason must be at least 3 characters long')
+    .max(500, 'Reason must be less than 500 characters')
+    .trim()
+    .optional(),
+  notes: notesSchema,
+}).strict()
 
 // Schema for appointment ID parameter
 export const appointmentIdSchema = idParamSchema

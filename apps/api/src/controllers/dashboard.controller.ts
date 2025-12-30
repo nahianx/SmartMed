@@ -23,12 +23,16 @@ export class DashboardController {
         return res.status(404).json({ error: 'Patient profile not found' })
       }
 
-      // Fetch upcoming appointments (not completed or no-show)
+      // Fetch upcoming accepted appointments
       const upcomingAppointments = await prisma.appointment.findMany({
         where: {
           patientId: patient.id,
           status: {
-            notIn: [AppointmentStatus.COMPLETED, AppointmentStatus.NO_SHOW],
+            in: [
+              AppointmentStatus.ACCEPTED,
+              AppointmentStatus.CONFIRMED,
+              AppointmentStatus.SCHEDULED,
+            ],
           },
           dateTime: {
             gte: new Date(), // Only future appointments

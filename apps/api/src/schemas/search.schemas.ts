@@ -17,12 +17,6 @@ export const doctorSearchSchema = z
     q: z.string().max(200).optional(),
     specialty: z.string().optional(),
     clinicId: z.string().uuid().optional(),
-    acceptingNew: z.coerce.boolean().optional(),
-    availableFrom: z.coerce.date().optional(),
-    availableTo: z.coerce.date().optional(),
-    visitType: coerceStringArray(
-      z.enum(['telemedicine', 'in-person'])
-    ).optional(),
     sortBy: z
       .enum(['name', 'specialization', 'availability', 'createdAt'])
       .default('name'),

@@ -124,6 +124,9 @@ export interface TimeSlot {
 
 // Appointment types
 export enum AppointmentStatus {
+  PENDING = 'PENDING',
+  ACCEPTED = 'ACCEPTED',
+  REJECTED = 'REJECTED',
   SCHEDULED = 'SCHEDULED',
   CONFIRMED = 'CONFIRMED',
   COMPLETED = 'COMPLETED',

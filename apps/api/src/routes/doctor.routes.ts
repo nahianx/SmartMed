@@ -12,6 +12,7 @@ import {
   removeAvailabilitySlot,
   searchDoctors,
   searchDoctorsAdvanced,
+  getDoctorAvailabilityByDateRange,
 } from '../services/doctor.service'
 import { broadcastDoctorStatus } from '../services/queue.service'
 import { getDoctorHistory } from '../services/appointment.service'
@@ -23,6 +24,7 @@ import {
 } from '../services/validation.service'
 import { prisma, DoctorAvailabilityStatus, QueueStatus, AuditAction } from '@smartmed/database'
 import { validateSchema } from '../middleware/validation'
+import { rateLimiter } from '../middleware/rateLimiter'
 import {
   doctorHistorySchema,
   doctorSearchSchema,
@@ -49,11 +51,38 @@ const doctorStatusSchema = {
   }),
 }
 
+const doctorIdParamSchema = {
+  params: z.object({
+    doctorId: z.string().uuid(),
+  }),
+}
+
+const availabilityQuerySchema = {
+  query: z.object({
+    startDate: z
+      .string()
+      .datetime('Invalid startDate format. Use ISO 8601 format'),
+    endDate: z
+      .string()
+      .datetime('Invalid endDate format. Use ISO 8601 format'),
+    duration: z.coerce.number().int().min(15).max(480).optional(),
+  }),
+}
+
 // Public search endpoint used by patients to find doctors
-router.get('/search', async (req: Request, res: Response) => {
+router.get('/search', rateLimiter(60, 60 * 1000), async (req: Request, res: Response) => {
   try {
     const q = String(req.query.q || '')
-    const doctors = await searchDoctors(q)
+    const specialization = req.query.specialization
+      ? String(req.query.specialization)
+      : undefined
+    const location =
+      (req.query.location && String(req.query.location)) ||
+      (req.query.city && String(req.query.city)) ||
+      (req.query.state && String(req.query.state)) ||
+      (req.query.address && String(req.query.address)) ||
+      undefined
+    const doctors = await searchDoctors(q, { specialization, location })
     res.json({ doctors })
   } catch (error) {
     res.status(500).json({ error: 'Failed to search doctors' })
@@ -116,6 +145,33 @@ router.get('/available', async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to load available doctors' })
   }
 })
+
+// Public availability by date range for patients
+router.get(
+  '/:doctorId/availability',
+  requireAuth,
+  requireRole(UserRole.PATIENT),
+  validateSchema({ ...doctorIdParamSchema, ...availabilityQuerySchema }),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { doctorId } = req.params
+      const { startDate, endDate, duration } = req.query as any
+
+      const slots = await getDoctorAvailabilityByDateRange({
+        doctorId,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        durationMinutes: duration ? Number(duration) : undefined,
+      })
+
+      res.json({ slots })
+    } catch (error: any) {
+      res
+        .status(error.status || 500)
+        .json({ error: error.message || 'Failed to load availability' })
+    }
+  }
+)
 
 // Authenticated advanced search with filters/pagination
 router.get(

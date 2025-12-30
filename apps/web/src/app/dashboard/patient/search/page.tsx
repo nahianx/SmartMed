@@ -20,12 +20,19 @@ import {
 } from '../../../../hooks/useProfile'
 import type { Doctor } from '@smartmed/types'
 import { appointmentService } from '../../../../services/appointmentService'
-import { apiClient } from '../../../../services/apiClient'
 
 interface Preset {
   name: string
   query: string
   specialization?: string
+  location?: string
+}
+
+interface AvailabilitySlot {
+  date: string
+  startTime: string
+  endTime: string
+  isAvailable: boolean
 }
 
 export default function DoctorFinderPage() {
@@ -33,6 +40,7 @@ export default function DoctorFinderPage() {
   const router = useRouter()
   const [query, setQuery] = useState('')
   const [specialization, setSpecialization] = useState<string>('')
+  const [location, setLocation] = useState<string>('')
   const [debouncedQuery, setDebouncedQuery] = useState('')
   const [presets, setPresets] = useState<Preset[]>([])
   const [bookingDoctor, setBookingDoctor] = useState<Doctor | null>(null)
@@ -41,7 +49,15 @@ export default function DoctorFinderPage() {
   const [bookReason, setBookReason] = useState('')
   const [bookError, setBookError] = useState<string | null>(null)
   const [bookSubmitting, setBookSubmitting] = useState(false)
-  const [patientId, setPatientId] = useState<string | null>(null)
+  const [bookingNotice, setBookingNotice] = useState<string | null>(null)
+  const [selectedDate, setSelectedDate] = useState('')
+  const [availabilitySlots, setAvailabilitySlots] = useState<
+    AvailabilitySlot[]
+  >([])
+  const [availabilityLoading, setAvailabilityLoading] = useState(false)
+  const [availabilityError, setAvailabilityError] = useState<string | null>(
+    null
+  )
 
   useEffect(() => {
     const saved = localStorage.getItem('doctor-search-presets')
@@ -61,17 +77,6 @@ export default function DoctorFinderPage() {
         router.replace('/auth/login')
       } else if (user.role !== 'PATIENT') {
         router.replace('/')
-      } else {
-        // Fetch patient ID from dashboard API
-        const fetchPatientId = async () => {
-          try {
-            const res = await apiClient.get('/dashboard/patient')
-            setPatientId(res.data.profile?.id)
-          } catch (err) {
-            console.error('Failed to load patient profile:', err)
-          }
-        }
-        fetchPatientId()
       }
     }
   }, [loading, user, router])
@@ -80,17 +85,19 @@ export default function DoctorFinderPage() {
     useSpecializations()
   const { data: doctors = [], isLoading } = useDoctorSearch(
     debouncedQuery,
-    specialization
+    specialization,
+    location
   )
 
   const handleSavePreset = () => {
-    if (!query && !specialization) return
+    if (!query && !specialization && !location) return
     const next: Preset[] = [
       ...presets,
       {
-        name: query || specialization || 'Saved search',
+        name: query || specialization || location || 'Saved search',
         query,
         specialization,
+        location,
       },
     ]
     setPresets(next)
@@ -100,26 +107,72 @@ export default function DoctorFinderPage() {
   const applyPreset = (preset: Preset) => {
     setQuery(preset.query)
     setSpecialization(preset.specialization || '')
+    setLocation(preset.location || '')
   }
 
   const filtered = useMemo(() => doctors, [doctors])
+
+  useEffect(() => {
+    if (!bookingDoctor) {
+      setSelectedDate('')
+      setAvailabilitySlots([])
+      setAvailabilityError(null)
+      return
+    }
+    setSelectedDate(new Date().toISOString().slice(0, 10))
+  }, [bookingDoctor])
+
+  useEffect(() => {
+    if (selectedDate) {
+      setBookDateTime('')
+    }
+  }, [selectedDate])
+
+  useEffect(() => {
+    const loadAvailability = async () => {
+      if (!bookingDoctor || !selectedDate) return
+      try {
+        setAvailabilityLoading(true)
+        setAvailabilityError(null)
+        const date = new Date(`${selectedDate}T00:00:00.000Z`)
+        const slots = await appointmentService.getDoctorAvailability({
+          doctorId: bookingDoctor.id,
+          startDate: date,
+          endDate: date,
+          duration: bookDuration,
+        })
+        setAvailabilitySlots(slots)
+      } catch (err: any) {
+        setAvailabilityError(
+          err?.response?.data?.error ||
+            'Failed to load availability for this date.'
+        )
+      } finally {
+        setAvailabilityLoading(false)
+      }
+    }
+
+    loadAvailability()
+  }, [bookingDoctor, selectedDate, bookDuration])
+
+  const handleSlotSelect = (slot: AvailabilitySlot) => {
+    if (!slot.isAvailable) return
+    setBookDateTime(`${slot.date}T${slot.startTime}`)
+    setBookError(null)
+  }
 
   const handleBook = async () => {
     if (!bookingDoctor || !bookDateTime || !bookReason.trim()) {
       setBookError('Select a time and add a reason to book.')
       return
     }
-    if (!patientId) {
-      setBookError('Patient profile not loaded. Please try again.')
-      return
-    }
 
     try {
       setBookSubmitting(true)
       setBookError(null)
+      setBookingNotice(null)
       const isoDate = new Date(bookDateTime).toISOString()
       const validation = await appointmentService.validateAppointment({
-        patientId,
         doctorId: bookingDoctor.id,
         dateTime: isoDate,
         duration: bookDuration,
@@ -130,7 +183,6 @@ export default function DoctorFinderPage() {
         return
       }
       await appointmentService.createAppointment({
-        patientId,
         doctorId: bookingDoctor.id,
         dateTime: isoDate,
         duration: bookDuration,
@@ -141,6 +193,9 @@ export default function DoctorFinderPage() {
       setBookDateTime('')
       setBookReason('')
       setBookError(null)
+      setBookingNotice(
+        'Appointment request sent. Awaiting doctor approval.'
+      )
     } catch (err: any) {
       setBookError(
         err?.response?.data?.error || 'Booking failed. Please try again.'
@@ -209,6 +264,15 @@ export default function DoctorFinderPage() {
                     ))}
               </select>
             </div>
+            <div className="relative flex-1 min-w-[220px]">
+              <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Input
+                placeholder="City or clinic location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="pl-10"
+              />
+            </div>
             <Button
               variant="outline"
               size="sm"
@@ -234,6 +298,11 @@ export default function DoctorFinderPage() {
             </div>
           )}
         </div>
+        {bookingNotice && (
+          <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+            {bookingNotice}
+          </div>
+        )}
 
         <div className="space-y-3">
           {isLoading ? (
@@ -346,13 +415,13 @@ export default function DoctorFinderPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Date & Time
+                  Date
                 </label>
                 <Input
-                  type="datetime-local"
-                  min={new Date().toISOString().slice(0, 16)}
-                  value={bookDateTime}
-                  onChange={(e) => setBookDateTime(e.target.value)}
+                  type="date"
+                  min={new Date().toISOString().slice(0, 10)}
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
                 />
               </div>
               <div>
@@ -374,6 +443,57 @@ export default function DoctorFinderPage() {
               </div>
             </div>
             <div>
+              <label className="block text-sm font-medium mb-2">
+                Available slots
+              </label>
+              {availabilityLoading ? (
+                <div className="text-sm text-slate-500">
+                  Loading availability...
+                </div>
+              ) : availabilityError ? (
+                <div className="text-sm text-red-600">{availabilityError}</div>
+              ) : availabilitySlots.length === 0 ? (
+                <div className="text-sm text-slate-500">
+                  No slots available for this date.
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {availabilitySlots.map((slot) => {
+                    const slotValue = `${slot.date}T${slot.startTime}`
+                    const selected = bookDateTime === slotValue
+                    return (
+                      <button
+                        key={`${slot.date}-${slot.startTime}`}
+                        type="button"
+                        onClick={() => handleSlotSelect(slot)}
+                        disabled={!slot.isAvailable}
+                        className={`rounded-full border px-3 py-1 text-sm ${
+                          slot.isAvailable
+                            ? selected
+                              ? 'border-blue-500 bg-blue-50 text-blue-700'
+                              : 'border-slate-200 text-slate-600 hover:border-blue-300'
+                            : 'border-slate-100 bg-slate-100 text-slate-400 cursor-not-allowed'
+                        }`}
+                      >
+                        {slot.startTime}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Date & Time
+              </label>
+              <Input
+                type="datetime-local"
+                min={new Date().toISOString().slice(0, 16)}
+                value={bookDateTime}
+                onChange={(e) => setBookDateTime(e.target.value)}
+              />
+            </div>
+            <div>
               <label className="block text-sm font-medium mb-1">Reason</label>
               <textarea
                 value={bookReason}
@@ -385,6 +505,11 @@ export default function DoctorFinderPage() {
             </div>
             {bookError && (
               <div className="text-sm text-red-600">{bookError}</div>
+            )}
+            {bookingNotice && (
+              <div className="text-sm text-emerald-600">
+                {bookingNotice}
+              </div>
             )}
             <div className="flex gap-3 pt-2">
               <Button

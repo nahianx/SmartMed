@@ -177,7 +177,9 @@ export default function AppointmentDetailPage() {
   }
 
   const canUpdateStatus =
-    appointment.status === 'SCHEDULED' || appointment.status === 'CONFIRMED'
+    appointment.status === 'ACCEPTED' ||
+    appointment.status === 'SCHEDULED' ||
+    appointment.status === 'CONFIRMED'
 
   return (
     <div className="min-h-screen bg-slate-50">

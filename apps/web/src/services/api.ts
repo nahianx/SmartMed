@@ -168,10 +168,15 @@ export const profileApi = {
 // Doctor API Services
 export const doctorApi = {
   // Search doctors
-  searchDoctors: async (query?: string, specialization?: string): Promise<Doctor[]> => {
+  searchDoctors: async (
+    query?: string,
+    specialization?: string,
+    location?: string
+  ): Promise<Doctor[]> => {
     const params = new URLSearchParams()
     if (query) params.append('q', query)
     if (specialization) params.append('specialization', specialization)
+    if (location) params.append('location', location)
     
     const response: AxiosResponse<DoctorResponse> = await apiClient.get(`/doctor/search?${params}`)
     return response.data.doctors || []

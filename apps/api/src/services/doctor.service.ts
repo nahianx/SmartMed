@@ -1,4 +1,4 @@
-import { prisma, DoctorAvailabilityStatus } from '@smartmed/database'
+import { prisma, DoctorAvailabilityStatus, AppointmentStatus } from '@smartmed/database'
 import { DoctorAvailability } from '@smartmed/types'
 import { randomUUID } from 'crypto'
 import { getDefaultTimezone } from '../utils/time'
@@ -255,22 +255,72 @@ export async function getDoctorStatus(doctorId: string) {
   })
 }
 
-export async function searchDoctors(query: string) {
-  if (!query.trim()) {
+export async function searchDoctors(
+  query: string,
+  filters?: { specialization?: string; location?: string }
+) {
+  const text = query.trim()
+  const where: any = {}
+  const orFilters: any[] = []
+
+  if (text) {
+    orFilters.push(
+      { firstName: { contains: text, mode: 'insensitive' } },
+      { lastName: { contains: text, mode: 'insensitive' } },
+      { specialization: { contains: text, mode: 'insensitive' } },
+      {
+        clinic: {
+          name: { contains: text, mode: 'insensitive' },
+        },
+      },
+      {
+        clinic: {
+          address: { contains: text, mode: 'insensitive' },
+        },
+      }
+    )
+  }
+
+  if (filters?.specialization) {
+    orFilters.push(
+      { specialization: { contains: filters.specialization, mode: 'insensitive' } },
+      {
+        specializations: {
+          some: {
+            specialization: {
+              name: { contains: filters.specialization, mode: 'insensitive' },
+            },
+          },
+        },
+      }
+    )
+  }
+
+  if (filters?.location) {
+    orFilters.push(
+      {
+        clinic: {
+          address: { contains: filters.location, mode: 'insensitive' },
+        },
+      },
+      {
+        clinic: {
+          name: { contains: filters.location, mode: 'insensitive' },
+        },
+      }
+    )
+  }
+
+  if (orFilters.length > 0) {
+    where.OR = orFilters
+  }
+
+  if (!where.OR) {
     return []
   }
 
-  // SQLite uses LIKE which is case-insensitive by default for ASCII
-  const lowerQuery = query.toLowerCase()
-
   const doctors = await prisma.doctor.findMany({
-    where: {
-      OR: [
-        { firstName: { contains: lowerQuery } },
-        { lastName: { contains: lowerQuery } },
-        { specialization: { contains: lowerQuery } },
-      ],
-    },
+    where,
     include: {
       clinic: true,
     },
@@ -391,4 +441,168 @@ export async function searchDoctorsAdvanced(filters: DoctorSearchFilters) {
       hasPreviousPage: currentPage > 1,
     },
   }
+}
+
+const BLOCKING_APPOINTMENT_STATUSES = [
+  AppointmentStatus.PENDING,
+  AppointmentStatus.ACCEPTED,
+  AppointmentStatus.CONFIRMED,
+  AppointmentStatus.SCHEDULED,
+] as const
+
+function parseTimeToMinutes(time: string) {
+  const [hours, minutes] = time.split(':').map((part) => parseInt(part, 10))
+  return hours * 60 + minutes
+}
+
+function formatMinutes(minutes: number) {
+  const hours = Math.floor(minutes / 60)
+  const mins = minutes % 60
+  return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`
+}
+
+function startOfUtcDay(date: Date) {
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
+}
+
+function addUtcDays(date: Date, days: number) {
+  const next = new Date(date)
+  next.setUTCDate(next.getUTCDate() + days)
+  return next
+}
+
+function timeRangesOverlap(
+  startA: Date,
+  endA: Date,
+  startB: Date,
+  endB: Date
+) {
+  return startA < endB && endA > startB
+}
+
+export async function getDoctorAvailabilityByDateRange(options: {
+  doctorId: string
+  startDate: Date
+  endDate: Date
+  durationMinutes?: number
+}) {
+  const { doctorId, startDate, endDate, durationMinutes } = options
+
+  const doctor = await prisma.doctor.findUnique({
+    where: { id: doctorId },
+    select: { id: true, averageConsultationTime: true },
+  })
+
+  if (!doctor) {
+    const error: any = new Error('Doctor not found')
+    error.status = 404
+    throw error
+  }
+
+  const slotDuration = Math.max(15, durationMinutes || doctor.averageConsultationTime || 30)
+
+  const fromDate = startOfUtcDay(startDate)
+  const toDate = startOfUtcDay(endDate)
+  if (fromDate > toDate) {
+    const error: any = new Error('Start date must be before end date')
+    error.status = 400
+    throw error
+  }
+
+  const slots = await prisma.doctorAvailability.findMany({
+    where: { doctorId, isAvailable: true },
+    orderBy: [{ dayOfWeek: 'asc' }, { startTime: 'asc' }],
+  })
+
+  const appointmentRangeStart = fromDate
+  const appointmentRangeEnd = addUtcDays(toDate, 1)
+
+  const appointments = await prisma.appointment.findMany({
+    where: {
+      doctorId,
+      status: { in: BLOCKING_APPOINTMENT_STATUSES as any },
+      dateTime: { gte: appointmentRangeStart, lt: appointmentRangeEnd },
+    },
+    select: {
+      dateTime: true,
+      duration: true,
+      status: true,
+    },
+  })
+
+  const now = new Date()
+  const results: Array<{
+    date: string
+    startTime: string
+    endTime: string
+    isAvailable: boolean
+  }> = []
+
+  for (
+    let cursor = new Date(fromDate);
+    cursor <= toDate;
+    cursor = addUtcDays(cursor, 1)
+  ) {
+    const dayOfWeek = cursor.getUTCDay()
+    const daySlots = slots.filter((slot) => slot.dayOfWeek === dayOfWeek)
+
+    for (const slot of daySlots) {
+      const slotStart = parseTimeToMinutes(slot.startTime)
+      const slotEnd = parseTimeToMinutes(slot.endTime)
+      const breakStart = slot.breakStart ? parseTimeToMinutes(slot.breakStart) : null
+      const breakEnd = slot.breakEnd ? parseTimeToMinutes(slot.breakEnd) : null
+
+      for (
+        let minutes = slotStart;
+        minutes + slotDuration <= slotEnd;
+        minutes += slotDuration
+      ) {
+        const endMinutes = minutes + slotDuration
+        if (
+          slot.hasBreak &&
+          breakStart !== null &&
+          breakEnd !== null &&
+          minutes < breakEnd &&
+          endMinutes > breakStart
+        ) {
+          continue
+        }
+
+        const slotStartDate = new Date(cursor)
+        slotStartDate.setUTCHours(
+          Math.floor(minutes / 60),
+          minutes % 60,
+          0,
+          0
+        )
+        const slotEndDate = new Date(slotStartDate.getTime() + slotDuration * 60000)
+
+        if (slotStartDate <= now) {
+          continue
+        }
+
+        const hasConflict = appointments.some((appointment) => {
+          const appointmentStart = appointment.dateTime
+          const appointmentEnd = new Date(
+            appointmentStart.getTime() + appointment.duration * 60000
+          )
+          return timeRangesOverlap(
+            slotStartDate,
+            slotEndDate,
+            appointmentStart,
+            appointmentEnd
+          )
+        })
+
+        results.push({
+          date: slotStartDate.toISOString().slice(0, 10),
+          startTime: formatMinutes(minutes),
+          endTime: formatMinutes(endMinutes),
+          isAvailable: !hasConflict,
+        })
+      }
+    }
+  }
+
+  return results
 }

@@ -6,7 +6,15 @@ export interface Appointment {
   doctorId: string
   dateTime: string
   duration: number
-  status: 'SCHEDULED' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW'
+  status:
+    | 'PENDING'
+    | 'ACCEPTED'
+    | 'REJECTED'
+    | 'SCHEDULED'
+    | 'CONFIRMED'
+    | 'COMPLETED'
+    | 'CANCELLED'
+    | 'NO_SHOW'
   reason: string
   notes?: string
   createdAt: string
@@ -75,7 +83,6 @@ class AppointmentService {
   }
 
   async createAppointment(data: {
-    patientId: string
     doctorId: string
     dateTime: string
     duration: number
@@ -108,17 +115,14 @@ class AppointmentService {
   async updateAppointmentStatus(
     id: string,
     status: 'COMPLETED' | 'NO_SHOW',
-    reason?: string
+    _reason?: string
   ): Promise<Appointment> {
-    const response = await apiClient.put(`/appointments/${id}`, {
-      status,
-      reason,
-    })
+    const route = status === 'COMPLETED' ? 'complete' : 'no-show'
+    const response = await apiClient.patch(`/appointments/${id}/${route}`)
     return response.data.appointment
   }
 
   async validateAppointment(data: {
-    patientId: string
     doctorId: string
     dateTime: string
     duration: number
@@ -131,6 +135,47 @@ class AppointmentService {
       if (error?.response?.status === 404) return { valid: true }
       throw error
     }
+  }
+
+  async getDoctorAvailability(options: {
+    doctorId: string
+    startDate: Date
+    endDate: Date
+    duration?: number
+  }): Promise<
+    Array<{
+      date: string
+      startTime: string
+      endTime: string
+      isAvailable: boolean
+    }>
+  > {
+    const response = await apiClient.get(
+      `/doctors/${options.doctorId}/availability`,
+      {
+        params: {
+          startDate: options.startDate.toISOString(),
+          endDate: options.endDate.toISOString(),
+          duration: options.duration,
+        },
+      }
+    )
+    return response.data.slots || []
+  }
+
+  async acceptAppointment(id: string): Promise<Appointment> {
+    const response = await apiClient.patch(`/appointments/${id}/accept`)
+    return response.data.appointment
+  }
+
+  async rejectAppointment(id: string): Promise<Appointment> {
+    const response = await apiClient.patch(`/appointments/${id}/reject`)
+    return response.data.appointment
+  }
+
+  async cancelAppointment(id: string): Promise<Appointment> {
+    const response = await apiClient.delete(`/appointments/${id}`)
+    return response.data.appointment
   }
 
   async getPreviousVisits(patientId: string): Promise<PreviousVisit[]> {

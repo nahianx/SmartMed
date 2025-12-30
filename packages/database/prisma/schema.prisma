@@ -79,7 +79,9 @@ model Doctor {
   phoneNumber             String
   licenseNumber           String                   @unique
   consultationFee         Float
+  // Deprecated: use DoctorAvailability instead of JSON schedules.
   availableDays           Json
+  // Deprecated: use DoctorAvailability instead of JSON schedules.
   availableTimeSlots      Json
   clinicId                String?
   timezone                String                   @default("UTC")
@@ -146,6 +148,7 @@ model Appointment {
   reports       Report[]
   queueEntry    QueueEntry?
 
+  @@unique([doctorId, dateTime])
   @@map("appointments")
 }
 
@@ -602,6 +605,9 @@ enum ActivityType {
 }
 
 enum AppointmentStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
   SCHEDULED
   CONFIRMED
   COMPLETED

@@ -8,10 +8,12 @@ import { AppointmentStatus } from '@smartmed/database'
 
 describe('Appointment Schema Validation', () => {
   describe('createAppointmentSchema', () => {
+    const futureDate = new Date()
+    futureDate.setDate(futureDate.getDate() + 7)
+
     const validData = {
-      patientId: '550e8400-e29b-41d4-a716-446655440000',
       doctorId: '550e8400-e29b-41d4-a716-446655440001',
-      dateTime: '2024-12-31T14:00:00.000Z',
+      dateTime: futureDate.toISOString(),
       duration: 30,
       reason: 'Regular checkup'
     }
@@ -25,22 +27,6 @@ describe('Appointment Schema Validation', () => {
       }
     })
 
-    it('requires patientId', () => {
-      const data = { ...validData }
-      delete (data as any).patientId
-      
-      const result = createAppointmentSchema.safeParse(data)
-      expect(result.success).toBe(false)
-      if (!result.success) {
-        expect(result.error.issues).toContainEqual(
-          expect.objectContaining({
-            path: ['patientId'],
-            code: 'invalid_type'
-          })
-        )
-      }
-    })
-
     it('requires doctorId', () => {
       const data = { ...validData }
       delete (data as any).doctorId
@@ -49,19 +35,11 @@ describe('Appointment Schema Validation', () => {
       expect(result.success).toBe(false)
     })
 
-    it('requires valid UUID for patientId', () => {
-      const data = { ...validData, patientId: 'invalid-uuid' }
-      
+    it('rejects patientId in request body', () => {
+      const data = { ...validData, patientId: '550e8400-e29b-41d4-a716-446655440000' }
+
       const result = createAppointmentSchema.safeParse(data)
       expect(result.success).toBe(false)
-      if (!result.success) {
-        expect(result.error.issues).toContainEqual(
-          expect.objectContaining({
-            path: ['patientId'],
-            message: 'Invalid UUID format'
-          })
-        )
-      }
     })
 
     it('requires future datetime', () => {
@@ -134,20 +112,19 @@ describe('Appointment Schema Validation', () => {
       expect(result.success).toBe(true)
     })
 
-    it('validates status enum', () => {
-      const validStatus = { status: AppointmentStatus.CONFIRMED }
-      const invalidStatus = { status: 'INVALID_STATUS' }
-      
-      expect(updateAppointmentSchema.safeParse(validStatus).success).toBe(true)
-      expect(updateAppointmentSchema.safeParse(invalidStatus).success).toBe(false)
+    it('rejects status updates', () => {
+      const data = { status: AppointmentStatus.CONFIRMED }
+
+      const result = updateAppointmentSchema.safeParse(data)
+      expect(result.success).toBe(false)
     })
 
-    it('validates future datetime for updates', () => {
-      const pastDate = new Date()
-      pastDate.setHours(pastDate.getHours() - 1)
-      
-      const data = { dateTime: pastDate.toISOString() }
-      
+    it('rejects dateTime updates', () => {
+      const futureDate = new Date()
+      futureDate.setHours(futureDate.getHours() + 1)
+
+      const data = { dateTime: futureDate.toISOString() }
+
       const result = updateAppointmentSchema.safeParse(data)
       expect(result.success).toBe(false)
     })

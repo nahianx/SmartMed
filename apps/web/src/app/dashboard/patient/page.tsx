@@ -291,6 +291,13 @@ export default function PatientDashboardPage() {
               </div>
               <div className="space-y-2">
                 <QuickLink
+                  label="Manage appointments"
+                  description="View requests, confirmations, and cancel"
+                  onClick={() =>
+                    router.push('/dashboard/patient/appointments')
+                  }
+                />
+                <QuickLink
                   label="View timeline"
                   description="See appointments, prescriptions, and reports"
                   onClick={() => router.push('/timeline')}
