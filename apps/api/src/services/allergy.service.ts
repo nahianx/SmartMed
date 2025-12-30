@@ -9,6 +9,7 @@ import { prisma, AllergenType, AllergySeverity, AuditAction } from '@smartmed/da
 import { drugService, DrugDetail } from './drug.service'
 import { CacheService, CacheKeys } from './cache.service'
 import env from '../config/env'
+import { logAuditEvent } from '../utils/audit'
 
 // =============================================================================
 // TYPES
@@ -16,9 +17,9 @@ import env from '../config/env'
 
 export interface PatientAllergyInput {
   patientId: string
-  allergen: string
+  allergenName: string
   allergenType: AllergenType
-  rxcui?: string | null
+  allergenRxcui?: string | null
   severity: AllergySeverity
   reaction?: string | null
   onsetDate?: Date | null
@@ -27,9 +28,9 @@ export interface PatientAllergyInput {
 }
 
 export interface PatientAllergyUpdate {
-  allergen?: string
+  allergenName?: string
   allergenType?: AllergenType
-  rxcui?: string | null
+  allergenRxcui?: string | null
   severity?: AllergySeverity
   reaction?: string | null
   onsetDate?: Date | null
@@ -62,9 +63,9 @@ export interface AllergyCheckResult {
 export interface PatientAllergyRecord {
   id: string
   patientId: string
-  allergen: string
+  allergenName: string
   allergenType: AllergenType
-  rxcui: string | null
+  allergenRxcui: string | null
   severity: AllergySeverity
   reaction: string | null
   onsetDate: Date | null
@@ -86,6 +87,21 @@ const CROSS_REACTIVE_CLASSES: Record<string, string[]> = {
   nsaid: ['aspirin'],
   // Sulfonamides
   sulfonamide: ['sulfonylurea', 'thiazide'],
+}
+
+const mapMatchTypeForDb = (matchType: AllergyConflict['matchType']): string => {
+  switch (matchType) {
+    case 'exact':
+      return 'EXACT'
+    case 'ingredient':
+      return 'INGREDIENT'
+    case 'class':
+      return 'DRUG_CLASS'
+    case 'cross_reactive':
+      return 'CROSS_REACTIVE'
+    default:
+      return matchType.toUpperCase()
+  }
 }
 
 // =============================================================================
@@ -119,7 +135,7 @@ export class AllergyService {
           },
           orderBy: [
             { severity: 'desc' },
-            { allergen: 'asc' },
+            { allergenName: 'asc' },
           ],
         })
         return allergies as PatientAllergyRecord[]
@@ -149,8 +165,8 @@ export class AllergyService {
     const existing = await prisma.patientAllergy.findFirst({
       where: {
         patientId: data.patientId,
-        allergen: {
-          equals: data.allergen,
+        allergenName: {
+          equals: data.allergenName,
           mode: 'insensitive',
         },
         isActive: true,
@@ -159,17 +175,17 @@ export class AllergyService {
 
     if (existing) {
       throw new AllergyDuplicateError(
-        `Patient already has an active allergy to "${data.allergen}"`
+        `Patient already has an active allergy to "${data.allergenName}"`
       )
     }
 
-    // If rxcui not provided but allergenType is MEDICATION, try to resolve it
-    let rxcui = data.rxcui
-    if (!rxcui && data.allergenType === 'MEDICATION') {
+    // If RxCUI not provided but allergenType is DRUG, try to resolve it
+    let allergenRxcui = data.allergenRxcui
+    if (!allergenRxcui && data.allergenType === AllergenType.DRUG) {
       try {
-        const resolved = await drugService.resolveDrugName(data.allergen)
+        const resolved = await drugService.resolveDrugName(data.allergenName)
         if (resolved) {
-          rxcui = resolved.rxcui
+          allergenRxcui = resolved.rxcui
         }
       } catch {
         // Continue without RxCUI if resolution fails
@@ -179,9 +195,9 @@ export class AllergyService {
     const allergy = await prisma.patientAllergy.create({
       data: {
         patientId: data.patientId,
-        allergen: data.allergen,
+        allergenName: data.allergenName,
         allergenType: data.allergenType,
-        rxcui,
+        allergenRxcui,
         severity: data.severity,
         reaction: data.reaction,
         onsetDate: data.onsetDate,
@@ -193,12 +209,16 @@ export class AllergyService {
     })
 
     // Log audit event
-    await this.logAuditEvent(
-      data.patientId,
-      createdById,
-      AuditAction.ALLERGY_ADDED,
-      { allergyId: allergy.id, allergen: data.allergen }
-    )
+    await logAuditEvent({
+      userId: createdById,
+      action: AuditAction.ALLERGY_ADDED,
+      resourceType: 'PatientAllergy',
+      resourceId: allergy.id,
+      metadata: {
+        patientId: data.patientId,
+        allergenName: data.allergenName,
+      },
+    })
 
     // Invalidate cache
     await this.cacheService.delete(CacheKeys.patientAllergies(data.patientId))
@@ -228,12 +248,13 @@ export class AllergyService {
     })
 
     // Log audit event
-    await this.logAuditEvent(
-      existing.patientId,
-      updatedById,
-      AuditAction.ALLERGY_UPDATED,
-      { allergyId, changes: data }
-    )
+    await logAuditEvent({
+      userId: updatedById,
+      action: AuditAction.ALLERGY_UPDATED,
+      resourceType: 'PatientAllergy',
+      resourceId: allergyId,
+      metadata: { patientId: existing.patientId, changes: data },
+    })
 
     // Invalidate cache
     await this.cacheService.delete(CacheKeys.patientAllergies(existing.patientId))
@@ -262,12 +283,13 @@ export class AllergyService {
     })
 
     // Log audit event
-    await this.logAuditEvent(
-      existing.patientId,
-      deletedById,
-      AuditAction.ALLERGY_DELETED,
-      { allergyId, allergen: existing.allergen }
-    )
+    await logAuditEvent({
+      userId: deletedById,
+      action: AuditAction.ALLERGY_DELETED,
+      resourceType: 'PatientAllergy',
+      resourceId: allergyId,
+      metadata: { patientId: existing.patientId, allergenName: existing.allergenName },
+    })
 
     // Invalidate cache
     await this.cacheService.delete(CacheKeys.patientAllergies(existing.patientId))
@@ -353,10 +375,15 @@ export class AllergyService {
       }
     }
 
-    // Sort conflicts by severity (SEVERE first)
+    // Sort conflicts by severity (highest first)
     conflicts.sort((a, b) => {
-      const severityOrder = { SEVERE: 0, MODERATE: 1, MILD: 2 }
-      return (severityOrder[a.severity] || 3) - (severityOrder[b.severity] || 3)
+      const severityOrder = {
+        LIFE_THREATENING: 0,
+        SEVERE: 1,
+        MODERATE: 2,
+        MILD: 3,
+      }
+      return (severityOrder[a.severity] ?? 4) - (severityOrder[b.severity] ?? 4)
     })
 
     const result: AllergyCheckResult = {
@@ -381,14 +408,14 @@ export class AllergyService {
     rxcui: string,
     drug: DrugDetail
   ): AllergyConflict | null {
-    const allergenLower = allergy.allergen.toLowerCase()
+    const allergenLower = allergy.allergenName.toLowerCase()
     const drugNameLower = drug.name.toLowerCase()
 
     // 1. Exact RxCUI match (highest confidence)
-    if (allergy.rxcui && allergy.rxcui === rxcui) {
+    if (allergy.allergenRxcui && allergy.allergenRxcui === rxcui) {
       return {
         allergyId: allergy.id,
-        allergen: allergy.allergen,
+        allergen: allergy.allergenName,
         allergenType: allergy.allergenType,
         severity: allergy.severity,
         matchedDrugRxcui: rxcui,
@@ -403,7 +430,7 @@ export class AllergyService {
     if (drugNameLower.includes(allergenLower) || allergenLower.includes(drugNameLower)) {
       return {
         allergyId: allergy.id,
-        allergen: allergy.allergen,
+        allergen: allergy.allergenName,
         allergenType: allergy.allergenType,
         severity: allergy.severity,
         matchedDrugRxcui: rxcui,
@@ -420,7 +447,7 @@ export class AllergyService {
       if (genericLower.includes(allergenLower) || allergenLower.includes(genericLower)) {
         return {
           allergyId: allergy.id,
-          allergen: allergy.allergen,
+          allergen: allergy.allergenName,
           allergenType: allergy.allergenType,
           severity: allergy.severity,
           matchedDrugRxcui: rxcui,
@@ -439,7 +466,7 @@ export class AllergyService {
         if (ingredientLower.includes(allergenLower) || allergenLower.includes(ingredientLower)) {
           return {
             allergyId: allergy.id,
-            allergen: allergy.allergen,
+            allergen: allergy.allergenName,
             allergenType: allergy.allergenType,
             severity: allergy.severity,
             matchedDrugRxcui: rxcui,
@@ -458,7 +485,7 @@ export class AllergyService {
       if (drugClassLower.includes(allergenLower) || allergenLower.includes(drugClassLower)) {
         return {
           allergyId: allergy.id,
-          allergen: allergy.allergen,
+          allergen: allergy.allergenName,
           allergenType: allergy.allergenType,
           severity: allergy.severity,
           matchedDrugRxcui: rxcui,
@@ -475,7 +502,7 @@ export class AllergyService {
     if (crossReactiveMatch) {
       return {
         allergyId: allergy.id,
-        allergen: allergy.allergen,
+        allergen: allergy.allergenName,
         allergenType: allergy.allergenType,
         severity: allergy.severity,
         matchedDrugRxcui: rxcui,
@@ -496,7 +523,7 @@ export class AllergyService {
     allergy: PatientAllergyRecord,
     drug: DrugDetail
   ): boolean {
-    const allergenLower = allergy.allergen.toLowerCase()
+    const allergenLower = allergy.allergenName.toLowerCase()
 
     // Find which class the allergen belongs to
     for (const [allergenClass, relatedClasses] of Object.entries(CROSS_REACTIVE_CLASSES)) {
@@ -533,30 +560,6 @@ export class AllergyService {
   // ---------------------------------------------------------------------------
 
   /**
-   * Log allergy-related audit events
-   */
-  private async logAuditEvent(
-    patientId: string,
-    userId: string,
-    action: AuditAction,
-    details: Record<string, unknown>
-  ): Promise<void> {
-    try {
-      await prisma.auditLog.create({
-        data: {
-          userId,
-          action,
-          entity: 'PatientAllergy',
-          entityId: (details.allergyId as string) || patientId,
-          details,
-        },
-      })
-    } catch (error) {
-      console.error('Failed to log audit event:', error)
-    }
-  }
-
-  /**
    * Log allergy check audit record
    */
   private async logAllergyCheck(
@@ -565,20 +568,30 @@ export class AllergyService {
     result: AllergyCheckResult
   ): Promise<void> {
     try {
-      await prisma.allergyCheck.create({
-        data: {
-          patientId,
-          checkedById,
-          checkedDrugs: result.checkedDrugs,
-          hasConflicts: result.hasConflicts,
-          conflicts: result.conflicts as unknown as Record<string, unknown>[],
-        },
-      })
+      if (result.conflicts.length > 0) {
+        await prisma.allergyCheck.createMany({
+          data: result.conflicts.map((conflict) => ({
+            patientId,
+            drugRxcui: conflict.matchedDrugRxcui,
+            drugName: conflict.matchedDrugName,
+            allergyId: conflict.allergyId,
+            allergenName: conflict.allergen,
+            matchType: mapMatchTypeForDb(conflict.matchType),
+            severity: conflict.severity,
+          })),
+        })
+      }
 
-      await this.logAuditEvent(patientId, checkedById, AuditAction.ALLERGY_CHECK, {
-        checkedDrugs: result.checkedDrugs,
-        conflictsFound: result.conflicts.length,
-        hasConflicts: result.hasConflicts,
+      await logAuditEvent({
+        userId: checkedById,
+        action: AuditAction.ALLERGY_CHECK,
+        resourceType: 'Patient',
+        resourceId: patientId,
+        metadata: {
+          checkedDrugs: result.checkedDrugs,
+          conflictsFound: result.conflicts.length,
+          hasConflicts: result.hasConflicts,
+        },
       })
     } catch (error) {
       console.error('Failed to log allergy check:', error)
@@ -595,24 +608,49 @@ export class AllergyService {
     overrideReason: string
   ): Promise<void> {
     try {
-      await prisma.allergyCheck.create({
-        data: {
-          patientId,
-          checkedById,
-          checkedDrugs: conflicts.map((c) => c.matchedDrugRxcui),
-          hasConflicts: true,
-          conflicts: conflicts as unknown as Record<string, unknown>[],
-          overrideReason,
-          overriddenAt: new Date(),
-          overriddenById: checkedById,
-        },
-      })
+      const overriddenAt = new Date()
 
-      await this.logAuditEvent(
-        patientId,
-        checkedById,
-        AuditAction.ALLERGY_CONFLICT_OVERRIDE,
-        {
+      for (const conflict of conflicts) {
+        const updateResult = await prisma.allergyCheck.updateMany({
+          where: {
+            patientId,
+            allergyId: conflict.allergyId,
+            drugRxcui: conflict.matchedDrugRxcui,
+            wasOverridden: false,
+          },
+          data: {
+            wasOverridden: true,
+            overrideReason,
+            overriddenBy: checkedById,
+            overriddenAt,
+          },
+        })
+
+        if (updateResult.count === 0) {
+          await prisma.allergyCheck.create({
+            data: {
+              patientId,
+              drugRxcui: conflict.matchedDrugRxcui,
+              drugName: conflict.matchedDrugName,
+              allergyId: conflict.allergyId,
+              allergenName: conflict.allergen,
+              matchType: mapMatchTypeForDb(conflict.matchType),
+              severity: conflict.severity,
+              wasOverridden: true,
+              overrideReason,
+              overriddenBy: checkedById,
+              overriddenAt,
+            },
+          })
+        }
+      }
+
+      await logAuditEvent({
+        userId: checkedById,
+        action: AuditAction.ALLERGY_CONFLICT_OVERRIDE,
+        resourceType: 'Patient',
+        resourceId: patientId,
+        metadata: {
           conflictsOverridden: conflicts.length,
           overrideReason,
           conflicts: conflicts.map((c) => ({
@@ -620,8 +658,8 @@ export class AllergyService {
             drug: c.matchedDrugName,
             severity: c.severity,
           })),
-        }
-      )
+        },
+      })
     } catch (error) {
       console.error('Failed to record allergy override:', error)
     }
@@ -656,15 +694,6 @@ export class AllergyService {
       where: { patientId },
       orderBy: { checkedAt: 'desc' },
       take: limit,
-      include: {
-        checkedBy: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-          },
-        },
-      },
     })
     return checks
   }

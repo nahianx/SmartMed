@@ -86,12 +86,13 @@ const enhancedMedicationSchema = z.object({
   route: z.enum([
     'ORAL',
     'TOPICAL', 
-    'INTRAVENOUS',
-    'INTRAMUSCULAR',
+    'IV',
+    'IM',
     'SUBCUTANEOUS',
     'INHALATION',
     'SUBLINGUAL',
     'RECTAL',
+    'TRANSDERMAL',
     'OPHTHALMIC',
     'OTIC',
     'NASAL',
@@ -106,12 +107,12 @@ const enhancedMedicationSchema = z.object({
 
 // Interaction override schema
 const interactionOverrideSchema = z.object({
-  interactionCheckStatus: z.enum(['PENDING', 'CHECKED', 'OVERRIDDEN', 'NOT_APPLICABLE']).optional(),
+  interactionCheckStatus: z.enum(['NOT_CHECKED', 'PASSED', 'WARNINGS_ACKNOWLEDGED', 'FAILED']).optional(),
   interactionOverrideReason: z.string().max(500).optional().nullable(),
   acknowledgedInteractions: z.array(z.object({
     drug1Rxcui: z.string(),
     drug2Rxcui: z.string(),
-    severity: z.enum(['CONTRAINDICATED', 'SEVERE', 'MODERATE', 'MINOR']),
+    severity: z.enum(['HIGH', 'MODERATE', 'LOW']),
     description: z.string(),
   })).optional(),
 })
@@ -133,7 +134,7 @@ const prescriptionBaseSchema = z.object({
     .optional(),
   notes: notesSchema,
   // Interaction override fields
-  interactionCheckStatus: z.enum(['PENDING', 'CHECKED', 'OVERRIDDEN', 'NOT_APPLICABLE']).optional(),
+  interactionCheckStatus: z.enum(['NOT_CHECKED', 'PASSED', 'WARNINGS_ACKNOWLEDGED', 'FAILED']).optional(),
   interactionOverrideReason: z.string().max(500).optional().nullable(),
 })
 
@@ -169,9 +170,9 @@ export const updatePrescriptionSchema = prescriptionBaseSchema
   })
   .strict()
   .refine(
-    (data) => !data.interactionCheckStatus || data.interactionCheckStatus !== 'OVERRIDDEN' || data.interactionOverrideReason,
+    (data) => !data.interactionCheckStatus || data.interactionCheckStatus !== 'WARNINGS_ACKNOWLEDGED' || data.interactionOverrideReason,
     {
-      message: 'Override reason required when status is OVERRIDDEN',
+      message: 'Override reason required when status is WARNINGS_ACKNOWLEDGED',
       path: ['interactionOverrideReason'],
     }
   )

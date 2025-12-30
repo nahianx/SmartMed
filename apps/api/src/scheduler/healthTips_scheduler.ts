@@ -117,7 +117,7 @@ async function createHealthTipNotification(
         userId,
         type: NotificationType.HEALTH_TIP_GENERATED,
         title: `${tipCount} new health tip${tipCount > 1 ? 's' : ''} available`,
-        message: 'Personalized health tips have been generated based on your health profile.',
+        body: 'Personalized health tips have been generated based on your health profile.',
       },
     })
   } catch (error) {

@@ -23,7 +23,7 @@ interface InteractionWarningModalProps {
   warnings: string[]
 }
 
-type SeverityLevel = 'CONTRAINDICATED' | 'SEVERE' | 'MODERATE' | 'MINOR'
+type SeverityLevel = 'HIGH' | 'MODERATE' | 'LOW'
 
 export default function InteractionWarningModal({
   isOpen,
@@ -43,10 +43,9 @@ export default function InteractionWarningModal({
 
   // Group interactions by severity
   const groupedInteractions: Record<SeverityLevel, DrugInteraction[]> = {
-    CONTRAINDICATED: [],
-    SEVERE: [],
+    HIGH: [],
     MODERATE: [],
-    MINOR: [],
+    LOW: [],
   }
 
   interactions.forEach((interaction) => {
@@ -55,11 +54,10 @@ export default function InteractionWarningModal({
 
   // Check if all severe items are acknowledged
   const severeInteractions = [
-    ...groupedInteractions.CONTRAINDICATED,
-    ...groupedInteractions.SEVERE,
+    ...groupedInteractions.HIGH,
   ]
   const severeAllergyConflicts = allergyConflicts.filter(
-    (c) => c.severity === 'SEVERE'
+    (c) => c.severity === 'SEVERE' || c.severity === 'LIFE_THREATENING'
   )
   
   const allSevereAcknowledged =
@@ -114,7 +112,7 @@ export default function InteractionWarningModal({
 
   const getSeverityConfig = (severity: SeverityLevel) => {
     switch (severity) {
-      case 'CONTRAINDICATED':
+      case 'HIGH':
         return {
           icon: AlertOctagon,
           bgColor: 'bg-red-50',
@@ -122,21 +120,11 @@ export default function InteractionWarningModal({
           textColor: 'text-red-700',
           iconColor: 'text-red-600',
           badgeColor: 'bg-red-100 text-red-800',
-          label: 'Contraindicated',
-        }
-      case 'SEVERE':
-        return {
-          icon: AlertTriangle,
-          bgColor: 'bg-orange-50',
-          borderColor: 'border-orange-200',
-          textColor: 'text-orange-700',
-          iconColor: 'text-orange-600',
-          badgeColor: 'bg-orange-100 text-orange-800',
-          label: 'Severe',
+          label: 'High',
         }
       case 'MODERATE':
         return {
-          icon: AlertCircle,
+          icon: AlertTriangle,
           bgColor: 'bg-yellow-50',
           borderColor: 'border-yellow-200',
           textColor: 'text-yellow-700',
@@ -144,7 +132,7 @@ export default function InteractionWarningModal({
           badgeColor: 'bg-yellow-100 text-yellow-800',
           label: 'Moderate',
         }
-      case 'MINOR':
+      case 'LOW':
         return {
           icon: Info,
           bgColor: 'bg-blue-50',
@@ -159,7 +147,7 @@ export default function InteractionWarningModal({
 
   const getAllergyConfig = (severity: string) => {
     switch (severity) {
-      case 'SEVERE':
+      case 'LIFE_THREATENING':
         return {
           icon: AlertOctagon,
           bgColor: 'bg-red-50',
@@ -168,7 +156,7 @@ export default function InteractionWarningModal({
           iconColor: 'text-red-600',
           badgeColor: 'bg-red-100 text-red-800',
         }
-      case 'MODERATE':
+      case 'SEVERE':
         return {
           icon: AlertTriangle,
           bgColor: 'bg-orange-50',
@@ -177,7 +165,7 @@ export default function InteractionWarningModal({
           iconColor: 'text-orange-600',
           badgeColor: 'bg-orange-100 text-orange-800',
         }
-      default:
+      case 'MODERATE':
         return {
           icon: AlertCircle,
           bgColor: 'bg-yellow-50',
@@ -185,6 +173,15 @@ export default function InteractionWarningModal({
           textColor: 'text-yellow-700',
           iconColor: 'text-yellow-600',
           badgeColor: 'bg-yellow-100 text-yellow-800',
+        }
+      default:
+        return {
+          icon: Info,
+          bgColor: 'bg-blue-50',
+          borderColor: 'border-blue-200',
+          textColor: 'text-blue-700',
+          iconColor: 'text-blue-600',
+          badgeColor: 'bg-blue-100 text-blue-800',
         }
     }
   }
@@ -194,7 +191,7 @@ export default function InteractionWarningModal({
     const Icon = config.icon
     const key = `${interaction.drug1Rxcui}-${interaction.drug2Rxcui}`
     const isAcknowledged = acknowledgedInteractions.has(key)
-    const isSevere = interaction.severity === 'CONTRAINDICATED' || interaction.severity === 'SEVERE'
+    const isSevere = interaction.severity === 'HIGH'
 
     return (
       <div
@@ -247,7 +244,7 @@ export default function InteractionWarningModal({
     const config = getAllergyConfig(conflict.severity)
     const Icon = config.icon
     const isAcknowledged = acknowledgedAllergies.has(conflict.allergyId)
-    const isSevere = conflict.severity === 'SEVERE'
+    const isSevere = conflict.severity === 'SEVERE' || conflict.severity === 'LIFE_THREATENING'
 
     return (
       <div

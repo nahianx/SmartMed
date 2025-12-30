@@ -39,6 +39,8 @@ export {
   type AuditLog,
   type QueueEntry,
   type QueueCounter,
+  type HealthTip,
+  type HealthTipPreference,
   // New drug-related models
   type Drug,
   type DrugInteraction,
@@ -106,6 +108,7 @@ export const NotificationType = {
   APPOINTMENT_REMINDER_1H: 'APPOINTMENT_REMINDER_1H',
   ACTIVITY_CREATED: 'ACTIVITY_CREATED',
   ACTIVITY_UPDATED: 'ACTIVITY_UPDATED',
+  HEALTH_TIP_GENERATED: 'HEALTH_TIP_GENERATED',
 } as const
 // eslint-disable-next-line no-redeclare
 export type NotificationType =
@@ -197,20 +200,19 @@ export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction]
 
 // eslint-disable-next-line no-redeclare
 export const InteractionSeverity = {
-  CONTRAINDICATED: 'CONTRAINDICATED',
-  SEVERE: 'SEVERE',
+  HIGH: 'HIGH',
   MODERATE: 'MODERATE',
-  MINOR: 'MINOR',
+  LOW: 'LOW',
 } as const
 // eslint-disable-next-line no-redeclare
 export type InteractionSeverity = (typeof InteractionSeverity)[keyof typeof InteractionSeverity]
 
 // eslint-disable-next-line no-redeclare
 export const InteractionCheckStatus = {
-  PENDING: 'PENDING',
-  CHECKED: 'CHECKED',
-  OVERRIDDEN: 'OVERRIDDEN',
-  NOT_APPLICABLE: 'NOT_APPLICABLE',
+  NOT_CHECKED: 'NOT_CHECKED',
+  PASSED: 'PASSED',
+  WARNINGS_ACKNOWLEDGED: 'WARNINGS_ACKNOWLEDGED',
+  FAILED: 'FAILED',
 } as const
 // eslint-disable-next-line no-redeclare
 export type InteractionCheckStatus = (typeof InteractionCheckStatus)[keyof typeof InteractionCheckStatus]
@@ -218,13 +220,14 @@ export type InteractionCheckStatus = (typeof InteractionCheckStatus)[keyof typeo
 // eslint-disable-next-line no-redeclare
 export const MedicationRoute = {
   ORAL: 'ORAL',
-  TOPICAL: 'TOPICAL',
-  INTRAVENOUS: 'INTRAVENOUS',
-  INTRAMUSCULAR: 'INTRAMUSCULAR',
+  IV: 'IV',
+  IM: 'IM',
   SUBCUTANEOUS: 'SUBCUTANEOUS',
+  TOPICAL: 'TOPICAL',
   INHALATION: 'INHALATION',
   SUBLINGUAL: 'SUBLINGUAL',
   RECTAL: 'RECTAL',
+  TRANSDERMAL: 'TRANSDERMAL',
   OPHTHALMIC: 'OPHTHALMIC',
   OTIC: 'OTIC',
   NASAL: 'NASAL',
@@ -235,7 +238,9 @@ export type MedicationRoute = (typeof MedicationRoute)[keyof typeof MedicationRo
 
 // eslint-disable-next-line no-redeclare
 export const AllergenType = {
-  MEDICATION: 'MEDICATION',
+  DRUG: 'DRUG',
+  DRUG_CLASS: 'DRUG_CLASS',
+  INGREDIENT: 'INGREDIENT',
   FOOD: 'FOOD',
   ENVIRONMENTAL: 'ENVIRONMENTAL',
   OTHER: 'OTHER',
@@ -248,6 +253,7 @@ export const AllergySeverity = {
   MILD: 'MILD',
   MODERATE: 'MODERATE',
   SEVERE: 'SEVERE',
+  LIFE_THREATENING: 'LIFE_THREATENING',
 } as const
 // eslint-disable-next-line no-redeclare
 export type AllergySeverity = (typeof AllergySeverity)[keyof typeof AllergySeverity]

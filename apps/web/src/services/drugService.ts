@@ -30,7 +30,7 @@ export interface DrugInteraction {
   drug1Name: string
   drug2Rxcui: string
   drug2Name: string
-  severity: 'CONTRAINDICATED' | 'SEVERE' | 'MODERATE' | 'MINOR'
+  severity: 'HIGH' | 'MODERATE' | 'LOW'
   description: string
   source?: string
 }
@@ -65,10 +65,10 @@ export interface AllergyCheckResult {
 export interface PatientAllergy {
   id: string
   patientId: string
-  allergen: string
-  allergenType: 'MEDICATION' | 'FOOD' | 'ENVIRONMENTAL' | 'OTHER'
-  rxcui?: string | null
-  severity: 'MILD' | 'MODERATE' | 'SEVERE'
+  allergenName: string
+  allergenType: 'DRUG' | 'DRUG_CLASS' | 'INGREDIENT' | 'FOOD' | 'ENVIRONMENTAL' | 'OTHER'
+  allergenRxcui?: string | null
+  severity: 'MILD' | 'MODERATE' | 'SEVERE' | 'LIFE_THREATENING'
   reaction?: string | null
   onsetDate?: string | null
   verifiedBy?: string | null
@@ -224,10 +224,10 @@ class DrugService {
   async addPatientAllergy(
     patientId: string,
     data: {
-      allergen: string
-      allergenType: 'MEDICATION' | 'FOOD' | 'ENVIRONMENTAL' | 'OTHER'
-      rxcui?: string
-      severity: 'MILD' | 'MODERATE' | 'SEVERE'
+      allergenName: string
+      allergenType: 'DRUG' | 'DRUG_CLASS' | 'INGREDIENT' | 'FOOD' | 'ENVIRONMENTAL' | 'OTHER'
+      allergenRxcui?: string
+      severity: 'MILD' | 'MODERATE' | 'SEVERE' | 'LIFE_THREATENING'
       reaction?: string
       onsetDate?: string
       notes?: string
@@ -246,10 +246,10 @@ class DrugService {
   async updatePatientAllergy(
     allergyId: string,
     data: Partial<{
-      allergen: string
-      allergenType: 'MEDICATION' | 'FOOD' | 'ENVIRONMENTAL' | 'OTHER'
-      rxcui?: string | null
-      severity: 'MILD' | 'MODERATE' | 'SEVERE'
+      allergenName: string
+      allergenType: 'DRUG' | 'DRUG_CLASS' | 'INGREDIENT' | 'FOOD' | 'ENVIRONMENTAL' | 'OTHER'
+      allergenRxcui?: string | null
+      severity: 'MILD' | 'MODERATE' | 'SEVERE' | 'LIFE_THREATENING'
       reaction?: string | null
       onsetDate?: string | null
       notes?: string | null
@@ -309,7 +309,7 @@ class DrugService {
         result.interactions = interactionResult.interactions
 
         const severeInteractions = interactionResult.interactions.filter(
-          (i) => i.severity === 'CONTRAINDICATED' || i.severity === 'SEVERE'
+          (i) => i.severity === 'HIGH'
         )
 
         if (severeInteractions.length > 0) {

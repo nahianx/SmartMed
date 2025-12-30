@@ -6,7 +6,7 @@ import {
   EnhancedMedicationData,
 } from '../schemas/prescription.schemas'
 import { Request } from 'express'
-import { drugService, InteractionResult } from './drug.service'
+import { drugService, DrugInteractionResult } from './drug.service'
 import { getAllergyService, AllergyConflict } from './allergy.service'
 import env from '../config/env'
 
@@ -27,7 +27,7 @@ interface MedicationWithRxcui {
 
 interface PrescriptionValidationResult {
   isValid: boolean
-  interactions: InteractionResult[]
+  interactions: DrugInteractionResult[]
   allergyConflicts: AllergyConflict[]
   warnings: string[]
   requiresOverride: boolean
@@ -94,7 +94,7 @@ async function validatePrescriptionMedications(
 
       // Flag severe/contraindicated interactions
       const severeInteractions = interactionResult.interactions.filter(
-        (i) => i.severity === 'CONTRAINDICATED' || i.severity === 'SEVERE'
+        (i) => i.severity === 'HIGH'
       )
 
       if (severeInteractions.length > 0) {
@@ -185,13 +185,15 @@ export async function createPrescription(
   }
 
   // Determine interaction check status
-  let interactionCheckStatus: InteractionCheckStatus = 'PENDING'
+  let interactionCheckStatus: InteractionCheckStatus = 'NOT_CHECKED'
   if (skipCheck) {
-    interactionCheckStatus = 'NOT_APPLICABLE'
-  } else if (data.interactionOverrideReason) {
-    interactionCheckStatus = 'OVERRIDDEN'
+    interactionCheckStatus = 'NOT_CHECKED'
   } else if (validation.interactions.length === 0 && validation.allergyConflicts.length === 0) {
-    interactionCheckStatus = 'CHECKED'
+    interactionCheckStatus = 'PASSED'
+  } else if (validation.requiresOverride && !data.interactionOverrideReason) {
+    interactionCheckStatus = 'FAILED'
+  } else {
+    interactionCheckStatus = 'WARNINGS_ACKNOWLEDGED'
   }
 
   const prescription = await prisma.prescription.create({
@@ -280,20 +282,24 @@ async function logInteractionCheck(
   overrideReason?: string | null
 ): Promise<void> {
   try {
-    await prisma.interactionCheck.create({
-      data: {
+    if (validation.interactions.length === 0) {
+      return
+    }
+
+    await prisma.interactionCheck.createMany({
+      data: validation.interactions.map((interaction) => ({
         prescriptionId,
-        checkedById,
-        checkedDrugs: validation.interactions.map((i) => i.drug1Rxcui).filter(Boolean),
-        interactionsFound: validation.interactions as any,
-        hasSevereInteractions: validation.interactions.some(
-          (i) => i.severity === 'CONTRAINDICATED' || i.severity === 'SEVERE'
-        ),
-        status: overrideReason ? 'OVERRIDDEN' : 'CHECKED',
-        overrideReason,
+        drug1Rxcui: interaction.drug1.rxcui || '',
+        drug1Name: interaction.drug1.name || 'Unknown',
+        drug2Rxcui: interaction.drug2.rxcui || '',
+        drug2Name: interaction.drug2.name || 'Unknown',
+        severity: interaction.severity,
+        description: interaction.description,
+        wasOverridden: Boolean(overrideReason),
+        overrideReason: overrideReason || null,
+        overriddenBy: overrideReason ? checkedById : null,
         overriddenAt: overrideReason ? new Date() : null,
-        overriddenById: overrideReason ? checkedById : null,
-      },
+      })),
     })
   } catch (error) {
     console.error('Failed to log interaction check:', error)
@@ -585,22 +591,6 @@ export async function getPrescriptionInteractionHistory(
   const checks = await prisma.interactionCheck.findMany({
     where: { prescriptionId },
     orderBy: { checkedAt: 'desc' },
-    include: {
-      checkedBy: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-        },
-      },
-      overriddenBy: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-        },
-      },
-    },
   })
   return checks
 }

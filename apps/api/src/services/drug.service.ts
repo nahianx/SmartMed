@@ -7,7 +7,7 @@
 
 import { env } from '../config/env'
 import { cacheService, CacheKeys } from './cache.service'
-import { prisma, AuditAction } from '@smartmed/database'
+import { prisma, AuditAction, AllergenType } from '@smartmed/database'
 import { logAuditEvent } from '../utils/audit'
 import { Request } from 'express'
 
@@ -62,12 +62,15 @@ export interface InteractionCheckResponse {
 }
 
 export interface AllergyConflict {
-  drugRxcui: string
-  drugName: string
-  allergenName: string
-  allergenRxcui?: string
-  matchType: 'EXACT' | 'DRUG_CLASS' | 'INGREDIENT'
+  allergyId: string
+  allergen: string
+  allergenType: AllergenType
   severity: 'MILD' | 'MODERATE' | 'SEVERE' | 'LIFE_THREATENING'
+  matchedDrugRxcui: string
+  matchedDrugName: string
+  matchType: 'exact' | 'ingredient' | 'class' | 'cross_reactive'
+  reaction?: string | null
+  confidence: 'high' | 'medium' | 'low'
 }
 
 // ==========================================
@@ -714,12 +717,15 @@ class DrugService {
           // Check exact drug match
           if (allergy.allergenRxcui === rxcui) {
             conflicts.push({
-              drugRxcui: rxcui,
-              drugName: drug.name,
-              allergenName: allergy.allergenName,
-              allergenRxcui: allergy.allergenRxcui || undefined,
-              matchType: 'EXACT',
+              allergyId: allergy.id,
+              allergen: allergy.allergenName,
+              allergenType: allergy.allergenType,
               severity: allergy.severity as AllergyConflict['severity'],
+              matchedDrugRxcui: rxcui,
+              matchedDrugName: drug.name,
+              matchType: 'exact',
+              reaction: allergy.reaction || null,
+              confidence: 'high',
             })
             continue
           }
@@ -730,11 +736,15 @@ class DrugService {
             if (drugClass.toLowerCase().includes(allergenLower) ||
                 allergenLower.includes(drugClass.toLowerCase())) {
               conflicts.push({
-                drugRxcui: rxcui,
-                drugName: drug.name,
-                allergenName: allergy.allergenName,
-                matchType: 'DRUG_CLASS',
+                allergyId: allergy.id,
+                allergen: allergy.allergenName,
+                allergenType: allergy.allergenType,
                 severity: allergy.severity as AllergyConflict['severity'],
+                matchedDrugRxcui: rxcui,
+                matchedDrugName: drug.name,
+                matchType: 'class',
+                reaction: allergy.reaction || null,
+                confidence: 'medium',
               })
               break
             }
@@ -745,11 +755,15 @@ class DrugService {
             if (ingredient.toLowerCase().includes(allergenLower) ||
                 allergenLower.includes(ingredient.toLowerCase())) {
               conflicts.push({
-                drugRxcui: rxcui,
-                drugName: drug.name,
-                allergenName: allergy.allergenName,
-                matchType: 'INGREDIENT',
+                allergyId: allergy.id,
+                allergen: allergy.allergenName,
+                allergenType: allergy.allergenType,
                 severity: allergy.severity as AllergyConflict['severity'],
+                matchedDrugRxcui: rxcui,
+                matchedDrugName: drug.name,
+                matchType: 'ingredient',
+                reaction: allergy.reaction || null,
+                confidence: 'high',
               })
               break
             }
