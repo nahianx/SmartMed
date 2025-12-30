@@ -173,6 +173,7 @@ const CONFIG = {
   maxRetries: parseInt(process.env.HF_MAX_RETRIES || '2', 10),
   tipsPerGeneration: parseInt(process.env.TIPS_PER_GENERATION || '3', 10),
   cacheTtlMs: parseInt(process.env.TIPS_CACHE_TTL_MS || String(24 * 60 * 60 * 1000), 10),
+  inferenceEndpointUrl: process.env.HF_INFERENCE_ENDPOINT_URL,
 }
 
 class HealthTipsService {
@@ -400,6 +401,7 @@ class HealthTipsService {
     }
 
     const prompt = this.buildPrompt(context)
+    const endpointUrl = this.getInferenceEndpointUrl()
     
     let lastError: Error | null = null
     for (let attempt = 0; attempt < CONFIG.maxRetries; attempt++) {
@@ -409,6 +411,7 @@ class HealthTipsService {
         const response = await Promise.race([
           this.hf.textGeneration({
             model: CONFIG.modelId,
+            endpointUrl,
             inputs: prompt,
             parameters: {
               max_new_tokens: CONFIG.maxTokens,
@@ -442,6 +445,17 @@ class HealthTipsService {
     }
 
     return []
+  }
+
+  private getInferenceEndpointUrl(): string {
+    if (CONFIG.inferenceEndpointUrl) {
+      if (CONFIG.inferenceEndpointUrl.includes('{model}')) {
+        return CONFIG.inferenceEndpointUrl.replace('{model}', CONFIG.modelId)
+      }
+      return CONFIG.inferenceEndpointUrl
+    }
+
+    return `https://router.huggingface.co/hf-inference/models/${CONFIG.modelId}`
   }
 
   /**
