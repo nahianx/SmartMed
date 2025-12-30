@@ -6,15 +6,14 @@ import {
   EnhancedMedicationData,
 } from '../schemas/prescription.schemas'
 import { Request } from 'express'
-import { DrugService, InteractionResult } from './drug.service'
-import { AllergyService, AllergyConflict } from './allergy.service'
+import { drugService, InteractionResult } from './drug.service'
+import { getAllergyService, AllergyConflict } from './allergy.service'
 import env from '../config/env'
 
 type ErrorWithStatus = Error & { status: number }
 
-// Drug and allergy service instances
-const drugService = new DrugService()
-const allergyService = new AllergyService()
+// Use getter for lazy initialization to avoid circular dependency
+const getAllergy = () => getAllergyService()
 
 // =============================================================================
 // TYPES
@@ -113,7 +112,7 @@ async function validatePrescriptionMedications(
   // Check allergy conflicts
   if (env.ALLERGY_CHECK_ENABLED && rxcuis.length > 0) {
     try {
-      const allergyResult = await allergyService.checkAllergyConflicts(
+      const allergyResult = await getAllergy().checkAllergyConflicts(
         patientId,
         rxcuis,
         'system' // Will be replaced with actual user ID in route

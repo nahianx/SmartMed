@@ -9,7 +9,7 @@ import {
   setCSRFToken,
   generateCSRFToken,
 } from './middleware/csrf'
-import { startReminderScheduler } from './scheduler/reminder_scheduler'
+import { startReminderScheduler } from './scheduler/email_reminder_scheduler'
 import { startQueueScheduler } from './scheduler/queue_scheduler'
 import { startHealthTipsScheduler } from './scheduler/healthTips_scheduler'
 import { setupSecurityMiddleware } from './middleware/security'
@@ -32,6 +32,7 @@ import queueRoutes from './routes/queue.routes'
 import prescriptionRoutes from './routes/prescription.routes'
 import drugRoutes from './routes/drug.routes'
 import healthTipsRoutes from './routes/healthTips.routes'
+import calendarRoutes from './routes/calendar.routes'
 
 dotenv.config()
 
@@ -107,6 +108,9 @@ app.use('/api/admin', adminRoutes)
 app.use('/api/prescriptions', prescriptionRoutes)
 app.use('/api/drugs', drugRoutes)
 app.use('/api/health-tips', healthTipsRoutes)
+
+// Calendar integration routes (ICS downloads, Google Calendar links)
+app.use('/api', calendarRoutes)
 
 // 404 handler
 app.use((_req: Request, res: Response) => {

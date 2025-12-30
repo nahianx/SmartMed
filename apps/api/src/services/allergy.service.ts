@@ -6,7 +6,7 @@
  */
 
 import { prisma, AllergenType, AllergySeverity, AuditAction } from '@smartmed/database'
-import { DrugService, DrugDetail } from './drug.service'
+import { drugService, DrugDetail } from './drug.service'
 import { CacheService, CacheKeys } from './cache.service'
 import env from '../config/env'
 
@@ -93,11 +93,9 @@ const CROSS_REACTIVE_CLASSES: Record<string, string[]> = {
 // =============================================================================
 
 export class AllergyService {
-  private drugService: DrugService
   private cacheService: CacheService
 
   constructor() {
-    this.drugService = new DrugService()
     this.cacheService = CacheService.getInstance()
   }
 
@@ -169,7 +167,7 @@ export class AllergyService {
     let rxcui = data.rxcui
     if (!rxcui && data.allergenType === 'MEDICATION') {
       try {
-        const resolved = await this.drugService.resolveDrugName(data.allergen)
+        const resolved = await drugService.resolveDrugName(data.allergen)
         if (resolved) {
           rxcui = resolved.rxcui
         }
@@ -334,7 +332,7 @@ export class AllergyService {
     const drugDetails = await Promise.all(
       rxcuis.map(async (rxcui) => {
         try {
-          return await this.drugService.getDrugByRxCUI(rxcui)
+          return await drugService.getDrugByRxCUI(rxcui)
         } catch {
           return null
         }

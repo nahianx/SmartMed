@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Prisma, $Enums } from '@prisma/client'
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
@@ -11,6 +11,9 @@ export const prisma =
   })
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+
+// Re-export Prisma $Enums for strict typing
+export { $Enums }
 
 // Re-export Prisma types (excluding enums which are now defined as string constants for SQLite)
 export {

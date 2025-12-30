@@ -16,6 +16,13 @@ import { searchAppointments } from '../services/appointment.service'
 import { logSearchOperation } from '../utils/audit'
 import { UserRole } from '@smartmed/types'
 
+// Email notification imports
+import {
+  sendBookingConfirmationEmails,
+  sendBookingUpdateEmails,
+  sendBookingCancellationEmails,
+} from '../services/appointment-email.service'
+
 const router = Router()
 
 type DbClient = PrismaClient | Prisma.TransactionClient
@@ -518,6 +525,19 @@ router.post(
         return created
       })
 
+      // Send confirmation emails (non-blocking)
+      sendBookingConfirmationEmails(appointment.id)
+        .then(result => {
+          console.log('📧 Confirmation emails sent:', {
+            patient: result.patientEmail.success ? '✅' : '❌',
+            doctor: result.doctorEmail.success ? '✅' : '❌',
+          })
+        })
+        .catch(err => {
+          console.error('📧 Email sending error:', err)
+          // Don't fail the booking if email fails
+        })
+
       res.status(201).json({
         message: 'Appointment request created successfully',
         appointment,
@@ -578,6 +598,11 @@ router.patch(
         },
       })
 
+      // Send status update email to patient (non-blocking)
+      sendBookingUpdateEmails(appointment.id, 'status_changed')
+        .then(result => console.log('📧 Acceptance email:', result.success ? '✅' : '❌'))
+        .catch(err => console.error('📧 Email error:', err))
+
       res.json({
         message: 'Appointment accepted',
         appointment: updatedAppointment,
@@ -626,6 +651,11 @@ router.patch(
           title: `Appointment request rejected by Dr. ${updatedAppointment.doctor?.firstName ?? ''} ${updatedAppointment.doctor?.lastName ?? ''}`.trim(),
         },
       })
+
+      // Send rejection email to patient (non-blocking)
+      sendBookingCancellationEmails(appointment.id, 'doctor', 'Appointment request was declined by the doctor')
+        .then(result => console.log('📧 Rejection email:', result.success ? '✅' : '❌'))
+        .catch(err => console.error('📧 Email error:', err))
 
       res.json({
         message: 'Appointment rejected',
@@ -864,6 +894,14 @@ router.delete(
           title: `[CANCELLED] Appointment with Dr. ${cancelledAppointment.doctor?.firstName ?? ''} ${cancelledAppointment.doctor?.lastName ?? ''}`.trim(),
         },
       })
+
+      // Determine who cancelled (based on user role)
+      const cancelledBy = req.user?.role === UserRole.DOCTOR ? 'doctor' : 'patient'
+
+      // Send cancellation email (non-blocking)
+      sendBookingCancellationEmails(id, cancelledBy)
+        .then(result => console.log('📧 Cancellation email:', result.success ? '✅' : '❌'))
+        .catch(err => console.error('📧 Email error:', err))
 
       res.json({
         message: 'Appointment cancelled successfully',
