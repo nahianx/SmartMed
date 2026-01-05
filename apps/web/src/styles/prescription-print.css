@@ -1,0 +1,406 @@
+/**
+ * Print Stylesheet for Prescriptions
+ * 
+ * Optimized for pharmacy and professional printing.
+ * Ensures proper formatting, page breaks, and readability.
+ */
+
+@media print {
+  /* Reset and base styles */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Hide non-printable elements */
+  .no-print,
+  .print\\:hidden,
+  [data-no-print],
+  nav,
+  footer,
+  header:not(.print-header),
+  button:not(.print-button),
+  .sidebar,
+  .navigation,
+  .toast,
+  .modal-overlay,
+  .dropdown-menu,
+  [role="navigation"],
+  [role="banner"]:not(.print-banner) {
+    display: none !important;
+  }
+
+  /* Page setup */
+  @page {
+    size: A4 portrait;
+    margin: 15mm 12mm;
+  }
+
+  @page :first {
+    margin-top: 10mm;
+  }
+
+  /* Prevent page breaks inside elements */
+  .medication-item,
+  .prescription-header,
+  .patient-info,
+  .doctor-info,
+  .medication-card,
+  .no-break {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Force page breaks */
+  .page-break-before {
+    page-break-before: always;
+    break-before: always;
+  }
+
+  .page-break-after {
+    page-break-after: always;
+    break-after: always;
+  }
+
+  /* Typography adjustments */
+  body {
+    font-family: "Times New Roman", Times, Georgia, serif;
+    font-size: 11pt;
+    line-height: 1.4;
+    color: #000 !important;
+    background: #fff !important;
+  }
+
+  h1 {
+    font-size: 18pt;
+    font-weight: bold;
+    margin-bottom: 8pt;
+  }
+
+  h2 {
+    font-size: 14pt;
+    font-weight: bold;
+    margin-bottom: 6pt;
+  }
+
+  h3 {
+    font-size: 12pt;
+    font-weight: bold;
+    margin-bottom: 4pt;
+  }
+
+  h4 {
+    font-size: 11pt;
+    font-weight: bold;
+    margin-bottom: 4pt;
+  }
+
+  /* Prescription container */
+  .prescription-container,
+  .prescription-view {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Header section */
+  .prescription-print-header {
+    text-align: center;
+    border-bottom: 2pt solid #000;
+    padding-bottom: 10pt;
+    margin-bottom: 15pt;
+  }
+
+  .prescription-print-header h1 {
+    font-size: 20pt;
+    text-transform: uppercase;
+    letter-spacing: 1pt;
+  }
+
+  .prescription-print-header .subtitle {
+    font-size: 10pt;
+    color: #333;
+  }
+
+  /* Info sections (Patient & Doctor) */
+  .info-section {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15pt;
+    padding: 10pt;
+    border: 1pt solid #ccc;
+    background: #f9f9f9 !important;
+  }
+
+  .info-section .patient-info,
+  .info-section .doctor-info {
+    width: 48%;
+  }
+
+  .info-label {
+    font-weight: bold;
+    font-size: 9pt;
+    text-transform: uppercase;
+    color: #555;
+    margin-bottom: 2pt;
+  }
+
+  .info-value {
+    font-size: 11pt;
+    color: #000;
+    margin-bottom: 4pt;
+  }
+
+  /* Diagnosis section */
+  .diagnosis-section {
+    margin-bottom: 15pt;
+    padding: 10pt;
+    border: 1pt solid #ccc;
+  }
+
+  .diagnosis-section h3 {
+    border-bottom: 1pt solid #ddd;
+    padding-bottom: 4pt;
+    margin-bottom: 8pt;
+  }
+
+  /* Medications table */
+  .medications-section {
+    margin-bottom: 15pt;
+  }
+
+  .medications-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10pt;
+  }
+
+  .medications-table th {
+    background: #333 !important;
+    color: #fff !important;
+    font-weight: bold;
+    text-align: left;
+    padding: 8pt 6pt;
+    border: 1pt solid #333;
+    font-size: 9pt;
+    text-transform: uppercase;
+  }
+
+  .medications-table td {
+    padding: 8pt 6pt;
+    border: 1pt solid #ccc;
+    vertical-align: top;
+  }
+
+  .medications-table tr:nth-child(even) {
+    background: #f5f5f5 !important;
+  }
+
+  .medication-name {
+    font-weight: bold;
+    font-size: 11pt;
+  }
+
+  .medication-generic {
+    font-style: italic;
+    font-size: 9pt;
+    color: #555;
+  }
+
+  .medication-instructions {
+    font-size: 9pt;
+    color: #333;
+    padding-top: 4pt;
+    border-top: 1pt dotted #ccc;
+    margin-top: 4pt;
+  }
+
+  /* Alternative card layout for medications */
+  .medication-card {
+    border: 1pt solid #ccc;
+    padding: 10pt;
+    margin-bottom: 10pt;
+    page-break-inside: avoid;
+  }
+
+  .medication-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1pt solid #ddd;
+    padding-bottom: 6pt;
+    margin-bottom: 6pt;
+  }
+
+  .medication-card-number {
+    display: inline-block;
+    width: 20pt;
+    height: 20pt;
+    line-height: 20pt;
+    text-align: center;
+    background: #333 !important;
+    color: #fff !important;
+    border-radius: 50%;
+    font-size: 10pt;
+    font-weight: bold;
+    margin-right: 8pt;
+  }
+
+  .medication-card-details {
+    display: flex;
+    gap: 15pt;
+    font-size: 10pt;
+  }
+
+  .medication-card-details > div {
+    flex: 1;
+  }
+
+  .medication-card-details .label {
+    font-size: 8pt;
+    color: #666;
+    text-transform: uppercase;
+  }
+
+  .medication-card-details .value {
+    font-weight: 600;
+    color: #000;
+  }
+
+  /* Notes section */
+  .notes-section {
+    margin-top: 15pt;
+    padding: 10pt;
+    border: 1pt dashed #999;
+    background: #fffef0 !important;
+  }
+
+  .notes-section h4 {
+    color: #856404;
+  }
+
+  /* Footer / Signature section */
+  .prescription-footer {
+    margin-top: 30pt;
+    padding-top: 15pt;
+    border-top: 1pt solid #ccc;
+  }
+
+  .signature-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40pt;
+  }
+
+  .signature-line {
+    width: 200pt;
+    border-top: 1pt solid #000;
+    padding-top: 4pt;
+    text-align: center;
+    font-size: 9pt;
+  }
+
+  /* Disclaimer */
+  .print-disclaimer {
+    margin-top: 20pt;
+    padding: 8pt;
+    border: 1pt solid #ddd;
+    font-size: 8pt;
+    color: #666;
+    text-align: center;
+  }
+
+  /* Validity notice */
+  .validity-notice {
+    text-align: center;
+    font-size: 9pt;
+    color: #333;
+    margin-top: 10pt;
+    font-style: italic;
+  }
+
+  /* RxCUI badge for pharmacy */
+  .rxcui-badge {
+    font-family: "Courier New", monospace;
+    font-size: 8pt;
+    background: #eee !important;
+    padding: 2pt 4pt;
+    border-radius: 2pt;
+  }
+
+  /* QR Code space (if implemented) */
+  .qr-code-area {
+    width: 80pt;
+    height: 80pt;
+    border: 1pt solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8pt;
+    color: #999;
+  }
+
+  /* Links - show URL */
+  a[href]::after {
+    content: none; /* Don't show URLs by default in prescriptions */
+  }
+
+  /* Remove shadows and decorative elements */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Ensure proper colors for background elements */
+  .bg-blue-50,
+  .bg-blue-100,
+  .bg-slate-50,
+  .bg-gray-50 {
+    background-color: #f5f5f5 !important;
+  }
+
+  .bg-blue-600,
+  .bg-blue-700 {
+    background-color: #333 !important;
+  }
+
+  .text-blue-600,
+  .text-blue-700 {
+    color: #000 !important;
+  }
+
+  /* Prescription ID watermark */
+  .prescription-id {
+    position: absolute;
+    top: 10pt;
+    right: 10pt;
+    font-size: 8pt;
+    color: #999;
+    font-family: monospace;
+  }
+}
+
+/* Screen-only styles for print preview */
+@media screen {
+  .print-preview-container {
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 20px;
+    background: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+
+  .print-only {
+    display: none;
+  }
+}

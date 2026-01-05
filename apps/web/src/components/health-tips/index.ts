@@ -2,6 +2,12 @@
 export { HealthTipCard, CategoryBadge, categoryConfig } from './HealthTipCard'
 export { HealthTipsList, HealthTipsDrawerContent } from './HealthTipsList'
 export { HealthTipsPreferences } from './HealthTipsPreferences'
+export { 
+  MedicalDisclaimer, 
+  AIGeneratedBadge, 
+  MedicalDisclaimerModal,
+  useDisclaimerAcknowledgment 
+} from './MedicalDisclaimer'
 
 // Hooks
 export {

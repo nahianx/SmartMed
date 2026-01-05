@@ -4,6 +4,7 @@ import { RefreshCw, Sparkles, Lightbulb } from 'lucide-react'
 import { Button, ScrollArea } from '@smartmed/ui'
 import { HealthTipCard } from './HealthTipCard'
 import { useHealthTips } from './useHealthTips'
+import { MedicalDisclaimer, AIGeneratedBadge, useDisclaimerAcknowledgment } from './MedicalDisclaimer'
 
 interface HealthTipsListProps {
   maxItems?: number
@@ -33,6 +34,8 @@ export function HealthTipsList({
     archive,
     hasMore,
   } = useHealthTips(maxItems || 10)
+
+  const { isAcknowledged } = useDisclaimerAcknowledgment()
 
   const displayedTips = maxItems ? tips.slice(0, maxItems) : tips
   const unreadCount = tips.filter((t) => !t.isRead).length
@@ -97,10 +100,16 @@ export function HealthTipsList({
 
   return (
     <div className={className}>
+      {/* Medical Disclaimer Banner */}
+      {tips.length > 0 && !isAcknowledged && (
+        <MedicalDisclaimer variant="banner" className="mb-4" />
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <h2 className="text-lg font-semibold text-gray-900">Health Tips</h2>
+          <AIGeneratedBadge size="sm" />
           {unreadCount > 0 && (
             <span className="inline-flex items-center justify-center min-w-[1.5rem] h-6 px-2 text-xs font-medium text-white bg-blue-600 rounded-full">
               {unreadCount} new
@@ -202,6 +211,8 @@ export function HealthTipsDrawerContent() {
     archive,
   } = useHealthTips(20)
 
+  const { isAcknowledged } = useDisclaimerAcknowledgment()
+
   if (loading && tips.length === 0) {
     return (
       <div className="p-4 space-y-3">
@@ -241,6 +252,10 @@ export function HealthTipsDrawerContent() {
   return (
     <ScrollArea className="h-full">
       <div className="p-4 space-y-3">
+        {/* Compact disclaimer for drawer */}
+        {!isAcknowledged && (
+          <MedicalDisclaimer variant="banner" compact className="mb-2" />
+        )}
         {tips.map((tip) => (
           <HealthTipCard
             key={tip.id}

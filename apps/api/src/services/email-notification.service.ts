@@ -14,6 +14,7 @@
 import { Resend } from 'resend'
 import ical, { ICalCalendarMethod, ICalEventStatus, ICalAlarmType, ICalAttendeeRole } from 'ical-generator'
 import { Prisma } from '@smartmed/database'
+import { emailLogService, EmailType } from './email-log.service'
 
 // Initialize Resend client
 const resend = new Resend(process.env.RESEND_API_KEY)
@@ -332,17 +333,32 @@ export async function sendBookingConfirmationEmail(
   `
   
   try {
+    // Create email log entry
+    const subject = `✅ Appointment Confirmed - ${doctorName} on ${new Date(appointment.dateTime).toLocaleDateString()}`
+    const logId = await emailLogService.createLog({
+      recipientEmail: patientEmail,
+      recipientUserId: appointment.patient.userId,
+      templateType: 'APPOINTMENT_CONFIRMATION' as EmailType,
+      subject,
+      metadata: {
+        appointmentId: appointment.id,
+        doctorId: appointment.doctorId,
+        dateTime: appointment.dateTime,
+      },
+    })
+
     // Check if we're in development/test mode
     if (!process.env.RESEND_API_KEY || process.env.NODE_ENV === 'test') {
       console.log(`[EMAIL-DEV] Booking confirmation would be sent to: ${patientEmail}`)
       console.log(`[EMAIL-DEV] Subject: Appointment Confirmed - ${doctorName}`)
+      await emailLogService.markAsSent(logId, 'dev-mode-' + Date.now())
       return { success: true, messageId: 'dev-mode-' + Date.now() }
     }
     
     const { data, error } = await resend.emails.send({
       from: EMAIL_FROM,
       to: patientEmail,
-      subject: `✅ Appointment Confirmed - ${doctorName} on ${new Date(appointment.dateTime).toLocaleDateString()}`,
+      subject,
       html,
       attachments: [
         {
@@ -355,9 +371,11 @@ export async function sendBookingConfirmationEmail(
     
     if (error) {
       console.error('[EMAIL] Failed to send booking confirmation:', error)
+      await emailLogService.markAsFailed(logId, error.message)
       return { success: false, error: error.message }
     }
     
+    await emailLogService.markAsSent(logId, data?.id)
     console.log(`[EMAIL] Booking confirmation sent to ${patientEmail}, ID: ${data?.id}`)
     return { success: true, messageId: data?.id }
   } catch (err) {
@@ -433,15 +451,32 @@ export async function sendBookingUpdateEmail(
   `
   
   try {
+    // Create email log entry
+    const subject = `${title} - ${doctorName}`
+    const logId = await emailLogService.createLog({
+      recipientEmail: patientEmail,
+      recipientUserId: appointment.patient.userId,
+      templateType: updateType === 'CANCELLATION' 
+        ? 'APPOINTMENT_CANCELLATION' as EmailType 
+        : 'APPOINTMENT_CONFIRMATION' as EmailType,
+      subject,
+      metadata: {
+        appointmentId: appointment.id,
+        updateType,
+        doctorId: appointment.doctorId,
+      },
+    })
+
     if (!process.env.RESEND_API_KEY || process.env.NODE_ENV === 'test') {
       console.log(`[EMAIL-DEV] Booking update (${updateType}) would be sent to: ${patientEmail}`)
+      await emailLogService.markAsSent(logId, 'dev-mode-' + Date.now())
       return { success: true, messageId: 'dev-mode-' + Date.now() }
     }
     
     const { data, error } = await resend.emails.send({
       from: EMAIL_FROM,
       to: patientEmail,
-      subject: `${title} - ${doctorName}`,
+      subject,
       html,
       attachments: [
         {
@@ -454,9 +489,11 @@ export async function sendBookingUpdateEmail(
     
     if (error) {
       console.error('[EMAIL] Failed to send booking update:', error)
+      await emailLogService.markAsFailed(logId, error.message)
       return { success: false, error: error.message }
     }
     
+    await emailLogService.markAsSent(logId, data?.id)
     return { success: true, messageId: data?.id }
   } catch (err) {
     console.error('[EMAIL] Error sending booking update:', err)
@@ -515,23 +552,40 @@ export async function sendBookingCancellationEmail(
   `
   
   try {
+    // Create email log entry
+    const subject = `Appointment Cancelled - ${doctorName}`
+    const logId = await emailLogService.createLog({
+      recipientEmail: patientEmail,
+      recipientUserId: appointment.patient.userId,
+      templateType: 'APPOINTMENT_CANCELLATION' as EmailType,
+      subject,
+      metadata: {
+        appointmentId: appointment.id,
+        cancelledBy,
+        reason,
+      },
+    })
+
     if (!process.env.RESEND_API_KEY || process.env.NODE_ENV === 'test') {
       console.log(`[EMAIL-DEV] Cancellation email would be sent to: ${patientEmail}`)
+      await emailLogService.markAsSent(logId, 'dev-mode-' + Date.now())
       return { success: true, messageId: 'dev-mode-' + Date.now() }
     }
     
     const { data, error } = await resend.emails.send({
       from: EMAIL_FROM,
       to: patientEmail,
-      subject: `Appointment Cancelled - ${doctorName}`,
+      subject,
       html,
     })
     
     if (error) {
       console.error('[EMAIL] Failed to send cancellation email:', error)
+      await emailLogService.markAsFailed(logId, error.message)
       return { success: false, error: error.message }
     }
     
+    await emailLogService.markAsSent(logId, data?.id)
     return { success: true, messageId: data?.id }
   } catch (err) {
     console.error('[EMAIL] Error sending cancellation email:', err)
@@ -612,23 +666,41 @@ export async function sendAppointmentReminderEmail(
   `
   
   try {
+    // Create email log entry
+    const subject = `${config.emoji} Reminder: Appointment ${config.timeText} with ${doctorName}`
+    const logId = await emailLogService.createLog({
+      recipientEmail: patientEmail,
+      recipientUserId: appointment.patient.userId,
+      templateType: 'APPOINTMENT_REMINDER' as EmailType,
+      subject,
+      metadata: {
+        appointmentId: appointment.id,
+        reminderType,
+        doctorId: appointment.doctorId,
+        scheduledTime: appointment.dateTime,
+      },
+    })
+
     if (!process.env.RESEND_API_KEY || process.env.NODE_ENV === 'test') {
       console.log(`[EMAIL-DEV] ${reminderType} reminder would be sent to: ${patientEmail}`)
+      await emailLogService.markAsSent(logId, 'dev-mode-' + Date.now())
       return { success: true, messageId: 'dev-mode-' + Date.now() }
     }
     
     const { data, error } = await resend.emails.send({
       from: EMAIL_FROM,
       to: patientEmail,
-      subject: `${config.emoji} Reminder: Appointment ${config.timeText} with ${doctorName}`,
+      subject,
       html,
     })
     
     if (error) {
       console.error('[EMAIL] Failed to send reminder email:', error)
+      await emailLogService.markAsFailed(logId, error.message)
       return { success: false, error: error.message }
     }
     
+    await emailLogService.markAsSent(logId, data?.id)
     return { success: true, messageId: data?.id }
   } catch (err) {
     console.error('[EMAIL] Error sending reminder email:', err)
@@ -695,15 +767,30 @@ export async function sendDoctorNewBookingNotification(
   `
   
   try {
+    // Create email log entry
+    const subject = `New Appointment: ${patientName} on ${new Date(appointment.dateTime).toLocaleDateString()}`
+    const logId = await emailLogService.createLog({
+      recipientEmail: doctorEmail,
+      recipientUserId: appointment.doctor.userId,
+      templateType: 'APPOINTMENT_CONFIRMATION' as EmailType,
+      subject,
+      metadata: {
+        appointmentId: appointment.id,
+        patientId: appointment.patientId,
+        isForDoctor: true,
+      },
+    })
+
     if (!process.env.RESEND_API_KEY || process.env.NODE_ENV === 'test') {
       console.log(`[EMAIL-DEV] Doctor notification would be sent to: ${doctorEmail}`)
+      await emailLogService.markAsSent(logId, 'dev-mode-' + Date.now())
       return { success: true, messageId: 'dev-mode-' + Date.now() }
     }
     
     const { data, error } = await resend.emails.send({
       from: EMAIL_FROM,
       to: doctorEmail,
-      subject: `New Appointment: ${patientName} on ${new Date(appointment.dateTime).toLocaleDateString()}`,
+      subject,
       html,
       attachments: [
         {
@@ -716,9 +803,11 @@ export async function sendDoctorNewBookingNotification(
     
     if (error) {
       console.error('[EMAIL] Failed to send doctor notification:', error)
+      await emailLogService.markAsFailed(logId, error.message)
       return { success: false, error: error.message }
     }
     
+    await emailLogService.markAsSent(logId, data?.id)
     return { success: true, messageId: data?.id }
   } catch (err) {
     console.error('[EMAIL] Error sending doctor notification:', err)

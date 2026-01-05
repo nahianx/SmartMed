@@ -150,10 +150,19 @@ async function processBatch(users: UserWithPreferences[]): Promise<{
         // Create notification
         await createHealthTipNotification(user.id, tips.length)
 
-        // Update last generated timestamp
-        await prisma.healthTipPreference.update({
+        // Update last generated timestamp (create preferences if missing)
+        const lastGeneratedAt = new Date()
+        await prisma.healthTipPreference.upsert({
           where: { userId: user.id },
-          data: { lastGeneratedAt: new Date() },
+          update: { lastGeneratedAt },
+          create: {
+            userId: user.id,
+            enabled: true,
+            categories: [],
+            frequency: 'DAILY',
+            deliveryMethod: 'IN_APP',
+            lastGeneratedAt,
+          },
         })
 
         succeeded++

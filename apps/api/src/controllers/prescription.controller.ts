@@ -4,6 +4,7 @@ import { prisma } from '@smartmed/database'
 import { AuthenticatedRequest } from '../types/auth'
 import * as prescriptionService from '../services/prescription.service'
 import { getOrCreateDoctor } from '../services/doctor.service'
+import { prescriptionTokenService } from '../services/prescriptionToken.service'
 
 export class PrescriptionController {
   private static async sendPrescriptionEmail(
@@ -11,6 +12,16 @@ export class PrescriptionController {
     prescriptionId: string
   ) {
     try {
+      // Generate secure access token for the prescription
+      const { url: secureLink, expiresAt } = await prescriptionTokenService.generateToken(
+        prescriptionId,
+        {
+          purpose: 'VIEW',
+          expiresInHours: 72, // 3 days for email links
+          maxUses: 10, // Allow multiple views
+        }
+      )
+
       const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -19,8 +30,15 @@ export class PrescriptionController {
         },
       })
 
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000'
-      const link = `${frontendUrl}/dashboard/patient/prescriptions/${prescriptionId}`
+      // Format expiration for display
+      const expiresFormatted = expiresAt.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
 
       await transporter.sendMail({
         from: `"SmartMed" <${process.env.USER_EMAIL}>`,
@@ -32,18 +50,26 @@ export class PrescriptionController {
             <p style="color: #555;">Hello,</p>
             <p style="color: #555;">Your doctor has issued a new prescription for you.</p>
             <div style="margin: 30px 0; text-align: center;">
-              <a href="${link}" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">View Prescription</a>
+              <a href="${secureLink}" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">View Prescription</a>
             </div>
+            <p style="color: #888; font-size: 13px; margin-top: 15px;">
+              <strong>Security Notice:</strong> This is a secure, time-limited link that will expire on ${expiresFormatted}.
+              For your privacy, please do not share this link with others.
+            </p>
             <p style="color: #999; font-size: 12px; margin-top: 20px;">
               If the button doesn't work, copy and paste this link into your browser:<br>
-              <a href="${link}" style="color: #007bff;">${link}</a>
+              <a href="${secureLink}" style="color: #007bff; word-break: break-all;">${secureLink}</a>
+            </p>
+            <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+            <p style="color: #999; font-size: 11px;">
+              If you did not expect this email or believe it was sent in error, please contact our support team.
             </p>
           </div>
         `,
       })
 
       // eslint-disable-next-line no-console
-      console.log(`Prescription email sent successfully to ${patientEmail}`)
+      console.log(`Prescription email sent successfully to ${patientEmail} with secure link`)
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error sending prescription email:', error)

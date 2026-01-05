@@ -12,6 +12,7 @@ import {
 import { startReminderScheduler } from './scheduler/email_reminder_scheduler'
 import { startQueueScheduler } from './scheduler/queue_scheduler'
 import { startHealthTipsScheduler } from './scheduler/healthTips_scheduler'
+import { startTokenCleanupScheduler } from './scheduler/token_cleanup_scheduler'
 import { setupSecurityMiddleware } from './middleware/security'
 import { authMiddleware } from './middleware/auth'
 import { initializeSocketIO } from './socket/socketServer'
@@ -33,6 +34,9 @@ import prescriptionRoutes from './routes/prescription.routes'
 import drugRoutes from './routes/drug.routes'
 import healthTipsRoutes from './routes/healthTips.routes'
 import calendarRoutes from './routes/calendar.routes'
+import publicRoutes from './routes/public.routes'
+import pushRoutes from './routes/push.routes'
+import notificationPreferencesRoutes from './routes/notification-preferences.routes'
 
 dotenv.config()
 
@@ -112,6 +116,15 @@ app.use('/api/health-tips', healthTipsRoutes)
 // Calendar integration routes (ICS downloads, Google Calendar links)
 app.use('/api', calendarRoutes)
 
+// Public routes (no auth required - security via tokens)
+app.use('/api/public', publicRoutes)
+
+// Push notification routes
+app.use('/api/push', pushRoutes)
+
+// Notification preferences routes
+app.use('/api/notifications', notificationPreferencesRoutes)
+
 // 404 handler
 app.use((_req: Request, res: Response) => {
   res.status(404).json({ error: 'Route not found' })
@@ -134,6 +147,7 @@ if (process.env.NODE_ENV !== 'test') {
   startReminderScheduler()
   startQueueScheduler()
   startHealthTipsScheduler()
+  startTokenCleanupScheduler()
 }
 
 export default app

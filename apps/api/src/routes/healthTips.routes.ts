@@ -33,6 +33,22 @@ const generateTipsSchema = z.object({
   forceRefresh: z.boolean().optional().default(false),
 })
 
+type PreferenceCreateOverrides = Partial<z.infer<typeof preferencesUpdateSchema>> & {
+  lastGeneratedAt?: Date | null
+}
+
+const buildPreferenceCreateData = (
+  userId: string,
+  overrides: PreferenceCreateOverrides = {}
+) => ({
+  userId,
+  enabled: overrides.enabled ?? true,
+  categories: overrides.categories ?? [],
+  frequency: overrides.frequency ?? 'DAILY',
+  deliveryMethod: overrides.deliveryMethod ?? 'IN_APP',
+  lastGeneratedAt: overrides.lastGeneratedAt ?? null,
+})
+
 // GET /api/health-tips - Get health tips for current user
 router.get(
   '/',
@@ -85,6 +101,11 @@ router.get(
           items: existingTips.map(formatTipForResponse),
           total,
           source: 'database',
+          disclaimer: {
+            required: true,
+            message: 'These health tips are AI-generated for informational purposes only and do not constitute medical advice. Always consult with a qualified healthcare professional for medical decisions.',
+            aiGenerated: true,
+          },
         })
       }
 
@@ -100,6 +121,11 @@ router.get(
         items: storedTips.map(formatTipForResponse),
         total: storedTips.length,
         source: 'generated',
+        disclaimer: {
+          required: true,
+          message: 'These health tips are AI-generated for informational purposes only and do not constitute medical advice. Always consult with a qualified healthcare professional for medical decisions.',
+          aiGenerated: true,
+        },
       })
     } catch (error) {
       console.error('Error fetching health tips:', error)
@@ -139,13 +165,11 @@ router.post(
       const storedTips = await storeTips(req.user.id, generatedTips)
 
       // Update last generated timestamp
+      const lastGeneratedAt = new Date()
       await prisma.healthTipPreference.upsert({
         where: { userId: req.user.id },
-        update: { lastGeneratedAt: new Date() },
-        create: {
-          userId: req.user.id,
-          lastGeneratedAt: new Date(),
-        },
+        update: { lastGeneratedAt },
+        create: buildPreferenceCreateData(req.user.id, { lastGeneratedAt }),
       })
 
       return res.status(201).json({
@@ -153,6 +177,11 @@ router.post(
         total: storedTips.length,
         source: 'generated',
         generatedAt: new Date().toISOString(),
+        disclaimer: {
+          required: true,
+          message: 'These health tips are AI-generated for informational purposes only and do not constitute medical advice. Always consult with a qualified healthcare professional for medical decisions.',
+          aiGenerated: true,
+        },
       })
     } catch (error) {
       console.error('Error generating health tips:', error)
@@ -221,8 +250,7 @@ router.put(
         where: { userId: req.user.id },
         update: updates,
         create: {
-          userId: req.user.id,
-          ...updates,
+          ...buildPreferenceCreateData(req.user.id, updates),
         },
       })
 

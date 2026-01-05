@@ -1,13 +1,14 @@
 'use client'
 
 import { useAuthContext } from '@/context/AuthContext'
-import { ArrowLeft, Pill, Calendar, User, FileText } from 'lucide-react'
+import { ArrowLeft, Pill, Calendar, User, FileText, Printer } from 'lucide-react'
 import { useRouter, useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import {
   prescriptionService,
   Prescription,
 } from '../../../../../services/prescriptionService'
+import '@/styles/prescription-print.css'
 
 export default function PrescriptionView() {
   const { user, loading } = useAuthContext()
@@ -21,6 +22,11 @@ export default function PrescriptionView() {
   const [success, setSuccess] = useState<string | null>(null)
 
   const [prescription, setPrescription] = useState<Prescription | null>(null)
+  const printRef = useRef<HTMLDivElement>(null)
+
+  const handlePrint = () => {
+    window.print()
+  }
 
   useEffect(() => {
     if (!loading) {
@@ -70,8 +76,14 @@ export default function PrescriptionView() {
   }
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 shadow-sm ">
-      <div className="bg-white border-b border-slate-200">
+    <div className="bg-white rounded-lg border border-slate-200 shadow-sm prescription-container" ref={printRef}>
+      {/* Print-only header */}
+      <div className="hidden print:block prescription-print-header">
+        <h1>Medical Prescription</h1>
+        <p className="subtitle">SmartMed Healthcare System</p>
+      </div>
+      
+      <div className="bg-white border-b border-slate-200 no-print">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
@@ -91,6 +103,13 @@ export default function PrescriptionView() {
                 </p>
               </div>
             </div>
+            <button
+              onClick={handlePrint}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Printer className="h-4 w-4" />
+              Print Prescription
+            </button>
           </div>
         </div>
       </div>
@@ -199,6 +218,25 @@ export default function PrescriptionView() {
             </div>
           </div>
         )}
+
+        {/* Print-only footer */}
+        <div className="hidden print:block prescription-footer">
+          <div className="signature-section">
+            <div className="signature-line">
+              Prescriber&apos;s Signature
+            </div>
+            <div className="signature-line">
+              Date
+            </div>
+          </div>
+          <div className="print-disclaimer">
+            This is a computer-generated prescription from SmartMed Healthcare System.
+            Please verify authenticity before dispensing.
+          </div>
+          <div className="validity-notice">
+            Valid for 30 days from date of issue unless otherwise specified.
+          </div>
+        </div>
       </div>
     </div>
   )
