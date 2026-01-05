@@ -29,9 +29,9 @@ model User {
   country             String?
   profilePhotoUrl     String?
   isMfaEnabled        Boolean              @default(false)
-  mfaSecret           String?              // Encrypted TOTP secret
-  mfaBackupCodes      String[]             // Hashed backup codes
-  mfaVerifiedAt       DateTime?            // When MFA was last verified
+  mfaSecret           String? // Encrypted TOTP secret
+  mfaBackupCodes      String[] // Hashed backup codes
+  mfaVerifiedAt       DateTime? // When MFA was last verified
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
   doctor              Doctor?
@@ -795,7 +795,7 @@ model Permission {
   id          String           @id @default(uuid())
   name        String           @unique // e.g., "appointments:create", "prescriptions:write"
   description String?
-  resource    String           // e.g., "appointments", "prescriptions", "users"
+  resource    String // e.g., "appointments", "prescriptions", "users"
   action      PermissionAction // e.g., CREATE, READ, UPDATE, DELETE, MANAGE
   isSystem    Boolean          @default(false) // System permissions cannot be deleted
   createdAt   DateTime         @default(now())
