@@ -37,6 +37,8 @@ import calendarRoutes from './routes/calendar.routes'
 import publicRoutes from './routes/public.routes'
 import pushRoutes from './routes/push.routes'
 import notificationPreferencesRoutes from './routes/notification-preferences.routes'
+import mfaRoutes from './routes/mfa.routes'
+import consultationRoutes from './routes/consultation.routes'
 
 dotenv.config()
 
@@ -98,6 +100,7 @@ app.get('/api/csrf-token', (_req: Request, res: Response) => {
 
 // API Routes
 app.use('/api/auth', authRoutes)
+app.use('/api/auth/mfa', mfaRoutes)
 app.use('/api/profile', profileRoutes)
 app.use('/api/patient', patientRoutes)
 app.use('/api/doctor', doctorRoutes)
@@ -124,6 +127,9 @@ app.use('/api/push', pushRoutes)
 
 // Notification preferences routes
 app.use('/api/notifications', notificationPreferencesRoutes)
+
+// Consultation routes (patient context for doctors)
+app.use('/api/consultation', consultationRoutes)
 
 // 404 handler
 app.use((_req: Request, res: Response) => {

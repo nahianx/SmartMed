@@ -38,6 +38,20 @@ export const env = {
   
   // Logging
   LOG_LEVEL: process.env.LOG_LEVEL || 'info',
+
+  // SMTP Email Configuration
+  SMTP_HOST: process.env.SMTP_HOST || 'smtp.gmail.com',
+  SMTP_PORT: parseInt(process.env.SMTP_PORT || '587', 10),
+  SMTP_USER: process.env.SMTP_USER || '',
+  SMTP_PASSWORD: process.env.SMTP_PASSWORD || '',
+
+  // Resend Email Configuration
+  RESEND_API_KEY: process.env.RESEND_API_KEY || '',
+  EMAIL_FROM: process.env.EMAIL_FROM || 'SmartMed <onboarding@resend.dev>',
+  FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
+
+  // MFA Configuration
+  MFA_ENCRYPTION_KEY: process.env.MFA_ENCRYPTION_KEY || '',
 }
 
 // Validate critical environment variables
@@ -54,6 +68,9 @@ export function validateEnv(): void {
     console.log(`[Config] RxNav API: ${env.RXNAV_API_BASE_URL}`)
     console.log(`[Config] Drug features enabled: suggestions=${env.DRUG_SUGGESTIONS_ENABLED}, interactions=${env.INTERACTION_CHECK_ENABLED}, allergies=${env.ALLERGY_CHECK_ENABLED}`)
     console.log(`[Config] Cache: Redis=${env.REDIS_URL ? 'configured' : 'not configured (using in-memory)'}`)
+    console.log(`[Config] SMTP: ${env.SMTP_USER ? 'configured' : 'not configured (prescription emails disabled)'}`)
+    console.log(`[Config] Resend: ${env.RESEND_API_KEY ? 'configured' : 'not configured (using dev mode)'}`)
+    console.log(`[Config] MFA: ${env.MFA_ENCRYPTION_KEY ? 'configured' : 'not configured (using auto-generated key)'}`)
   }
 }
 

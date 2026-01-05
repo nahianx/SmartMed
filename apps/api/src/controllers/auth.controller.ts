@@ -134,4 +134,11 @@ export class AuthController {
     const user = await AuthService.verifyEmail(token)
     res.json({ user })
   }
+
+  static async resendVerificationEmail(req: Request, res: Response) {
+    const { email } = req.body
+    await AuthService.resendVerificationEmail(email)
+    // Always return success to prevent email enumeration
+    res.json({ success: true, message: 'If the email exists and is unverified, a new verification email has been sent.' })
+  }
 }

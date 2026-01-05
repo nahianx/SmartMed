@@ -104,16 +104,48 @@ export const patientIdParamSchema = z.object({
 // Interaction Override Schema
 // ==========================================
 
+// Individual interaction acknowledgment with details
+export const interactionAcknowledgmentSchema = z.object({
+  interactionId: z.string().uuid('Invalid interaction ID'),
+  severity: z.enum(['HIGH', 'MODERATE', 'LOW']),
+  drugPair: z.object({
+    drug1: z.string(),
+    drug2: z.string()
+  }),
+  acknowledgedAt: z.coerce.date().optional()
+})
+
 export const interactionOverrideSchema = z.object({
   interactionCheckId: z.string().uuid('Invalid interaction check ID'),
+  prescriptionId: z.string().uuid('Invalid prescription ID').optional(),
+  patientId: z.string().uuid('Invalid patient ID').optional(),
   overrideReason: z
     .string()
-    .min(10, 'Override reason must be at least 10 characters')
-    .max(500, 'Override reason is too long')
+    .min(10, 'Override reason must be at least 10 characters - please provide clinical justification')
+    .max(1000, 'Override reason is too long')
     .trim(),
   acknowledgedInteractions: z
     .array(z.string().uuid())
     .min(1, 'At least one interaction must be acknowledged'),
+  // Detailed acknowledgments with severity confirmation
+  interactionDetails: z
+    .array(interactionAcknowledgmentSchema)
+    .optional(),
+  // Confirmation that doctor has reviewed all interactions
+  confirmedReview: z
+    .boolean()
+    .refine(val => val === true, 'You must confirm that you have reviewed all interactions'),
+  // Alternative medications considered (optional but recommended)
+  alternativesConsidered: z
+    .string()
+    .max(500, 'Alternatives description is too long')
+    .trim()
+    .optional(),
+  // Patient consent obtained
+  patientInformed: z
+    .boolean()
+    .optional()
+    .default(false)
 })
 
 // ==========================================

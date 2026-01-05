@@ -21,7 +21,14 @@ export interface AuthResult {
     role: string
     emailVerified: boolean
   }
+  requiresEmailVerification?: boolean
 }
+
+// Environment flag to require email verification before login
+const REQUIRE_EMAIL_VERIFICATION = process.env.REQUIRE_EMAIL_VERIFICATION === 'true'
+
+// Grace period in hours - users can login without verification within this period
+const VERIFICATION_GRACE_PERIOD_HOURS = parseInt(process.env.VERIFICATION_GRACE_PERIOD_HOURS || '24', 10)
 
 export class AuthService {
   private static SALT_ROUNDS = 12
@@ -55,21 +62,22 @@ export class AuthService {
       },
     })
 
-    // (no-op) user should contain created record
-
+    // Create email verification token and send verification email
     const verificationToken = crypto.randomBytes(32).toString('hex')
-    const verification = await prisma.emailVerification.create({
+    await prisma.emailVerification.create({
       data: {
         userId: user.id,
         verificationToken,
-        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000), // 1 hour expiry
       },
     })
 
-    // TODO: Email service not implemented yet - skip sending verification email during development
-    // await EmailService.sendVerificationEmail(user, verification.verificationToken)
+    // Send verification email (async, don't block registration)
+    EmailService.sendVerificationEmail(user, verificationToken).catch(err => {
+      console.error('[AuthService] Failed to send verification email:', err)
+    })
 
-    const { accessToken, refreshToken, session } =
+    const { accessToken, refreshToken } =
       await TokenService.issueTokensForUser(user, ipAddress, deviceInfo)
 
     return {
@@ -82,6 +90,7 @@ export class AuthService {
         role: user.role,
         emailVerified: user.emailVerified,
       },
+      requiresEmailVerification: !user.emailVerified,
     }
   }
 
@@ -107,6 +116,17 @@ export class AuthService {
       throw new Error('ACCOUNT_INACTIVE')
     }
 
+    // Check email verification if required
+    if (REQUIRE_EMAIL_VERIFICATION && !user.emailVerified) {
+      // Check if user is within grace period
+      const accountAge = Date.now() - new Date(user.createdAt).getTime()
+      const gracePeriodMs = VERIFICATION_GRACE_PERIOD_HOURS * 60 * 60 * 1000
+      
+      if (accountAge > gracePeriodMs) {
+        throw new Error('EMAIL_NOT_VERIFIED')
+      }
+    }
+
     await prisma.user.update({
       where: { id: user.id },
       data: { lastLogin: new Date() },
@@ -129,6 +149,56 @@ export class AuthService {
         emailVerified: user.emailVerified,
       },
     }
+  }
+
+  /**
+   * Resend verification email for a user
+   */
+  static async resendVerificationEmail(email: string): Promise<void> {
+    ValidationService.validateEmail(email)
+
+    const user = await prisma.user.findUnique({ where: { email } })
+    
+    // Don't reveal if user exists
+    if (!user) {
+      return
+    }
+
+    // Already verified
+    if (user.emailVerified) {
+      return
+    }
+
+    // Check for rate limiting - only allow resend every 2 minutes
+    const recentVerification = await prisma.emailVerification.findFirst({
+      where: {
+        userId: user.id,
+        createdAt: { gt: new Date(Date.now() - 2 * 60 * 1000) },
+      },
+    })
+
+    if (recentVerification) {
+      throw new Error('VERIFICATION_EMAIL_RATE_LIMITED')
+    }
+
+    // Invalidate old tokens
+    await prisma.emailVerification.updateMany({
+      where: { userId: user.id, verified: false },
+      data: { expiresAt: new Date() }, // Expire them
+    })
+
+    // Create new verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex')
+    await prisma.emailVerification.create({
+      data: {
+        userId: user.id,
+        verificationToken,
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000), // 1 hour expiry
+      },
+    })
+
+    // Send new verification email
+    await EmailService.sendVerificationEmail(user, verificationToken)
   }
 
   static async verifyEmail(token: string) {

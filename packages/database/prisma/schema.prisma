@@ -29,6 +29,9 @@ model User {
   country             String?
   profilePhotoUrl     String?
   isMfaEnabled        Boolean              @default(false)
+  mfaSecret           String?              // Encrypted TOTP secret
+  mfaBackupCodes      String[]             // Hashed backup codes
+  mfaVerifiedAt       DateTime?            // When MFA was last verified
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
   doctor              Doctor?
@@ -784,6 +787,49 @@ model HealthTipPreference {
   @@map("health_tip_preferences")
 }
 
+// ========================
+// RBAC Permission System
+// ========================
+
+model Permission {
+  id          String           @id @default(uuid())
+  name        String           @unique // e.g., "appointments:create", "prescriptions:write"
+  description String?
+  resource    String           // e.g., "appointments", "prescriptions", "users"
+  action      PermissionAction // e.g., CREATE, READ, UPDATE, DELETE, MANAGE
+  isSystem    Boolean          @default(false) // System permissions cannot be deleted
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  rolePermissions RolePermission[]
+
+  @@index([resource])
+  @@index([action])
+  @@map("permissions")
+}
+
+model RolePermission {
+  id           String     @id @default(uuid())
+  role         UserRole
+  permissionId String
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  grantedBy    String? // User ID who granted this permission
+  grantedAt    DateTime   @default(now())
+
+  @@unique([role, permissionId])
+  @@index([role])
+  @@map("role_permissions")
+}
+
+enum PermissionAction {
+  CREATE
+  READ
+  UPDATE
+  DELETE
+  MANAGE // Full access including admin operations
+  EXECUTE // For action-based permissions like "queue:call_next"
+}
+
 enum HealthTipCategory {
   GENERAL_WELLNESS
   NUTRITION
@@ -892,8 +938,22 @@ enum AuditAction {
   USER_ROLE_CHANGED
   PERMISSION_GRANTED
   PERMISSION_REVOKED
+  PERMISSION_CREATED
+  PERMISSION_UPDATED
+  PERMISSION_DELETED
+  PERMISSIONS_BULK_GRANTED
+  PERMISSIONS_BULK_REVOKED
+  PERMISSIONS_CLONED
   UNAUTHORIZED_ACCESS_ATTEMPT
   SUSPICIOUS_ACTIVITY
+  // MFA-related audit actions
+  MFA_SETUP_INITIATED
+  MFA_ENABLED
+  MFA_DISABLED
+  MFA_VERIFIED
+  MFA_VERIFICATION_FAILED
+  MFA_BACKUP_CODES_REGENERATED
+  // Queue-related audit actions
   QUEUE_ENTRY_ADDED
   QUEUE_ENTRY_REMOVED
   QUEUE_ENTRY_STATUS_CHANGED

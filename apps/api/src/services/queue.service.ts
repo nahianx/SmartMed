@@ -929,15 +929,22 @@ export async function handleNoShows() {
       status: QueueStatus.IN_PROGRESS,
       calledTime: { not: null },
     },
+    include: {
+      patient: {
+        select: { id: true, userId: true, firstName: true, lastName: true }
+      },
+      doctor: {
+        select: { firstName: true, lastName: true, noShowTimeout: true }
+      }
+    }
   })
 
-  for (const entry of entries) {
-    const doctor = await prisma.doctor.findUnique({
-      where: { id: entry.doctorId },
-    })
-    if (!doctor || !entry.calledTime) continue
+  let processedCount = 0
 
-    const timeoutMs = (doctor.noShowTimeout || 30) * 60 * 1000
+  for (const entry of entries) {
+    if (!entry.calledTime || !entry.doctor) continue
+
+    const timeoutMs = (entry.doctor.noShowTimeout || 30) * 60 * 1000
     const overdue = entry.calledTime.getTime() + timeoutMs < Date.now()
     if (!overdue) continue
 
@@ -965,6 +972,19 @@ export async function handleNoShows() {
           },
         })
 
+        // Create notification for patient
+        if (entry.patient?.userId) {
+          await tx.notification.create({
+            data: {
+              userId: entry.patient.userId,
+              title: 'Missed Appointment',
+              message: `You were marked as no-show for your appointment with Dr. ${entry.doctor.firstName} ${entry.doctor.lastName}. Please reschedule if needed.`,
+              type: 'ACTIVITY_UPDATED',
+              isRead: false
+            }
+          })
+        }
+
         await recalculateQueuePositions(tx, entry.doctorId)
       },
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }
@@ -975,12 +995,33 @@ export async function handleNoShows() {
       action: AuditAction.QUEUE_ENTRY_STATUS_CHANGED,
       resourceType: 'QueueEntry',
       resourceId: entry.id,
-      metadata: { status: QueueStatus.NO_SHOW, reason: 'timeout' },
+      metadata: { 
+        status: QueueStatus.NO_SHOW, 
+        reason: 'timeout',
+        timeoutMinutes: entry.doctor.noShowTimeout || 30,
+        patientId: entry.patientId
+      },
     })
+
+    // Notify patient via WebSocket
+    if (entry.patient) {
+      await notifyPatient(entry.patient.id, {
+        queueEntryId: entry.id,
+        doctorId: entry.doctorId,
+        status: 'NO_SHOW',
+        message: `You have been marked as no-show after ${entry.doctor.noShowTimeout || 30} minutes.`,
+      })
+    }
 
     await emitQueueState(entry.doctorId)
     await broadcastDoctorStatus(entry.doctorId)
     await emitQueueEntryUpdate(entry.id)
+    
+    processedCount++
+  }
+
+  if (processedCount > 0) {
+    console.log(`[Queue Scheduler] Processed ${processedCount} no-show(s)`)
   }
 }
 

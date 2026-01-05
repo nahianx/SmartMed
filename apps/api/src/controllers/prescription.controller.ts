@@ -22,11 +22,24 @@ export class PrescriptionController {
         }
       )
 
+      // Validate SMTP configuration before attempting to send
+      const smtpUser = process.env.SMTP_USER
+      const smtpPassword = process.env.SMTP_PASSWORD
+      const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com'
+      const smtpPort = parseInt(process.env.SMTP_PORT || '587', 10)
+
+      if (!smtpUser || !smtpPassword) {
+        console.warn('[EMAIL] SMTP credentials not configured. Skipping prescription email.')
+        return
+      }
+
       const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpPort === 465,
         auth: {
-          user: process.env.USER_EMAIL || 'woam naki jzkj bvsh',
-          pass: process.env.APP_PASSWORD || 'haquesptfy@gmail.com',
+          user: smtpUser,
+          pass: smtpPassword,
         },
       })
 
@@ -41,7 +54,7 @@ export class PrescriptionController {
       })
 
       await transporter.sendMail({
-        from: `"SmartMed" <${process.env.USER_EMAIL}>`,
+        from: `"SmartMed" <${smtpUser}>`,
         to: patientEmail,
         subject: 'New Prescription Issued - SmartMed',
         html: `

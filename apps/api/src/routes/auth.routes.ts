@@ -34,6 +34,10 @@ const passwordResetCompleteSchema = z.object({
   newPassword: z.string(),
 })
 
+const resendVerificationSchema = z.object({
+  email: z.string().email(),
+})
+
 // Registration
 router.post(
   '/register/doctor',
@@ -94,6 +98,14 @@ router.post(
 router.post(
   '/verify-email/:token',
   (req, res, next) => AuthController.verifyEmail(req, res).catch(next),
+)
+
+// Resend verification email
+router.post(
+  '/resend-verification',
+  rateLimiter(3, 15 * 60 * 1000), // Only 3 attempts per 15 minutes
+  validateBody(resendVerificationSchema),
+  (req, res, next) => AuthController.resendVerificationEmail(req, res).catch(next),
 )
 
 // Current user
