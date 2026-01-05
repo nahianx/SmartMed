@@ -429,7 +429,7 @@ model Report {
 }
 
 model Activity {
-  id             String             @id @default(uuid())
+  id             String                   @id @default(uuid())
   type           ActivityType
   occurredAt     DateTime
   patientId      String
@@ -444,13 +444,13 @@ model Activity {
   notes          String?
   vitals         Json?
   searchVector   Unsupported("tsvector")? @map("search_vector")
-  createdAt      DateTime           @default(now())
-  updatedAt      DateTime           @updatedAt
-  appointment    Appointment?       @relation(fields: [appointmentId], references: [id])
-  doctor         Doctor?            @relation(fields: [doctorId], references: [id])
-  patient        Patient            @relation(fields: [patientId], references: [id])
-  prescription   Prescription?      @relation(fields: [prescriptionId], references: [id])
-  report         Report?            @relation(fields: [reportId], references: [id])
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
+  appointment    Appointment?             @relation(fields: [appointmentId], references: [id])
+  doctor         Doctor?                  @relation(fields: [doctorId], references: [id])
+  patient        Patient                  @relation(fields: [patientId], references: [id])
+  prescription   Prescription?            @relation(fields: [prescriptionId], references: [id])
+  report         Report?                  @relation(fields: [reportId], references: [id])
   notifications  Notification[]
 
   @@index([patientId, occurredAt(sort: Desc)])
