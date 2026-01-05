@@ -155,7 +155,7 @@ model Appointment {
 }
 
 model Prescription {
-  id                        String                   @id @default(uuid())
+  id                        String                    @id @default(uuid())
   appointmentId             String
   patientId                 String
   doctorId                  String
@@ -163,15 +163,15 @@ model Prescription {
   diagnosis                 String
   notes                     String?
   // Interaction check results
-  interactionCheckStatus    InteractionCheckStatus   @default(NOT_CHECKED)
+  interactionCheckStatus    InteractionCheckStatus    @default(NOT_CHECKED)
   interactionOverrideReason String?
   interactionOverrideAt     DateTime?
-  createdAt                 DateTime                 @default(now())
-  updatedAt                 DateTime                 @updatedAt
+  createdAt                 DateTime                  @default(now())
+  updatedAt                 DateTime                  @updatedAt
   activities                Activity[]
-  appointment               Appointment              @relation(fields: [appointmentId], references: [id])
-  doctor                    Doctor                   @relation(fields: [doctorId], references: [id])
-  patient                   Patient                  @relation(fields: [patientId], references: [id])
+  appointment               Appointment               @relation(fields: [appointmentId], references: [id])
+  doctor                    Doctor                    @relation(fields: [doctorId], references: [id])
+  patient                   Patient                   @relation(fields: [patientId], references: [id])
   // New structured medications relation
   prescriptionMedications   PrescriptionMedication[]
   interactionChecks         InteractionCheck[]
@@ -193,9 +193,9 @@ model PrescriptionAccessToken {
   lastUsedAt     DateTime?
   lastUsedIp     String?
   createdAt      DateTime     @default(now())
-  
-  prescription   Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
-  
+
+  prescription Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+
   @@index([token])
   @@index([prescriptionId])
   @@index([expiresAt])
@@ -476,24 +476,24 @@ model Notification {
 
 // Email delivery log for tracking and debugging
 model EmailLog {
-  id              String          @id @default(uuid())
+  id              String      @id @default(uuid())
   recipientEmail  String
   recipientUserId String?
   templateType    EmailType
   subject         String
-  status          EmailStatus     @default(PENDING)
-  providerId      String?         // External ID from email provider (e.g., Resend)
-  metadata        Json?           // Additional context (appointmentId, prescriptionId, etc.)
+  status          EmailStatus @default(PENDING)
+  providerId      String? // External ID from email provider (e.g., Resend)
+  metadata        Json? // Additional context (appointmentId, prescriptionId, etc.)
   errorMessage    String?
   errorCode       String?
-  attempts        Int             @default(1)
+  attempts        Int         @default(1)
   sentAt          DateTime?
   deliveredAt     DateTime?
   openedAt        DateTime?
   clickedAt       DateTime?
   bouncedAt       DateTime?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
 
   @@index([recipientEmail])
   @@index([recipientUserId])
@@ -530,18 +530,18 @@ enum EmailStatus {
 
 // Web Push notification subscriptions
 model PushSubscription {
-  id             String   @id @default(uuid())
-  userId         String
-  endpoint       String   @unique
-  p256dh         String   // Public key for encryption
-  auth           String   // Auth secret for encryption
-  userAgent      String?  // Browser/device info
-  deviceName     String?  // User-friendly device name
-  isActive       Boolean  @default(true)
-  lastUsedAt     DateTime?
-  failureCount   Int      @default(0)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id           String    @id @default(uuid())
+  userId       String
+  endpoint     String    @unique
+  p256dh       String // Public key for encryption
+  auth         String // Auth secret for encryption
+  userAgent    String? // Browser/device info
+  deviceName   String? // User-friendly device name
+  isActive     Boolean   @default(true)
+  lastUsedAt   DateTime?
+  failureCount Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   @@index([userId])
   @@index([isActive])
@@ -550,39 +550,39 @@ model PushSubscription {
 
 // User notification preferences
 model NotificationPreference {
-  id                      String   @id @default(uuid())
-  userId                  String   @unique
-  
+  id     String @id @default(uuid())
+  userId String @unique
+
   // Appointment notifications
-  appointmentReminders    Boolean  @default(true)
-  appointmentConfirmation Boolean  @default(true)
-  appointmentCancellation Boolean  @default(true)
-  reminderTiming          String   @default("24h,1h") // Comma-separated: 24h, 1h, 30m
-  
+  appointmentReminders    Boolean @default(true)
+  appointmentConfirmation Boolean @default(true)
+  appointmentCancellation Boolean @default(true)
+  reminderTiming          String  @default("24h,1h") // Comma-separated: 24h, 1h, 30m
+
   // Queue notifications
-  queueUpdates            Boolean  @default(true)
-  queuePositionThreshold  Int      @default(3) // Notify when position <= this
-  
+  queueUpdates           Boolean @default(true)
+  queuePositionThreshold Int     @default(3) // Notify when position <= this
+
   // Health tips notifications
-  healthTipsEnabled       Boolean  @default(true)
-  healthTipsFrequency     String   @default("DAILY") // DAILY, WEEKLY, MONTHLY
-  
+  healthTipsEnabled   Boolean @default(true)
+  healthTipsFrequency String  @default("DAILY") // DAILY, WEEKLY, MONTHLY
+
   // Prescription notifications
-  prescriptionReady       Boolean  @default(true)
-  
+  prescriptionReady Boolean @default(true)
+
   // Delivery channels
-  emailEnabled            Boolean  @default(true)
-  pushEnabled             Boolean  @default(true)
-  smsEnabled              Boolean  @default(false)
-  
+  emailEnabled Boolean @default(true)
+  pushEnabled  Boolean @default(true)
+  smsEnabled   Boolean @default(false)
+
   // Quiet hours (no notifications during this time)
-  quietHoursEnabled       Boolean  @default(false)
-  quietHoursStart         String?  @default("22:00") // 24-hour format
-  quietHoursEnd           String?  @default("08:00")
-  timezone                String   @default("UTC")
-  
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  quietHoursEnabled Boolean @default(false)
+  quietHoursStart   String? @default("22:00") // 24-hour format
+  quietHoursEnd     String? @default("08:00")
+  timezone          String  @default("UTC")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("notification_preferences")
 }
