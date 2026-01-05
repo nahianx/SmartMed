@@ -3,6 +3,7 @@
 import { io, type Socket } from 'socket.io-client'
 import { tokenManager } from '../utils/tokenManager'
 import { SOCKET_EVENTS } from './socketConstants'
+import { getSocketBase } from '../utils/apiBase'
 
 type ListenerMap = Map<string, Array<(...args: any[]) => void>>
 
@@ -16,11 +17,7 @@ class SocketService {
     }
 
     const authToken = token || tokenManager.getAccessToken()
-    const apiBase = (
-      process.env.NEXT_PUBLIC_SOCKET_URL ||
-      process.env.NEXT_PUBLIC_API_URL ||
-      'http://localhost:4000'
-    ).replace(/\/api$/, '')
+    const apiBase = getSocketBase()
 
     this.socket = io(apiBase, {
       auth: { token: authToken },

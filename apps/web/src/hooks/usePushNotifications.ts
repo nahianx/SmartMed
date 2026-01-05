@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react'
+import { getApiBase } from '@/utils/apiBase'
 
 interface PushSubscriptionState {
   isSupported: boolean
@@ -21,7 +22,7 @@ interface UsePushNotificationsReturn extends PushSubscriptionState {
   sendTest: () => Promise<boolean>
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+const API_BASE = getApiBase()
 
 /**
  * Convert a base64 string to Uint8Array (for VAPID key)

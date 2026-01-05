@@ -1,10 +1,8 @@
 import axios from 'axios'
 import { tokenManager } from '../utils/tokenManager'
+import { getApiBaseWithApi } from '../utils/apiBase'
 
-// Use NEXT_PUBLIC_API_URL from .env.local (should point to the API base and include /api)
-const baseURL = (
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
-).replace(/\/$/, '')
+const baseURL = getApiBaseWithApi()
 
 function getCookie(name: string): string | null {
   if (typeof document === 'undefined') return null

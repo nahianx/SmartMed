@@ -5,6 +5,7 @@ import { Document, Page, pdfjs } from 'react-pdf'
 import { FileText, Loader, AlertTriangle, ZoomIn, ZoomOut } from 'lucide-react'
 import { Button } from '@smartmed/ui'
 import { tokenManager } from '@/utils/tokenManager'
+import { getApiBaseWithApi } from '@/utils/apiBase'
 
 // Set up PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`
@@ -20,7 +21,7 @@ export function PDFViewer({ reportId, fileName }: PDFViewerProps) {
   const [scale, setScale] = useState<number>(1.0)
   const [error, setError] = useState<string | null>(null)
 
-  const apiBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api').replace(/\/$/, '')
+  const apiBase = getApiBaseWithApi()
   const accessToken = typeof window !== 'undefined' ? tokenManager.getAccessToken() : null
   const pdfUrl = `${apiBase}/reports/${reportId}/download?disposition=inline`
   const documentFile = accessToken

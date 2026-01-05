@@ -2,9 +2,10 @@
 import axios, { AxiosResponse } from 'axios'
 import { User, Doctor, Patient, DoctorAvailability, Specialization } from '@smartmed/types'
 import { tokenManager } from '@/utils/tokenManager'
+import { getApiBaseWithApi } from '@/utils/apiBase'
 
 // Configure axios instance
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api').replace(/\/$/, '')
+const API_BASE_URL = getApiBaseWithApi()
 
 function getCookie(name: string): string | null {
   if (typeof document === 'undefined') return null

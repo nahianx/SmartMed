@@ -21,6 +21,7 @@ import {
   Calendar,
   FileText,
 } from 'lucide-react'
+import { getApiBase } from '@/utils/apiBase'
 
 interface PrescriptionData {
   id: string
@@ -75,7 +76,7 @@ export default function PrescriptionViewPage() {
       }
 
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+        const apiUrl = getApiBase()
         const response = await fetch(`${apiUrl}/api/public/prescriptions/${token}`)
         const data = await response.json()
 
