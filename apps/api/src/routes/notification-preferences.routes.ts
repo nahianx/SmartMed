@@ -5,10 +5,22 @@
  */
 
 import { Router, Request, Response } from 'express'
-import { notificationPreferenceService, NotificationPreferenceInput } from '../services/notification-preference.service'
+import { notificationPreferenceService, NotificationPreferenceInput, NOTIFICATION_SOUNDS } from '../services/notification-preference.service'
 import { requireAuth } from '../middleware/auth'
 
 const router = Router()
+
+/**
+ * @route   GET /api/notifications/preferences/sounds
+ * @desc    Get available notification sounds
+ * @access  Private
+ */
+router.get('/preferences/sounds', requireAuth, async (_req: Request, res: Response) => {
+  return res.status(200).json({
+    success: true,
+    data: NOTIFICATION_SOUNDS,
+  })
+})
 
 /**
  * @route   GET /api/notifications/preferences
@@ -71,6 +83,10 @@ router.put('/preferences', requireAuth, async (req: Request, res: Response) => {
       'emailEnabled',
       'pushEnabled',
       'smsEnabled',
+      'audioNotificationsEnabled',
+      'browserNotificationsEnabled',
+      'notificationSound',
+      'notificationVolume',
       'quietHoursEnabled',
       'quietHoursStart',
       'quietHoursEnd',

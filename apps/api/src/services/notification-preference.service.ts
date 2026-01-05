@@ -30,6 +30,12 @@ export interface NotificationPreferenceInput {
   pushEnabled?: boolean
   smsEnabled?: boolean
 
+  // Audio and Browser Notifications (for doctors)
+  audioNotificationsEnabled?: boolean
+  browserNotificationsEnabled?: boolean
+  notificationSound?: string
+  notificationVolume?: number
+
   // Quiet hours
   quietHoursEnabled?: boolean
   quietHoursStart?: string
@@ -52,6 +58,10 @@ export interface NotificationPreference {
   emailEnabled: boolean
   pushEnabled: boolean
   smsEnabled: boolean
+  audioNotificationsEnabled: boolean
+  browserNotificationsEnabled: boolean
+  notificationSound: string
+  notificationVolume: number
   quietHoursEnabled: boolean
   quietHoursStart: string | null
   quietHoursEnd: string | null
@@ -59,6 +69,14 @@ export interface NotificationPreference {
   createdAt: Date
   updatedAt: Date
 }
+
+// Available notification sounds
+export const NOTIFICATION_SOUNDS = [
+  { id: 'notification-default', name: 'Default', file: 'notification-default.mp3' },
+  { id: 'notification-gentle', name: 'Gentle', file: 'notification-gentle.mp3' },
+  { id: 'notification-alert', name: 'Alert', file: 'notification-alert.mp3' },
+  { id: 'notification-chime', name: 'Chime', file: 'notification-chime.mp3' },
+] as const
 
 // Default preferences
 const DEFAULT_PREFERENCES: Omit<NotificationPreferenceInput, never> = {
@@ -74,6 +92,10 @@ const DEFAULT_PREFERENCES: Omit<NotificationPreferenceInput, never> = {
   emailEnabled: true,
   pushEnabled: true,
   smsEnabled: false,
+  audioNotificationsEnabled: true,
+  browserNotificationsEnabled: true,
+  notificationSound: 'notification-default',
+  notificationVolume: 70,
   quietHoursEnabled: false,
   quietHoursStart: '22:00',
   quietHoursEnd: '08:00',

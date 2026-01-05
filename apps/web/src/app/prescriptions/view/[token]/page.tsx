@@ -3,6 +3,8 @@
  * 
  * Displays prescriptions accessed via secure token links.
  * No authentication required - security is provided by the token.
+ * 
+ * Print-optimized for A4 paper with professional pharmacy formatting.
  */
 
 'use client'
@@ -22,6 +24,7 @@ import {
   FileText,
 } from 'lucide-react'
 import { getApiBase } from '@/utils/apiBase'
+import '@/styles/prescription-print.css'
 
 interface PrescriptionData {
   id: string
@@ -160,10 +163,10 @@ export default function PrescriptionViewPage() {
   const prescriptionDate = new Date(prescription.createdAt)
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-3xl mx-auto">
-        {/* Security Notice */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-start gap-3 print:hidden">
+    <div className="min-h-screen bg-gray-50 py-8 px-4 print:bg-white print:p-0 print:min-h-0">
+      <div className="max-w-3xl mx-auto prescription-container">
+        {/* Security Notice - hidden on print */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-start gap-3 no-print">
           <Shield className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div className="text-sm">
             <p className="text-blue-800 font-medium">{accessInfo?.message}</p>
@@ -171,10 +174,17 @@ export default function PrescriptionViewPage() {
           </div>
         </div>
 
+        {/* Print-only Professional Header */}
+        <div className="hidden print:block prescription-print-header">
+          <h1>Medical Prescription</h1>
+          <p className="subtitle">SmartMed Healthcare System</p>
+          <p className="prescription-id">ID: {prescription.id.slice(0, 8).toUpperCase()}</p>
+        </div>
+
         {/* Main Prescription Card */}
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden print:shadow-none print:rounded-none">
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden print:shadow-none print:rounded-none prescription-view">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-5 print:bg-blue-600">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-5 print:hidden">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <FileText className="h-8 w-8" />
@@ -185,7 +195,7 @@ export default function PrescriptionViewPage() {
               </div>
               <button
                 onClick={handlePrint}
-                className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-colors print:hidden"
+                className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-colors"
               >
                 <Printer className="h-4 w-4" />
                 Print
@@ -194,9 +204,22 @@ export default function PrescriptionViewPage() {
           </div>
 
           {/* Prescription Details */}
-          <div className="p-6">
-            {/* Date and ID */}
-            <div className="flex flex-wrap gap-6 text-sm text-gray-600 mb-6 pb-6 border-b">
+          <div className="p-6 print:p-0">
+            {/* Print-only date/meta section */}
+            <div className="hidden print:flex justify-between text-sm text-gray-600 mb-4 pb-4 border-b print:border-gray-300">
+              <div>
+                <span className="font-medium">Date:</span> {format(prescriptionDate, 'MMMM d, yyyy')}
+              </div>
+              <div>
+                <span className="font-medium">Time:</span> {format(prescriptionDate, 'h:mm a')}
+              </div>
+              <div>
+                <span className="font-medium">ID:</span> {prescription.id.slice(0, 8).toUpperCase()}
+              </div>
+            </div>
+
+            {/* Date and ID - Screen only */}
+            <div className="flex flex-wrap gap-6 text-sm text-gray-600 mb-6 pb-6 border-b print:hidden">
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
                 <span>Date: {format(prescriptionDate, 'MMMM d, yyyy')}</span>
@@ -208,39 +231,41 @@ export default function PrescriptionViewPage() {
             </div>
 
             {/* Patient & Doctor Info */}
-            <div className="grid md:grid-cols-2 gap-6 mb-8">
+            <div className="grid md:grid-cols-2 gap-6 mb-8 info-section print:border print:border-gray-300 print:p-4 print:mb-4">
               {/* Patient */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <div className="flex items-center gap-2 text-gray-700 font-medium mb-3">
+              <div className="bg-gray-50 rounded-lg p-4 patient-info print:bg-transparent print:p-0 print:rounded-none">
+                <div className="flex items-center gap-2 text-gray-700 font-medium mb-3 print:hidden">
                   <User className="h-4 w-4" />
                   Patient Information
                 </div>
-                <p className="text-gray-900 font-semibold">{prescription.patient.name}</p>
-                <p className="text-sm text-gray-600">
+                <div className="info-label hidden print:block">Patient Information</div>
+                <p className="text-gray-900 font-semibold info-value">{prescription.patient.name}</p>
+                <p className="text-sm text-gray-600 info-value">
                   DOB: {format(new Date(prescription.patient.dateOfBirth), 'MMM d, yyyy')}
                 </p>
               </div>
 
               {/* Doctor */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <div className="flex items-center gap-2 text-gray-700 font-medium mb-3">
+              <div className="bg-gray-50 rounded-lg p-4 doctor-info print:bg-transparent print:p-0 print:rounded-none">
+                <div className="flex items-center gap-2 text-gray-700 font-medium mb-3 print:hidden">
                   <Stethoscope className="h-4 w-4" />
                   Prescriber Information
                 </div>
-                <p className="text-gray-900 font-semibold">{prescription.doctor.name}</p>
-                <p className="text-sm text-gray-600">{prescription.doctor.specialization}</p>
-                <p className="text-xs text-gray-500">License: {prescription.doctor.licenseNumber}</p>
+                <div className="info-label hidden print:block">Prescriber Information</div>
+                <p className="text-gray-900 font-semibold info-value">{prescription.doctor.name}</p>
+                <p className="text-sm text-gray-600 info-value">{prescription.doctor.specialization}</p>
+                <p className="text-xs text-gray-500 info-value">License: {prescription.doctor.licenseNumber}</p>
               </div>
             </div>
 
             {/* Diagnosis */}
-            <div className="mb-8">
-              <h2 className="text-sm font-medium text-gray-700 mb-2">Diagnosis</h2>
-              <p className="text-gray-900 bg-gray-50 rounded-lg p-4">{prescription.diagnosis}</p>
+            <div className="mb-8 diagnosis-section print:mb-4">
+              <h2 className="text-sm font-medium text-gray-700 mb-2 print:text-black print:font-bold">Diagnosis</h2>
+              <p className="text-gray-900 bg-gray-50 rounded-lg p-4 print:bg-transparent print:border print:border-gray-300 print:rounded-none">{prescription.diagnosis}</p>
               {prescription.notes && (
-                <div className="mt-3">
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Notes</h3>
-                  <p className="text-gray-700 text-sm bg-amber-50 rounded-lg p-4 border border-amber-100">
+                <div className="mt-3 notes-section print:mt-2">
+                  <h3 className="text-sm font-medium text-gray-700 mb-2 print:text-black">Notes</h3>
+                  <p className="text-gray-700 text-sm bg-amber-50 rounded-lg p-4 border border-amber-100 print:border-gray-300 print:bg-transparent">
                     {prescription.notes}
                   </p>
                 </div>
@@ -248,12 +273,15 @@ export default function PrescriptionViewPage() {
             </div>
 
             {/* Medications */}
-            <div>
-              <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
+            <div className="medications-section">
+              <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4 print:hidden">
                 <Pill className="h-5 w-5 text-blue-600" />
                 Prescribed Medications
               </h2>
-              <div className="space-y-4">
+              <h2 className="hidden print:block text-lg font-bold mb-4 border-b border-gray-300 pb-2">Prescribed Medications</h2>
+              
+              {/* Screen view - Card layout */}
+              <div className="space-y-4 print:hidden">
                 {prescription.medications.map((med, index) => (
                   <div
                     key={index}
@@ -304,42 +332,95 @@ export default function PrescriptionViewPage() {
                   </div>
                 ))}
               </div>
+
+              {/* Print view - Table layout */}
+              <table className="hidden print:table medications-table w-full">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Medication</th>
+                    <th>Dosage</th>
+                    <th>Frequency</th>
+                    <th>Duration</th>
+                    <th>Instructions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {prescription.medications.map((med, index) => (
+                    <tr key={index} className="medication-item">
+                      <td className="text-center">{index + 1}</td>
+                      <td>
+                        <div className="medication-name">{med.name}</div>
+                        {med.drug?.genericName && (
+                          <div className="medication-generic">{med.drug.genericName}</div>
+                        )}
+                        {med.drug?.rxcui && (
+                          <span className="rxcui-badge">RxCUI: {med.drug.rxcui}</span>
+                        )}
+                      </td>
+                      <td>{med.dosage}</td>
+                      <td>{med.frequency}</td>
+                      <td>{med.duration}</td>
+                      <td>
+                        {med.instructions && (
+                          <div className="medication-instructions">{med.instructions}</div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
 
-          {/* Footer */}
-          <div className="bg-gray-50 px-6 py-4 border-t text-center">
+          {/* Footer - Screen */}
+          <div className="bg-gray-50 px-6 py-4 border-t text-center print:hidden">
             <p className="text-xs text-gray-500">
               This is a computer-generated prescription from SmartMed Healthcare System.
               Please verify authenticity before dispensing. Valid for 30 days from date of issue.
             </p>
           </div>
+
+          {/* Footer - Print */}
+          <div className="hidden print:block prescription-footer mt-8">
+            {/* Signature Section */}
+            <div className="signature-section flex justify-between items-end mb-6">
+              <div className="qr-code-area w-20 h-20 border border-gray-300 flex items-center justify-center text-xs text-gray-400">
+                QR Code
+              </div>
+              <div className="signature-box text-center">
+                <div className="signature-line border-t border-black mt-12 pt-2">
+                  <p className="text-sm">{prescription.doctor.name}</p>
+                  <p className="text-xs text-gray-600">{prescription.doctor.specialization}</p>
+                  <p className="text-xs text-gray-500">License: {prescription.doctor.licenseNumber}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Validity Notice */}
+            <div className="validity-notice text-center text-sm italic text-gray-600 mb-4">
+              Valid for 30 days from date of issue. Not valid after {format(new Date(prescriptionDate.getTime() + 30 * 24 * 60 * 60 * 1000), 'MMMM d, yyyy')}.
+            </div>
+
+            {/* Disclaimer */}
+            <div className="print-disclaimer border border-gray-200 p-3 text-xs text-gray-500 text-center">
+              <p>This is a computer-generated prescription from SmartMed Healthcare System.</p>
+              <p>Please verify authenticity before dispensing. Keep out of reach of children.</p>
+              <p>Do not exceed prescribed dosage. Consult your healthcare provider for any concerns.</p>
+            </div>
+
+            {/* Print Timestamp */}
+            <p className="print-timestamp text-right text-xs text-gray-400 mt-2">
+              Printed: {format(new Date(), 'MMM d, yyyy h:mm a')}
+            </p>
+          </div>
         </div>
 
-        {/* Print Styles Notice */}
-        <p className="text-center text-sm text-gray-500 mt-4 print:hidden">
+        {/* Print Styles Notice - Screen only */}
+        <p className="text-center text-sm text-gray-500 mt-4 no-print">
           This prescription is optimized for printing. Click the print button above for best results.
         </p>
       </div>
-
-      {/* Print-specific styles */}
-      <style jsx global>{`
-        @media print {
-          body {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          .print\\:hidden {
-            display: none !important;
-          }
-          .print\\:shadow-none {
-            box-shadow: none !important;
-          }
-          .print\\:rounded-none {
-            border-radius: 0 !important;
-          }
-        }
-      `}</style>
     </div>
   )
 }

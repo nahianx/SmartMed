@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Users, RefreshCw, Calendar } from 'lucide-react'
+import { Users, RefreshCw, Calendar, Shield } from 'lucide-react'
 import { Badge, Button } from '@smartmed/ui'
 import { useAuthContext } from '../../../context/AuthContext'
 import { adminService, DashboardStats } from '../../../services/adminService'
@@ -59,6 +59,13 @@ export default function AdminDashboardPage() {
         'View all appointments, patient context, and update statuses',
       color: 'blue' as const,
       action: () => router.push('/dashboard/admin/appointments'),
+    },
+    {
+      icon: Shield,
+      title: 'Permission Management',
+      description: 'Manage role-based access control and permissions',
+      color: 'purple' as const,
+      action: () => router.push('/dashboard/admin/permissions'),
     },
   ]
 

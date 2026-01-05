@@ -13,6 +13,7 @@ import { Badge, Button } from '@smartmed/ui'
 import { format } from 'date-fns'
 import { apiClient } from '@/services/apiClient'
 import { handleApiError } from '@/lib/error_utils'
+import { SearchHighlight, useHasSearchHighlights } from './SearchHighlight'
 
 interface TimelineItemProps {
   activity: TimelineActivity
@@ -27,6 +28,7 @@ export function TimelineItem({
 }: TimelineItemProps) {
   const router = useRouter()
   const [isDownloading, setIsDownloading] = useState(false)
+  const hasHighlights = useHasSearchHighlights(activity)
 
   const getIcon = () => {
     switch (activity.type) {
@@ -133,9 +135,32 @@ export function TimelineItem({
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="font-medium">{activity.title}</h3>
+              <h3 className="font-medium">
+                {hasHighlights && activity.highlightedTitle ? (
+                  <SearchHighlight 
+                    text={activity.highlightedTitle} 
+                    fallback={activity.title} 
+                  />
+                ) : (
+                  activity.title
+                )}
+              </h3>
               {getStatusBadge()}
             </div>
+
+            {/* Show highlighted subtitle if available */}
+            {activity.subtitle && (
+              <p className="text-sm text-gray-600 mt-0.5">
+                {hasHighlights && activity.highlightedSubtitle ? (
+                  <SearchHighlight 
+                    text={activity.highlightedSubtitle} 
+                    fallback={activity.subtitle} 
+                  />
+                ) : (
+                  activity.subtitle
+                )}
+              </p>
+            )}
 
             <div className="mt-1 flex items-center gap-3 text-sm text-gray-600 flex-wrap">
               <span className="flex items-center gap-1">

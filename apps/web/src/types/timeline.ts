@@ -41,6 +41,12 @@ export interface TimelineActivity {
   }
   linkedReports?: string[]
   linkedPrescriptions?: string[]
+
+  // Full-text search metadata (available when useFullTextSearch=true)
+  searchRank?: number
+  highlightedTitle?: string
+  highlightedSubtitle?: string
+  highlightedNotes?: string
 }
 
 export interface FilterState {
@@ -52,4 +58,18 @@ export interface FilterState {
   types: ActivityType[]
   statuses: AppointmentStatus[]
   searchText: string
+  /** Enable PostgreSQL full-text search for better results */
+  useFullTextSearch?: boolean
+}
+
+/** Search metadata returned when using full-text search */
+export interface SearchMetadata {
+  /** Relevance ranking score */
+  searchRank?: number
+  /** Title with matched terms highlighted (HTML with <mark> tags) */
+  highlightedTitle?: string
+  /** Subtitle with matched terms highlighted */
+  highlightedSubtitle?: string
+  /** Notes with matched terms highlighted */
+  highlightedNotes?: string
 }

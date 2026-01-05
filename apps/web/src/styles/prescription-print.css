@@ -17,7 +17,6 @@
   body {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    color-adjust: exact !important;
   }
 
   /* Hide non-printable elements */
@@ -56,18 +55,15 @@
   .medication-card,
   .no-break {
     page-break-inside: avoid;
-    break-inside: avoid;
   }
 
   /* Force page breaks */
   .page-break-before {
     page-break-before: always;
-    break-before: always;
   }
 
   .page-break-after {
     page-break-after: always;
-    break-after: always;
   }
 
   /* Typography adjustments */
@@ -402,5 +398,92 @@
 
   .print-only {
     display: none;
+  }
+}
+
+/* Additional print utility classes */
+@media print {
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Reset tailwind print utilities */
+  .print\:bg-white {
+    background: white !important;
+  }
+
+  .print\:p-0 {
+    padding: 0 !important;
+  }
+
+  .print\:shadow-none {
+    box-shadow: none !important;
+  }
+
+  .print\:rounded-none {
+    border-radius: 0 !important;
+  }
+
+  .print\:border-gray-300 {
+    border-color: #d1d5db !important;
+  }
+
+  .print\:bg-transparent {
+    background: transparent !important;
+  }
+
+  .print\:border {
+    border-width: 1pt !important;
+    border-style: solid !important;
+  }
+
+  .print\:min-h-0 {
+    min-height: 0 !important;
+  }
+
+  .print\:mb-4 {
+    margin-bottom: 12pt !important;
+  }
+
+  .print\:mt-2 {
+    margin-top: 6pt !important;
+  }
+
+  .print\:font-bold {
+    font-weight: bold !important;
+  }
+
+  .print\:text-black {
+    color: #000 !important;
+  }
+
+  /* Medications table column widths */
+  .medications-table th:nth-child(1) {
+    width: 5%;
+  }
+
+  .medications-table th:nth-child(2) {
+    width: 30%;
+  }
+
+  .medications-table th:nth-child(3) {
+    width: 12%;
+  }
+
+  .medications-table th:nth-child(4) {
+    width: 15%;
+  }
+
+  .medications-table th:nth-child(5) {
+    width: 12%;
+  }
+
+  .medications-table th:nth-child(6) {
+    width: 26%;
+  }
+
+  /* Signature box width */
+  .signature-box {
+    width: 200pt;
   }
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { formatDistanceToNow } from 'date-fns'
-import { Bell, Lightbulb, Calendar, Activity } from 'lucide-react'
+import { Bell, Lightbulb, Calendar, Activity, CheckCheck, Trash2, Loader2 } from 'lucide-react'
 import { NotificationItem } from '@/types/notification'
 import {
   Sheet,
@@ -17,6 +17,10 @@ interface NotificationsDrawerProps {
   onClose: () => void
   notifications: NotificationItem[]
   onMarkRead: (id: string) => void
+  onMarkAllRead?: () => Promise<void>
+  onClearRead?: () => Promise<void>
+  isMarkingAllRead?: boolean
+  isClearingRead?: boolean
 }
 
 function getNotificationIcon(type: NotificationItem['type']) {
@@ -53,8 +57,16 @@ export function NotificationsDrawer({
   onClose,
   notifications,
   onMarkRead,
+  onMarkAllRead,
+  onClearRead,
+  isMarkingAllRead = false,
+  isClearingRead = false,
 }: NotificationsDrawerProps) {
   const hasNotifications = notifications.length > 0
+  const unreadCount = notifications.filter((n) => !n.readAt).length
+  const readCount = notifications.filter((n) => n.readAt).length
+  const hasUnread = unreadCount > 0
+  const hasRead = readCount > 0
 
   return (
     <Sheet open={open} onOpenChange={onClose}>
@@ -63,10 +75,55 @@ export function NotificationsDrawer({
           <SheetTitle className="flex items-center gap-2">
             <Bell className="h-4 w-4" />
             Notifications
+            {hasUnread && (
+              <span className="ml-auto inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                {unreadCount} unread
+              </span>
+            )}
           </SheetTitle>
         </SheetHeader>
 
-        <ScrollArea className="mt-4 h-[calc(100vh-6rem)]">
+        {/* Action buttons */}
+        {hasNotifications && (
+          <div className="flex gap-2 mt-4 pb-2 border-b">
+            {hasUnread && onMarkAllRead && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={onMarkAllRead}
+                disabled={isMarkingAllRead}
+                className="flex-1 text-xs"
+                title="Mark all notifications as read"
+              >
+                {isMarkingAllRead ? (
+                  <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                ) : (
+                  <CheckCheck className="h-3 w-3 mr-1" />
+                )}
+                Mark all read
+              </Button>
+            )}
+            {hasRead && onClearRead && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={onClearRead}
+                disabled={isClearingRead}
+                className="flex-1 text-xs text-gray-600 hover:text-red-600"
+                title="Clear all read notifications"
+              >
+                {isClearingRead ? (
+                  <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                ) : (
+                  <Trash2 className="h-3 w-3 mr-1" />
+                )}
+                Clear read
+              </Button>
+            )}
+          </div>
+        )}
+
+        <ScrollArea className="mt-4 h-[calc(100vh-10rem)]">
           {!hasNotifications && (
             <div className="flex flex-col items-center justify-center py-8 text-center text-sm text-gray-500">
               <p>No notifications yet.</p>

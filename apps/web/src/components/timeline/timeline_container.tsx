@@ -114,7 +114,13 @@ export function TimelineContainer({
     if (filters.types.length > 0) params.types = filters.types.join(',')
     if (filters.statuses.length > 0)
       params.statuses = filters.statuses.join(',')
-    if (filters.searchText) params.search = filters.searchText
+    if (filters.searchText) {
+      params.search = filters.searchText
+      // Enable full-text search for queries with 3+ characters
+      if (filters.searchText.length >= 3) {
+        params.useFullTextSearch = 'true'
+      }
+    }
 
     return params
   }, [filters])
@@ -214,6 +220,43 @@ export function TimelineContainer({
       showSuccess('Notification marked as read')
     } catch (error) {
       handleApiError(error, 'Failed to mark notification as read')
+    }
+  }
+
+  const [isMarkingAllRead, setIsMarkingAllRead] = useState(false)
+  const [isClearingRead, setIsClearingRead] = useState(false)
+
+  const handleMarkAllNotificationsRead = async () => {
+    if (isMarkingAllRead) return
+    
+    setIsMarkingAllRead(true)
+    try {
+      const response = await apiClient.post('/notifications/mark-all-read')
+      refetchNotifications()
+      if (response.data?.markedCount > 0) {
+        showSuccess(response.data.message || 'All notifications marked as read')
+      }
+    } catch (error) {
+      handleApiError(error, 'Failed to mark all notifications as read')
+    } finally {
+      setIsMarkingAllRead(false)
+    }
+  }
+
+  const handleClearReadNotifications = async () => {
+    if (isClearingRead) return
+    
+    setIsClearingRead(true)
+    try {
+      const response = await apiClient.delete('/notifications/clear-read')
+      refetchNotifications()
+      if (response.data?.deletedCount > 0) {
+        showSuccess(response.data.message || 'Read notifications cleared')
+      }
+    } catch (error) {
+      handleApiError(error, 'Failed to clear read notifications')
+    } finally {
+      setIsClearingRead(false)
     }
   }
 
@@ -499,6 +542,10 @@ export function TimelineContainer({
           onClose={() => setNotificationsOpen(false)}
           notifications={notifications}
           onMarkRead={handleMarkNotificationRead}
+          onMarkAllRead={handleMarkAllNotificationsRead}
+          onClearRead={handleClearReadNotifications}
+          isMarkingAllRead={isMarkingAllRead}
+          isClearingRead={isClearingRead}
         />
       </div>
     </div>
