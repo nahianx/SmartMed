@@ -14,7 +14,6 @@ import {
   Search,
   ShieldCheck,
   ClipboardList,
-  LogOut,
   ChevronRight,
   TrendingUp,
   Bell,
@@ -25,6 +24,7 @@ import { TimelineContainer } from '@/components/timeline/timeline_container'
 import { PatientQueueTracker } from '@/components/queue/PatientQueueTracker'
 import { DoctorAvailabilityList } from '@/components/queue/DoctorAvailabilityList'
 import { HealthTipsList } from '@/components/health-tips/HealthTipsList'
+import { DashboardHeader } from '@/components/layout/DashboardHeader'
 import { Lightbulb } from 'lucide-react'
 
 interface PatientDashboardData {
@@ -104,28 +104,25 @@ export default function PatientDashboardPage() {
 
   return (
     <main className="min-h-screen bg-background">
+      {/* Top Navigation */}
+      <DashboardHeader />
+      
+      {/* Page Header */}
       <div className="border-b bg-gradient-to-r from-card via-card to-primary/5 dark:from-card dark:via-card dark:to-primary/10">
-        <div className="mx-auto max-w-6xl flex flex-wrap items-center justify-between gap-4 px-6 py-8">
-          <div className="space-y-2">
+        <div className="mx-auto max-w-6xl flex flex-wrap items-center justify-between gap-4 px-6 py-6">
+          <div className="space-y-1">
             <div className="flex items-center gap-3">
-              <div className="hidden sm:flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/25">
-                <Stethoscope className="h-6 w-6" />
+              <div className="hidden sm:flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/25">
+                <Stethoscope className="h-5 w-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-                    Patient Dashboard
+                  <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
+                    Welcome back, {firstName}
                   </h1>
-                  <Badge
-                    variant="outline"
-                    className="text-xs bg-primary/10 text-primary border-primary/20"
-                  >
-                    PATIENT
-                  </Badge>
                 </div>
-                <p className="text-muted-foreground mt-1">
-                  Welcome back, <span className="font-medium">{firstName}</span>
-                  . Track your visits, history, and doctors.
+                <p className="text-sm text-muted-foreground">
+                  Track your visits, health history, and manage your care
                 </p>
               </div>
             </div>
@@ -150,15 +147,6 @@ export default function PatientDashboardPage() {
                 className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`}
               />
               {refreshing ? 'Refreshing...' : 'Refresh'}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => logout()}
-              className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground"
-            >
-              <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">Logout</span>
             </Button>
           </div>
         </div>

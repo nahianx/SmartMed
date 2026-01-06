@@ -5,6 +5,7 @@ import { ArrowLeft, Lightbulb, Settings } from 'lucide-react'
 import { Button } from '@smartmed/ui'
 import { HealthTipsList } from '@/components/health-tips/HealthTipsList'
 import { HealthTipsPreferences } from '@/components/health-tips/HealthTipsPreferences'
+import { DashboardHeader } from '@/components/layout/DashboardHeader'
 import { useState } from 'react'
 
 export default function HealthTipsPage() {
@@ -13,7 +14,10 @@ export default function HealthTipsPage() {
 
   return (
     <main className="min-h-screen bg-background">
-      {/* Header */}
+      {/* Top Navigation */}
+      <DashboardHeader />
+      
+      {/* Page Header */}
       <div className="border-b bg-gradient-to-r from-card via-card to-amber-500/5 dark:from-card dark:via-card dark:to-amber-500/10">
         <div className="mx-auto max-w-4xl px-6 py-6">
           <div className="flex items-center justify-between">

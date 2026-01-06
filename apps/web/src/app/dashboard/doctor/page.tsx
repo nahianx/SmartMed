@@ -16,12 +16,12 @@ import {
   UserRound,
   Clock,
   ArrowUpRight,
-  LogOut,
 } from 'lucide-react'
 import { useAuthContext } from '../../../context/AuthContext'
 import { apiClient } from '../../../services/apiClient'
 import { TimelineContainer } from '@/components/timeline/timeline_container'
 import { DoctorQueuePanel } from '@/components/queue/DoctorQueuePanel'
+import { DashboardHeader } from '@/components/layout/DashboardHeader'
 
 export default function DoctorDashboardPage() {
   const { user, loading, logout } = useAuthContext()
@@ -83,42 +83,39 @@ export default function DoctorDashboardPage() {
 
   return (
     <main className="min-h-screen bg-background">
-      <div className="border-b bg-card">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-8">
-          <div className="space-y-2">
+      {/* Top Navigation */}
+      <DashboardHeader />
+      
+      {/* Page Header */}
+      <div className="border-b bg-gradient-to-r from-card via-card to-blue-500/5 dark:from-card dark:via-card dark:to-blue-500/10">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-6">
+          <div className="space-y-1">
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-semibold">Doctor Dashboard</h1>
-              <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
-                DOCTOR
-              </span>
-              <span className="rounded-full bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">
-                Secure by default
-              </span>
-              <span
-                className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                  user.emailVerified
-                    ? 'bg-emerald-100 text-emerald-700'
-                    : 'bg-amber-100 text-amber-800'
-                }`}
-              >
-                {user.emailVerified ? 'Email verified' : 'Verify email'}
-              </span>
+              <div className="hidden sm:flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25">
+                <Stethoscope className="h-5 w-5" />
+              </div>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
+                  Welcome back, Dr. {firstName}
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Manage your practice, patients, and appointments
+                </p>
+              </div>
             </div>
-            <p className="text-muted-foreground">
-              Welcome back, {firstName}. Keep tabs on your practice, patients,
-              and profile from one place.
-            </p>
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => router.push('/profile?role=DOCTOR')}
-              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
-            >
-              <Sparkles className="h-4 w-4" />
-              Complete profile
-            </button>
+            {!profileComplete && (
+              <button
+                type="button"
+                onClick={() => router.push('/profile?role=DOCTOR')}
+                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+              >
+                <Sparkles className="h-4 w-4" />
+                Complete profile
+              </button>
+            )}
             <button
               type="button"
               onClick={fetchDashboard}
@@ -127,15 +124,7 @@ export default function DoctorDashboardPage() {
               <Stethoscope
                 className={`h-4 w-4 ${refreshing ? 'animate-pulse' : ''}`}
               />
-              {refreshing ? 'Refreshing...' : 'Refresh data'}
-            </button>
-            <button
-              type="button"
-              onClick={() => logout()}
-              className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground shadow-sm transition hover:bg-muted"
-            >
-              <LogOut className="h-4 w-4" />
-              Logout
+              {refreshing ? 'Refreshing...' : 'Refresh'}
             </button>
           </div>
         </div>

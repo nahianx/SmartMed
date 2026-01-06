@@ -276,7 +276,7 @@ export function HealthTipsPreferences({
       {/* Last Generated Info */}
       {currentPrefs.lastGeneratedAt && (
         <div className="text-sm text-muted-foreground text-center">
-          Last tips generated:{' '}}
+          Last tips generated:{' '}
           {new Date(currentPrefs.lastGeneratedAt).toLocaleDateString('en-US', {
             month: 'long',
             day: 'numeric',
