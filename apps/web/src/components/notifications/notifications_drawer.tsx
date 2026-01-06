@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { formatDistanceToNow, isToday, isYesterday, isThisWeek, format } from 'date-fns'
 import { 
   Bell, 
@@ -147,35 +148,72 @@ function getPriorityIndicator(type: NotificationType): 'high' | 'medium' | 'low'
 function NotificationCard({ 
   notification, 
   onMarkRead,
-  isAnimating = false
+  isAnimating = false,
+  onNavigate
 }: { 
   notification: NotificationItem
   onMarkRead: (id: string) => void
   isAnimating?: boolean
+  onNavigate?: () => void
 }) {
   const [isMarking, setIsMarking] = useState(false)
+  const router = useRouter()
   const created = new Date(notification.createdAt)
   const isUnread = !notification.readAt
   const category = getNotificationCategory(notification.type)
   const config = categoryConfig[category]
   const priority = getPriorityIndicator(notification.type)
 
-  const handleMarkRead = async () => {
+  const handleMarkRead = async (e: React.MouseEvent) => {
+    e.stopPropagation()
     setIsMarking(true)
     onMarkRead(notification.id)
     // Reset after animation
     setTimeout(() => setIsMarking(false), 300)
   }
 
+  const getNavigationPath = (): string | null => {
+    switch (notification.type) {
+      case 'HEALTH_TIP_GENERATED':
+        return '/dashboard/patient/health-tips'
+      case 'APPOINTMENT_CONFIRMED':
+      case 'APPOINTMENT_CANCELLED':
+      case 'APPOINTMENT_REMINDER_24H':
+      case 'APPOINTMENT_REMINDER_1H':
+        return '/dashboard/patient/appointments'
+      case 'ACTIVITY_CREATED':
+      case 'ACTIVITY_UPDATED':
+        return '/timeline'
+      default:
+        return null
+    }
+  }
+
+  const handleClick = () => {
+    const path = getNavigationPath()
+    if (path) {
+      // Mark as read when navigating
+      if (isUnread) {
+        onMarkRead(notification.id)
+      }
+      onNavigate?.()
+      router.push(path)
+    }
+  }
+
+  const isClickable = getNavigationPath() !== null
+
   return (
     <div
+      onClick={isClickable ? handleClick : undefined}
       className={cn(
         'group relative rounded-xl border p-4 transition-all duration-200',
         'hover:shadow-md hover:border-primary/20',
         isUnread && 'bg-gradient-to-r from-primary/5 to-transparent border-primary/30',
         !isUnread && 'bg-card border-border opacity-75 hover:opacity-100',
         isAnimating && 'animate-slide-in-right',
-        isMarking && 'scale-98 opacity-50'
+        isMarking && 'scale-98 opacity-50',
+        isClickable && 'cursor-pointer'
       )}
     >
       {/* Priority indicator for urgent notifications */}
@@ -487,6 +525,7 @@ export function NotificationsDrawer({
                             notification={notification}
                             onMarkRead={onMarkRead}
                             isAnimating={index < 3 && timeGroup === 'today'}
+                            onNavigate={onClose}
                           />
                         ))}
                       </div>

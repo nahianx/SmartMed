@@ -275,12 +275,21 @@ class HealthTipsService {
       // Aggregate patient context
       const context = await this.aggregatePatientContext(input.userId)
 
-      // Try ML generation
+      // Try ML generation only if HuggingFace client is available
       if (this.hf) {
-        const mlTips = await this.generateWithML(context)
-        if (mlTips.length > 0) {
-          this.metrics.mlSuccess++
-          return mlTips
+        try {
+          const mlTips = await this.generateWithML(context)
+          if (mlTips.length > 0) {
+            this.metrics.mlSuccess++
+            return mlTips
+          }
+        } catch (mlError) {
+          // Log ML failure once (not per-retry) and continue to fallback
+          console.warn(
+            '⚠️ ML tip generation unavailable, using curated tips:',
+            mlError instanceof Error ? mlError.message : 'Unknown error'
+          )
+          this.metrics.mlFailures++
         }
       }
 
@@ -288,8 +297,7 @@ class HealthTipsService {
       this.metrics.fallbackUsage++
       return this.getStaticFallbackTips(context)
     } catch (error) {
-      console.error('Error generating health tips:', error)
-      this.metrics.mlFailures++
+      console.error('Error in tip generation pipeline:', error)
       this.metrics.fallbackUsage++
       return this.getStaticFallbackTips()
     }
@@ -426,12 +434,24 @@ class HealthTipsService {
         ])
 
         const latency = Date.now() - startTime
-        console.log(`ML inference completed in ${latency}ms`)
+        console.log(`✅ ML inference completed in ${latency}ms`)
 
         return this.parseMLResponse(response.generated_text)
       } catch (error) {
         lastError = error as Error
-        console.warn(`ML inference attempt ${attempt + 1} failed:`, error)
+        
+        // Only log on final attempt to reduce noise
+        if (attempt === CONFIG.maxRetries - 1) {
+          // Don't log full stack trace for known transient errors
+          const isTransientError =
+            lastError.message.includes('blob') ||
+            lastError.message.includes('timeout') ||
+            lastError.message.includes('rate limit')
+          
+          if (!isTransientError) {
+            console.warn(`ML inference failed after ${CONFIG.maxRetries} attempts:`, error)
+          }
+        }
         
         // Exponential backoff
         if (attempt < CONFIG.maxRetries - 1) {

@@ -13,6 +13,9 @@ import {
   Filter as FilterIcon,
   Search as SearchIcon,
   Upload,
+  Clock,
+  TrendingUp,
+  ArrowLeft,
 } from 'lucide-react'
 import type { Patient } from '@smartmed/types'
 import {
@@ -472,7 +475,7 @@ export function TimelineContainer({
   )
 
   const renderStandalone = () => (
-    <div className="flex h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-background">
       <TopAppBar
         onMenuClick={() => setMobileFiltersOpen(true)}
         showMenuButton
@@ -490,6 +493,59 @@ export function TimelineContainer({
         }
         uploading={uploading}
       />
+
+      {/* Page Header */}
+      <div className="border-b bg-gradient-to-r from-card via-card to-primary/5 dark:from-card dark:via-card dark:to-primary/10">
+        <div className="mx-auto max-w-7xl px-6 py-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => window.history.back()}
+                className="gap-2 text-muted-foreground hover:text-foreground"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                <span className="hidden sm:inline">Back</span>
+              </Button>
+              <div className="h-6 w-px bg-border hidden sm:block" />
+              <div className="flex items-center gap-3">
+                <div className="rounded-xl bg-gradient-to-br from-primary to-primary/80 p-2.5 text-primary-foreground shadow-lg shadow-primary/25">
+                  <TrendingUp className="h-6 w-6" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold tracking-tight">
+                    Activity Timeline
+                  </h1>
+                  <p className="text-sm text-muted-foreground">
+                    Track your appointments, prescriptions, and reports
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Clock className="h-4 w-4" />
+                <span>{stats.total} total activities</span>
+              </div>
+              <div className="flex gap-2">
+                <Badge variant="secondary" className="gap-1">
+                  <span className="h-2 w-2 rounded-full bg-blue-500" />
+                  {stats.appointments} Appts
+                </Badge>
+                <Badge variant="secondary" className="gap-1">
+                  <span className="h-2 w-2 rounded-full bg-green-500" />
+                  {stats.prescriptions} Rx
+                </Badge>
+                <Badge variant="secondary" className="gap-1">
+                  <span className="h-2 w-2 rounded-full bg-purple-500" />
+                  {stats.reports} Reports
+                </Badge>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <input
         ref={fileInputRef}

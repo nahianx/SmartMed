@@ -57,7 +57,13 @@ export function HealthTipsList({
   if (error && tips.length === 0) {
     return (
       <div className={`text-center py-8 ${className}`}>
-        <p className="text-red-600 mb-4">{error}</p>
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 mb-4">
+          <RefreshCw className="h-6 w-6 text-red-600 dark:text-red-400" />
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+          Unable to load health tips
+        </h3>
+        <p className="text-red-600 dark:text-red-400 text-sm mb-4 max-w-sm mx-auto">{error}</p>
         <Button onClick={refresh} variant="outline">
           <RefreshCw className="h-4 w-4 mr-2" />
           Try Again
@@ -69,13 +75,13 @@ export function HealthTipsList({
   if (tips.length === 0) {
     return (
       <div className={`text-center py-12 ${className}`}>
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-4">
-          <Lightbulb className="h-8 w-8 text-blue-600" />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 mb-4">
+          <Lightbulb className="h-8 w-8 text-blue-600 dark:text-blue-400" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
           No health tips yet
         </h3>
-        <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+        <p className="text-gray-500 dark:text-gray-400 mb-6 max-w-sm mx-auto">
           Get personalized health tips based on your medical history and
           preferences.
         </p>

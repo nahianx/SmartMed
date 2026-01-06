@@ -112,8 +112,25 @@ export function useHealthTips(initialLimit = 10) {
       }
       setTotal(response.total)
       setOffset(newOffset)
-    } catch (err) {
-      setError('Failed to load health tips')
+    } catch (err: any) {
+      // Extract meaningful error message based on error type
+      let errorMessage = 'Failed to load health tips'
+      
+      if (err?.code === 'ERR_NETWORK' || err?.message?.includes('Network Error')) {
+        errorMessage = 'Unable to connect to server. Please check your connection.'
+      } else if (err?.response?.status === 401) {
+        errorMessage = 'Please log in to view your health tips.'
+      } else if (err?.response?.status === 403) {
+        errorMessage = 'Health tips are disabled. Enable them in preferences.'
+      } else if (err?.response?.data?.error) {
+        errorMessage = err.response.data.error
+      } else if (err?.response?.data?.message) {
+        errorMessage = err.response.data.message
+      } else if (err?.message) {
+        errorMessage = err.message
+      }
+      
+      setError(errorMessage)
       console.error('Error loading health tips:', err)
     } finally {
       setLoading(false)
@@ -136,8 +153,27 @@ export function useHealthTips(initialLimit = 10) {
       setTips(response.items)
       setTotal(response.total)
       setOffset(0)
-    } catch (err) {
-      setError('Failed to generate new tips')
+    } catch (err: any) {
+      // Extract meaningful error message based on error type
+      let errorMessage = 'Failed to generate new tips'
+      
+      if (err?.code === 'ERR_NETWORK' || err?.message?.includes('Network Error')) {
+        errorMessage = 'Unable to connect to server. Please check your connection.'
+      } else if (err?.response?.status === 401) {
+        errorMessage = 'Please log in to generate health tips.'
+      } else if (err?.response?.status === 403) {
+        errorMessage = 'Health tips are disabled. Enable them in preferences first.'
+      } else if (err?.response?.status === 429) {
+        errorMessage = 'Too many requests. Please wait a moment before trying again.'
+      } else if (err?.response?.data?.error) {
+        errorMessage = err.response.data.error
+      } else if (err?.response?.data?.message) {
+        errorMessage = err.response.data.message
+      } else if (err?.message) {
+        errorMessage = err.message
+      }
+      
+      setError(errorMessage)
       console.error('Error generating tips:', err)
     } finally {
       setGenerating(false)
