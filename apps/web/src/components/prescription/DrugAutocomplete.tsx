@@ -243,7 +243,7 @@ export default function DrugAutocomplete({
           <button
             type="button"
             onClick={handleClear}
-            className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600"
+            className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground hover:text-foreground"
             aria-label="Clear selection"
           >
             <X className="h-4 w-4" />
@@ -316,20 +316,20 @@ export default function DrugAutocomplete({
 
       {/* Selected drug info panel */}
       {showDrugInfo && selectedDrug && (
-        <div className="mt-2 p-3 bg-blue-50 border border-blue-100 rounded-lg">
+        <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-800 rounded-lg">
           {loadingInfo ? (
-            <div className="flex items-center gap-2 text-blue-600">
+            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
               <Loader2 className="h-4 w-4 animate-spin" />
               <span className="text-sm">Loading drug information...</span>
             </div>
           ) : drugInfo ? (
             <div className="space-y-2">
               <div className="flex items-start gap-2">
-                <Info className="h-4 w-4 text-blue-500 mt-0.5" />
+                <Info className="h-4 w-4 text-blue-500 dark:text-blue-400 mt-0.5" />
                 <div className="text-sm">
-                  <p className="font-medium text-slate-900">{drugInfo.name}</p>
+                  <p className="font-medium text-foreground">{drugInfo.name}</p>
                   {drugInfo.genericName && (
-                    <p className="text-slate-600">
+                    <p className="text-muted-foreground">
                       Generic: {drugInfo.genericName}
                     </p>
                   )}
@@ -339,39 +339,39 @@ export default function DrugAutocomplete({
               <div className="grid grid-cols-2 gap-2 text-xs">
                 {drugInfo.strength && (
                   <div>
-                    <span className="text-slate-500">Strength:</span>{' '}
-                    <span className="text-slate-700">{drugInfo.strength}</span>
+                    <span className="text-muted-foreground">Strength:</span>{' '}
+                    <span className="text-foreground">{drugInfo.strength}</span>
                   </div>
                 )}
                 {drugInfo.dosageForm && (
                   <div>
-                    <span className="text-slate-500">Form:</span>{' '}
-                    <span className="text-slate-700">{drugInfo.dosageForm}</span>
+                    <span className="text-muted-foreground">Form:</span>{' '}
+                    <span className="text-foreground">{drugInfo.dosageForm}</span>
                   </div>
                 )}
                 {drugInfo.route && (
                   <div>
-                    <span className="text-slate-500">Route:</span>{' '}
-                    <span className="text-slate-700">{drugInfo.route}</span>
+                    <span className="text-muted-foreground">Route:</span>{' '}
+                    <span className="text-foreground">{drugInfo.route}</span>
                   </div>
                 )}
                 {drugInfo.drugClass && (
                   <div>
-                    <span className="text-slate-500">Class:</span>{' '}
-                    <span className="text-slate-700">{drugInfo.drugClass}</span>
+                    <span className="text-muted-foreground">Class:</span>{' '}
+                    <span className="text-foreground">{drugInfo.drugClass}</span>
                   </div>
                 )}
               </div>
               
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 RxCUI: {drugInfo.rxcui}
               </p>
             </div>
           ) : (
-            <div className="flex items-center gap-2 text-blue-600">
+            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
               <Pill className="h-4 w-4" />
               <span className="text-sm font-medium">{selectedDrug.name}</span>
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-muted-foreground">
                 (RxCUI: {selectedDrug.rxcui})
               </span>
             </div>

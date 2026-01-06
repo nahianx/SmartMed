@@ -197,7 +197,7 @@ export default function PrescriptionModal({
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-medium text-slate-600 mb-1">
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">
                         Medicine Name <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -211,13 +211,13 @@ export default function PrescriptionModal({
                           )
                         }
                         placeholder="e.g., Paracetamol"
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-background text-foreground"
                         required
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-medium text-slate-600 mb-1">
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">
                         Dosage <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -231,13 +231,13 @@ export default function PrescriptionModal({
                           )
                         }
                         placeholder="e.g., 500mg"
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-background text-foreground"
                         required
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-medium text-slate-600 mb-1">
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">
                         Frequency <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -251,13 +251,13 @@ export default function PrescriptionModal({
                           )
                         }
                         placeholder="e.g., 1-0-1 (Morning-Afternoon-Night)"
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-background text-foreground"
                         required
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-medium text-slate-600 mb-1">
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">
                         Duration <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -271,13 +271,13 @@ export default function PrescriptionModal({
                           )
                         }
                         placeholder="e.g., 7 days"
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-background text-foreground"
                         required
                       />
                     </div>
 
                     <div className="md:col-span-2">
-                      <label className="block text-xs font-medium text-slate-600 mb-1">
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">
                         Instructions (Optional)
                       </label>
                       <input
@@ -291,7 +291,7 @@ export default function PrescriptionModal({
                           )
                         }
                         placeholder="e.g., Take after meals"
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-background text-foreground"
                       />
                     </div>
                   </div>

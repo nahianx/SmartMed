@@ -212,11 +212,11 @@ export default function InteractionWarningModal({
             <p className={`mt-2 font-medium ${config.textColor}`}>
               {interaction.drug1Name} + {interaction.drug2Name}
             </p>
-            <p className="mt-1 text-sm text-slate-600">
+            <p className="mt-1 text-sm text-muted-foreground">
               {interaction.description}
             </p>
             {interaction.source && (
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-muted-foreground">
                 Source: {interaction.source}
               </p>
             )}
@@ -227,9 +227,9 @@ export default function InteractionWarningModal({
                   type="checkbox"
                   checked={isAcknowledged}
                   onChange={() => toggleInteractionAcknowledged(interaction)}
-                  className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                  className="w-4 h-4 rounded border-border text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-sm text-slate-700">
+                <span className="text-sm text-foreground">
                   I acknowledge this interaction
                 </span>
               </label>
@@ -261,15 +261,15 @@ export default function InteractionWarningModal({
               <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${config.badgeColor}`}>
                 {conflict.severity} Allergy
               </span>
-              <span className="px-2 py-0.5 text-xs rounded-full bg-slate-100 text-slate-600">
+              <span className="px-2 py-0.5 text-xs rounded-full bg-muted text-muted-foreground">
                 {conflict.matchType === 'exact' ? 'Exact Match' :
                  conflict.matchType === 'ingredient' ? 'Ingredient Match' :
                  conflict.matchType === 'class' ? 'Drug Class Match' : 'Cross-Reactive'}
               </span>
               <span className={`px-2 py-0.5 text-xs rounded-full ${
-                conflict.confidence === 'high' ? 'bg-red-100 text-red-700' :
-                conflict.confidence === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                'bg-slate-100 text-slate-600'
+                conflict.confidence === 'high' ? 'bg-red-100 dark:bg-red-950/50 text-red-700 dark:text-red-300' :
+                conflict.confidence === 'medium' ? 'bg-yellow-100 dark:bg-yellow-950/50 text-yellow-700 dark:text-yellow-300' :
+                'bg-muted text-muted-foreground'
               }`}>
                 {conflict.confidence} confidence
               </span>
@@ -277,11 +277,11 @@ export default function InteractionWarningModal({
             <p className={`mt-2 font-medium ${config.textColor}`}>
               Patient is allergic to: {conflict.allergen}
             </p>
-            <p className="mt-1 text-sm text-slate-600">
+            <p className="mt-1 text-sm text-muted-foreground">
               Medication: <span className="font-medium">{conflict.matchedDrugName}</span>
             </p>
             {conflict.reaction && (
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Known reaction: {conflict.reaction}
               </p>
             )}
@@ -292,9 +292,9 @@ export default function InteractionWarningModal({
                   type="checkbox"
                   checked={isAcknowledged}
                   onChange={() => toggleAllergyAcknowledged(conflict.allergyId)}
-                  className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                  className="w-4 h-4 rounded border-border text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-sm text-slate-700">
+                <span className="text-sm text-foreground">
                   I acknowledge this allergy conflict
                 </span>
               </label>
@@ -380,7 +380,7 @@ export default function InteractionWarningModal({
           {/* Override reason input */}
           {hasAnySevere && (
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-slate-700">
+              <label className="block text-sm font-medium text-foreground">
                 Clinical Justification <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -388,9 +388,9 @@ export default function InteractionWarningModal({
                 onChange={(e) => setOverrideReason(e.target.value)}
                 placeholder="Please provide clinical justification for proceeding despite the warnings..."
                 rows={3}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-background text-foreground"
               />
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 This will be recorded in the patient's medical record
               </p>
             </div>
