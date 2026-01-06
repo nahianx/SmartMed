@@ -1,5 +1,12 @@
 import { apiClient } from './apiClient'
 
+export interface AvailabilitySlot {
+  date: string
+  startTime: string
+  endTime: string
+  isAvailable: boolean
+}
+
 export interface Appointment {
   id: string
   patientId: string
@@ -126,7 +133,7 @@ class AppointmentService {
     doctorId: string
     dateTime: string
     duration: number
-  }): Promise<{ valid: boolean; conflicts?: any[] }> {
+  }): Promise<{ valid: boolean; conflicts?: any[]; reason?: string }> {
     try {
       const response = await apiClient.post('/appointments/validate', data)
       return response.data
@@ -161,6 +168,25 @@ class AppointmentService {
       }
     )
     return response.data.slots || []
+  }
+
+  async getDoctorSchedule(doctorId: string): Promise<
+    Array<{
+      dayOfWeek: number
+      startTime: string
+      endTime: string
+      hasBreak: boolean
+      breakStart?: string
+      breakEnd?: string
+    }>
+  > {
+    try {
+      const response = await apiClient.get(`/doctors/${doctorId}/schedule`)
+      return response.data.schedule || []
+    } catch (error) {
+      console.error('Error fetching doctor schedule:', error)
+      return []
+    }
   }
 
   async acceptAppointment(id: string): Promise<Appointment> {

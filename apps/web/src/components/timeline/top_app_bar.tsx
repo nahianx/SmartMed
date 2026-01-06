@@ -186,10 +186,17 @@ export function TopAppBar({
             aria-haspopup="true"
           >
             <Avatar className="h-9 w-9 border-2 border-transparent hover:border-primary/20 transition-colors">
-              <AvatarImage src={resolveProfilePhotoUrl(user?.profilePhotoUrl)} alt={user?.fullName || 'User'} />
-              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-medium">
-                {initials}
-              </AvatarFallback>
+              {user?.profilePhotoUrl ? (
+                <img 
+                  src={resolveProfilePhotoUrl(user.profilePhotoUrl)} 
+                  alt={user?.fullName || 'User'} 
+                  className="aspect-square h-full w-full object-cover"
+                />
+              ) : (
+                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-medium">
+                  {initials}
+                </AvatarFallback>
+              )}
             </Avatar>
             <ChevronDown className={`h-4 w-4 text-muted-foreground hidden sm:block transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
           </button>

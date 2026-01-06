@@ -13,17 +13,36 @@ import { toast } from "sonner";
 import { usePreferredDoctors, useAddPreferredDoctor, useRemovePreferredDoctor, useDoctorSearch } from "@/hooks/useProfile";
 import { Doctor } from "@smartmed/types";
 import { resolveProfilePhotoUrl } from "@/utils/apiBase";
+import { useRouter } from "next/navigation";
+
+// Type for the preferred doctor record from backend
+interface PreferredDoctorRecord {
+  id: string;
+  patientId: string;
+  doctorId: string;
+  doctor: Doctor & { clinic?: { name?: string; address?: string } };
+}
 
 export function PreferredDoctorsSection() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   
   // Query hooks
-  const { data: preferredDoctors = [], isLoading: preferredLoading } = usePreferredDoctors();
+  const { data: preferredRecords = [], isLoading: preferredLoading } = usePreferredDoctors();
   const { data: searchResults = [], isLoading: searchLoading } = useDoctorSearch(searchQuery);
   
   // Mutation hooks
   const addPreferredMutation = useAddPreferredDoctor();
   const removePreferredMutation = useRemovePreferredDoctor();
+  
+  // Extract doctors from preferred records (backend returns {doctor: Doctor} structure)
+  const preferredDoctors = useMemo(() => {
+    return (preferredRecords as PreferredDoctorRecord[]).map(record => ({
+      ...record.doctor,
+      preferredRecordId: record.id,
+      doctorId: record.doctorId,
+    }));
+  }, [preferredRecords]);
   
   // Filter search results to exclude already preferred doctors
   const filteredSearchResults = useMemo(() => {
@@ -32,21 +51,31 @@ export function PreferredDoctorsSection() {
   }, [searchResults, preferredDoctors]);
   
   // Handle adding/removing preferred doctors
-  const handleTogglePreferred = async (doctor: Doctor, isCurrentlyPreferred: boolean) => {
+  const handleTogglePreferred = async (doctor: Doctor & { doctorId?: string }, isCurrentlyPreferred: boolean) => {
     try {
+      // For preferred doctors, use doctorId (the actual doctor's ID in doctors table)
+      // For search results, use doctor.id
+      const idToUse = (doctor as any).doctorId || doctor.id;
+      
       if (isCurrentlyPreferred) {
-        await removePreferredMutation.mutateAsync(doctor.id);
+        await removePreferredMutation.mutateAsync(idToUse);
       } else {
         // Check limit (max 20 preferred doctors)
         if (preferredDoctors.length >= 20) {
           toast.error("You can only have up to 20 preferred doctors");
           return;
         }
-        await addPreferredMutation.mutateAsync(doctor.id);
+        await addPreferredMutation.mutateAsync(idToUse);
       }
     } catch (error) {
       console.error("Error toggling preferred doctor:", error);
     }
+  };
+
+  // Navigate to doctor's profile
+  const handleViewProfile = (doctor: Doctor) => {
+    const userId = (doctor as any).userId || doctor.id;
+    router.push(`/doctor/${userId}`);
   };
   
   const DoctorCard = ({ 
@@ -130,7 +159,11 @@ export function PreferredDoctorsSection() {
                 )}
                 {isPreferred ? "Remove" : "Add to Preferred"}
               </Button>
-              <Button variant="ghost" size="sm">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => handleViewProfile(doctor)}
+              >
                 <ExternalLink className="w-4 h-4 mr-2" />
                 View Profile
               </Button>

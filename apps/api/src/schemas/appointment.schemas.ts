@@ -29,7 +29,14 @@ export const createAppointmentSchema = appointmentBaseSchema.extend({
   doctorId: uuidSchema,
   dateTime: z.string()
     .datetime('Invalid datetime format. Use ISO 8601 format (YYYY-MM-DDTHH:mm:ss.sssZ)')
-    .refine((date) => new Date(date) > new Date(), {
+    .refine((date) => {
+      const appointmentDate = new Date(date)
+      const now = new Date()
+      // Allow appointments that are at least 5 minutes in the future
+      // This provides a buffer for clock drift and processing time
+      const bufferMs = 5 * 60 * 1000 // 5 minutes
+      return appointmentDate.getTime() > now.getTime() - bufferMs
+    }, {
       message: 'Appointment must be scheduled for a future date and time'
     }),
   reason: z.string()

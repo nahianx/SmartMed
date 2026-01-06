@@ -175,7 +175,17 @@ export function DashboardHeader({
               aria-haspopup="true"
             >
               <Avatar className="h-9 w-9 border-2 border-transparent hover:border-primary/20 transition-colors">
-                <AvatarImage src={resolveProfilePhotoUrl(user?.profilePhotoUrl)} alt={user?.fullName || 'User'} />
+                {user?.profilePhotoUrl ? (
+                  <img 
+                    src={resolveProfilePhotoUrl(user.profilePhotoUrl)} 
+                    alt={user?.fullName || 'User'} 
+                    className="aspect-square h-full w-full object-cover"
+                    onError={(e) => {
+                      // Hide broken image and show fallback
+                      (e.target as HTMLImageElement).style.display = 'none'
+                    }}
+                  />
+                ) : null}
                 <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-medium">
                   {initials}
                 </AvatarFallback>

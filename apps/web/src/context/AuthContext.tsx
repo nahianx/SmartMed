@@ -14,6 +14,16 @@ export interface AuthUser {
   fullName: string
   role: Role
   emailVerified: boolean
+  profilePhotoUrl?: string
+  phoneNumber?: string
+  dateOfBirth?: string
+  gender?: 'MALE' | 'FEMALE' | 'OTHER'
+  addressLine1?: string
+  addressLine2?: string
+  city?: string
+  region?: string
+  postalCode?: string
+  country?: string
 }
 
 interface AuthContextValue {

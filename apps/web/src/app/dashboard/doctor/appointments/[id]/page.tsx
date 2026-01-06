@@ -309,6 +309,17 @@ export default function AppointmentDetailPage() {
                       </p>
                     </div>
                   )}
+
+                  {/* View Full Profile Button */}
+                  {patient?.id && (
+                    <button
+                      onClick={() => router.push(`/patient/${patient.id}`)}
+                      className="w-full mt-4 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors"
+                    >
+                      <User className="h-4 w-4" />
+                      View Full Profile
+                    </button>
+                  )}
                 </div>
               </div>
 

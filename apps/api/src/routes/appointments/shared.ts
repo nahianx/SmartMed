@@ -24,10 +24,10 @@ export function parseTimeToMinutes(time: string): number {
 }
 
 /**
- * Get minutes since midnight from a Date (UTC)
+ * Get minutes since midnight from a Date (local time)
  */
-export function getUtcMinutes(date: Date): number {
-  return date.getUTCHours() * 60 + date.getUTCMinutes()
+export function getLocalMinutes(date: Date): number {
+  return date.getHours() * 60 + date.getMinutes()
 }
 
 /**
@@ -72,6 +72,7 @@ export function slotAllowsTime(
 
 /**
  * Check if a doctor is available at a given time
+ * Uses local time to match against availability slots stored in local time format
  */
 export async function isDoctorAvailable(
   db: DbClient,
@@ -79,8 +80,9 @@ export async function isDoctorAvailable(
   startTime: Date,
   duration: number
 ): Promise<boolean> {
-  const dayOfWeek = startTime.getUTCDay()
-  const startMinutes = getUtcMinutes(startTime)
+  // Use local day and time since availability slots are stored in local time
+  const dayOfWeek = startTime.getDay()
+  const startMinutes = getLocalMinutes(startTime)
   const endMinutes = startMinutes + duration
 
   const slots = await db.doctorAvailability.findMany({

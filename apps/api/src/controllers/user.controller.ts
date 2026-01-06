@@ -17,6 +17,16 @@ export class UserController {
       fullName: user.fullName,
       role: user.role,
       emailVerified: user.emailVerified,
+      profilePhotoUrl: user.profilePhotoUrl,
+      phoneNumber: user.phoneNumber,
+      dateOfBirth: user.dateOfBirth,
+      gender: user.gender,
+      addressLine1: user.addressLine1,
+      addressLine2: user.addressLine2,
+      city: user.city,
+      region: user.region,
+      postalCode: user.postalCode,
+      country: user.country,
     })
   }
 

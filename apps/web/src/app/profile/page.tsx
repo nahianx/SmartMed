@@ -34,9 +34,29 @@ export default function ProfilePage() {
   const isDoctor = resolvedRole === 'DOCTOR';
   const isPatient = resolvedRole === 'PATIENT';
   
+  // Get tab from URL params
+  const tabParam = searchParams.get('tab');
+  
   const [activeTab, setActiveTab] = useState('profile');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+
+  // Set active tab from URL parameter on mount
+  useEffect(() => {
+    if (tabParam) {
+      // Validate that the tab exists and is available for the user's role
+      const validTab = tabs.find(t => t.id === tabParam);
+      if (validTab) {
+        const isValidForRole = 
+          validTab.forRole === 'all' ||
+          (validTab.forRole === 'doctor' && isDoctor) ||
+          (validTab.forRole === 'patient' && isPatient);
+        if (isValidForRole) {
+          setActiveTab(tabParam);
+        }
+      }
+    }
+  }, [tabParam, isDoctor, isPatient]);
 
   useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {

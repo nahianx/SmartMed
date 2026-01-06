@@ -173,6 +173,45 @@ router.get(
   }
 )
 
+// Public endpoint to get doctor's weekly schedule (for patients to see office hours)
+router.get(
+  '/:doctorId/schedule',
+  requireAuth,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { doctorId } = req.params
+
+      const doctor = await prisma.doctor.findUnique({
+        where: { id: doctorId },
+        select: { id: true },
+      })
+
+      if (!doctor) {
+        return res.status(404).json({ error: 'Doctor not found' })
+      }
+
+      const schedule = await prisma.doctorAvailability.findMany({
+        where: { doctorId, isAvailable: true },
+        orderBy: [{ dayOfWeek: 'asc' }, { startTime: 'asc' }],
+        select: {
+          dayOfWeek: true,
+          startTime: true,
+          endTime: true,
+          hasBreak: true,
+          breakStart: true,
+          breakEnd: true,
+        },
+      })
+
+      res.json({ schedule })
+    } catch (error: any) {
+      res
+        .status(error.status || 500)
+        .json({ error: error.message || 'Failed to load schedule' })
+    }
+  }
+)
+
 // Authenticated advanced search with filters/pagination
 router.get(
   '/search/advanced',
