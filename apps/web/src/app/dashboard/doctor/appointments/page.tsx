@@ -160,24 +160,24 @@ export default function AppointmentsPage() {
   ).length
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200">
+      <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => router.push('/dashboard/doctor')}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-muted rounded-lg transition-colors"
                 aria-label="Back to dashboard"
               >
-                <ArrowLeft className="h-5 w-5 text-slate-600" />
+                <ArrowLeft className="h-5 w-5 text-muted-foreground" />
               </button>
               <div>
-                <h1 className="text-xl font-semibold text-slate-900">
+                <h1 className="text-xl font-semibold text-foreground">
                   Appointments
                 </h1>
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-muted-foreground">
                   View and manage patient appointments
                 </p>
               </div>
@@ -186,47 +186,47 @@ export default function AppointmentsPage() {
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-blue-50 via-white to-cyan-50 min-h-[calc(100vh-4rem)]">
+      <div className="bg-gradient-to-br from-blue-50 via-background to-cyan-50 dark:from-blue-950/20 dark:via-background dark:to-cyan-950/20 min-h-[calc(100vh-4rem)]">
         {/* Main Content */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+            <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg mb-6">
               {error}
             </div>
           )}
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
+            <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
               <div className="text-3xl font-bold text-blue-600 mb-1">
                 {appointments.length}
               </div>
-              <div className="text-sm text-slate-600">Total Appointments</div>
+              <div className="text-sm text-muted-foreground">Total Appointments</div>
             </div>
-            <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
+            <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
               <div className="text-3xl font-bold text-amber-600 mb-1">
                 {pendingCount}
               </div>
-              <div className="text-sm text-slate-600">Pending Requests</div>
+              <div className="text-sm text-muted-foreground">Pending Requests</div>
             </div>
-            <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
+            <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
               <div className="text-3xl font-bold text-orange-600 mb-1">
                 {upcomingCount}
               </div>
-              <div className="text-sm text-slate-600">Upcoming Accepted</div>
+              <div className="text-sm text-muted-foreground">Upcoming Accepted</div>
             </div>
-            <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
-              <div className="text-3xl font-bold text-gray-600 mb-1">
+            <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
+              <div className="text-3xl font-bold text-muted-foreground mb-1">
                 {completedCount}
               </div>
-              <div className="text-sm text-slate-600">Completed</div>
+              <div className="text-sm text-muted-foreground">Completed</div>
             </div>
           </div>
 
           {/* Filter Tabs */}
-          <div className="bg-white rounded-lg border border-slate-200 shadow-sm mb-6">
-            <div className="flex items-center gap-4 px-4 py-3 border-b border-slate-200">
-              <Filter className="h-5 w-5 text-slate-600" />
+          <div className="bg-card rounded-lg border border-border shadow-sm mb-6">
+            <div className="flex items-center gap-4 px-4 py-3 border-b border-border">
+              <Filter className="h-5 w-5 text-muted-foreground" />
               <div className="flex gap-2 flex-wrap">
                 <button
                   onClick={() => setFilter('all')}

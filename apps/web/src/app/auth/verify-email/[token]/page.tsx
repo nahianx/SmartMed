@@ -18,13 +18,13 @@ export default function VerifyEmailPage() {
   }, [token])
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8 text-center">
-        {status === "loading" && <p className="text-sm text-slate-600">Verifying your email...</p>}
+    <main className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="w-full max-w-md bg-card shadow-lg rounded-2xl p-8 text-center">
+        {status === "loading" && <p className="text-sm text-muted-foreground">Verifying your email...</p>}
         {status === "success" && (
           <div className="space-y-3">
             <h1 className="text-2xl font-semibold">Email verified</h1>
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-muted-foreground">
               Your email has been successfully verified. You can now access your dashboard.
             </p>
             <button
@@ -38,7 +38,7 @@ export default function VerifyEmailPage() {
         {status === "error" && (
           <div className="space-y-3">
             <h1 className="text-2xl font-semibold">Verification failed</h1>
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-muted-foreground">
               This verification link is invalid or has expired.
             </p>
             <button

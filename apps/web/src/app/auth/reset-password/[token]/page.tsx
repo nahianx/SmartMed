@@ -34,10 +34,10 @@ export default function ResetPasswordTokenPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
+    <main className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="w-full max-w-md bg-card shadow-lg rounded-2xl p-8">
         <h1 className="text-2xl font-semibold mb-2 text-center">Set a new password</h1>
-        <p className="text-sm text-slate-600 text-center mb-6">
+        <p className="text-sm text-muted-foreground text-center mb-6">
           Choose a strong password that you don&apos;t use elsewhere.
         </p>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -51,7 +51,7 @@ export default function ResetPasswordTokenPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
@@ -64,11 +64,11 @@ export default function ResetPasswordTokenPage() {
               required
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          {success && <p className="text-sm text-emerald-600">Password updated. Redirecting...</p>}
+          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+          {success && <p className="text-sm text-emerald-600 dark:text-emerald-400">Password updated. Redirecting...</p>}
           <button
             type="submit"
             disabled={loading}

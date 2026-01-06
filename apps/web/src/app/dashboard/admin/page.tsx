@@ -70,9 +70,9 @@ export default function AdminDashboardPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200">
+      <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
@@ -91,18 +91,18 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-red-50 via-white to-orange-50 min-h-[calc(100vh-4rem)]">
+      <div className="bg-gradient-to-br from-red-50 via-background to-orange-50 dark:from-red-950/20 dark:via-background dark:to-orange-950/20 min-h-[calc(100vh-4rem)]">
         {/* Main Content */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="mb-8">
-            <h2 className="text-gray-900 mb-2">Welcome, {user.fullName}!</h2>
-            <p className="text-gray-600">
+            <h2 className="text-foreground mb-2">Welcome, {user.fullName}!</h2>
+            <p className="text-muted-foreground">
               Manage users, roles, and system settings
             </p>
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+            <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg mb-6">
               {error}
             </div>
           )}
@@ -214,7 +214,7 @@ function DashboardCard({
   return (
     <button
       onClick={action}
-      className={`group w-full text-left bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border-2 border-transparent ${borderClasses[color]} hover:scale-105`}
+      className={`group w-full text-left bg-card rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border-2 border-transparent ${borderClasses[color]} hover:scale-105`}
     >
       <div className="flex items-start gap-4">
         <div
@@ -223,8 +223,8 @@ function DashboardCard({
           <Icon className="w-7 h-7 group-hover:text-white transition-colors" />
         </div>
         <div className="flex-1">
-          <h3 className="text-gray-900 mb-1">{title}</h3>
-          <p className="text-gray-600">{description}</p>
+          <h3 className="text-foreground mb-1">{title}</h3>
+          <p className="text-muted-foreground">{description}</p>
         </div>
       </div>
     </button>
