@@ -59,6 +59,9 @@ app.use(authMiddleware)
 // Serve static files from public directory
 app.use(express.static(path.join(__dirname, '../public')))
 
+// Serve uploaded files (profile photos, etc.)
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')))
+
 // Conditionally enable CSRF protection. Set DISABLE_CSRF=true for local/dev/Postman convenience.
 const disableCsrf =
   process.env.DISABLE_CSR === 'true' || process.env.DISABLE_CSRF === 'true'

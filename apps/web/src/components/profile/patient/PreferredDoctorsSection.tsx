@@ -12,6 +12,7 @@ import {
 import { toast } from "sonner";
 import { usePreferredDoctors, useAddPreferredDoctor, useRemovePreferredDoctor, useDoctorSearch } from "@/hooks/useProfile";
 import { Doctor } from "@smartmed/types";
+import { resolveProfilePhotoUrl } from "@/utils/apiBase";
 
 export function PreferredDoctorsSection() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -63,7 +64,7 @@ export function PreferredDoctorsSection() {
       <Card className="p-4 hover:shadow-md transition-shadow">
         <div className="flex gap-4">
           <Avatar className="w-16 h-16">
-            <AvatarImage src={(doctor as any).profilePhotoUrl || ""} />
+            <AvatarImage src={resolveProfilePhotoUrl((doctor as any).profilePhotoUrl)} />
             <AvatarFallback>
               {doctor.firstName?.[0]}{doctor.lastName?.[0]}
             </AvatarFallback>

@@ -24,3 +24,17 @@ export function getSocketBase(): string {
     DEFAULT_API_BASE
   return normalizeBase(raw).replace(/\/api$/, '')
 }
+
+/**
+ * Resolve a profile photo URL to a full URL.
+ * If the URL starts with '/', it's a relative path from the API server.
+ * Otherwise, return as-is (already a full URL).
+ */
+export function resolveProfilePhotoUrl(url: string | null | undefined): string {
+  if (!url) return ''
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url
+  }
+  // Relative URL from API server (e.g., /uploads/profile-photos/...)
+  return `${getApiBase()}${url}`
+}

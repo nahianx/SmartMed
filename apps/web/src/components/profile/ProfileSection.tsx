@@ -18,6 +18,7 @@ import {
 import { toast } from "sonner";
 import { useProfile, useUpdateProfile, useUploadProfilePhoto, useRemoveProfilePhoto, useSpecializations, useDoctorProfile, useUpdateSpecializations, useUpdateClinicInfo } from "@/hooks/useProfile";
 import { UserRole, User } from "@smartmed/types";
+import { resolveProfilePhotoUrl } from "@/utils/apiBase";
 
 interface ProfileSectionProps {
   onUnsavedChanges: (hasChanges: boolean) => void;
@@ -269,6 +270,9 @@ export function ProfileSection({ onUnsavedChanges, userId }: ProfileSectionProps
   if (!profile) {
     return <div>No profile data available</div>;
   }
+
+  // Resolve the profile photo URL for display
+  const photoUrl = resolveProfilePhotoUrl(profile.profilePhotoUrl);
   
   return (
     <div className="space-y-8">
@@ -276,7 +280,14 @@ export function ProfileSection({ onUnsavedChanges, userId }: ProfileSectionProps
       <div className="flex items-center gap-6">
         <div className="relative">
           <Avatar className="w-24 h-24">
-            <AvatarImage src={profile.profilePhotoUrl || ""} />
+            {photoUrl ? (
+              <img 
+                src={photoUrl} 
+                alt={formData.fullName || 'Profile photo'} 
+                className="aspect-square h-full w-full object-cover"
+                crossOrigin="anonymous"
+              />
+            ) : null}
             <AvatarFallback>
               {formData.fullName.split(" ").map(n => n[0]).join("").toUpperCase()}
             </AvatarFallback>

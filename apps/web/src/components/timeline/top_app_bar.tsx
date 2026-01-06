@@ -6,6 +6,7 @@ import { Search, Menu, Bell, Upload, User, LogOut, Settings, ChevronDown } from 
 import { Avatar, AvatarFallback, AvatarImage, Input, Button } from '@smartmed/ui'
 import { useAuthStore } from '@/store/auth'
 import { UserRole } from '@smartmed/types'
+import { resolveProfilePhotoUrl } from '@/utils/apiBase'
 
 interface TopAppBarProps {
   onMenuClick: () => void
@@ -185,7 +186,7 @@ export function TopAppBar({
             aria-haspopup="true"
           >
             <Avatar className="h-9 w-9 border-2 border-transparent hover:border-primary/20 transition-colors">
-              <AvatarImage src={user?.profilePhotoUrl || ''} alt={user?.fullName || 'User'} />
+              <AvatarImage src={resolveProfilePhotoUrl(user?.profilePhotoUrl)} alt={user?.fullName || 'User'} />
               <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-medium">
                 {initials}
               </AvatarFallback>

@@ -14,6 +14,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage, Button } from '@smartmed/ui'
 import { useAuthStore } from '@/store/auth'
 import { UserRole } from '@smartmed/types'
+import { resolveProfilePhotoUrl } from '@/utils/apiBase'
 
 interface DashboardHeaderProps {
   onMenuClick?: () => void
@@ -174,7 +175,7 @@ export function DashboardHeader({
               aria-haspopup="true"
             >
               <Avatar className="h-9 w-9 border-2 border-transparent hover:border-primary/20 transition-colors">
-                <AvatarImage src={user?.profilePhotoUrl || ''} alt={user?.fullName || 'User'} />
+                <AvatarImage src={resolveProfilePhotoUrl(user?.profilePhotoUrl)} alt={user?.fullName || 'User'} />
                 <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-medium">
                   {initials}
                 </AvatarFallback>

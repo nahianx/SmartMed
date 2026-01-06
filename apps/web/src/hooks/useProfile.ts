@@ -52,12 +52,10 @@ export const useUploadProfilePhoto = () => {
   return useMutation({
     mutationFn: profileApi.uploadPhoto,
     onSuccess: (data) => {
-      // Update profile in cache
-      queryClient.setQueryData(queryKeys.profile, (old: User | undefined) => 
-        old ? { ...old, profilePhotoUrl: data.profilePhotoUrl } : old
-      )
-      // Update auth store
+      // Update auth store immediately
       updateUser({ profilePhotoUrl: data.profilePhotoUrl })
+      // Invalidate all profile queries to refetch with new photo URL
+      queryClient.invalidateQueries({ queryKey: queryKeys.profile })
       toast.success('Profile photo uploaded successfully')
     },
     onError: (error: Error) => {
@@ -73,12 +71,10 @@ export const useRemoveProfilePhoto = () => {
   return useMutation({
     mutationFn: profileApi.removePhoto,
     onSuccess: () => {
-      // Update profile in cache
-      queryClient.setQueryData(queryKeys.profile, (old: User | undefined) => 
-        old ? { ...old, profilePhotoUrl: null } : old
-      )
-      // Update auth store
+      // Update auth store immediately
       updateUser({ profilePhotoUrl: null })
+      // Invalidate all profile queries to refetch
+      queryClient.invalidateQueries({ queryKey: queryKeys.profile })
       toast.success('Profile photo removed successfully')
     },
     onError: (error: Error) => {
