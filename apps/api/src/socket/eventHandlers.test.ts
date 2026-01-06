@@ -71,7 +71,7 @@ describe('queue:join RBAC', () => {
     await handler?.({ doctorId }, ack)
 
     expect(socket.join).toHaveBeenCalledWith(`doctor:${doctorId}:queue`)
-    expect(mockGetQueueState).toHaveBeenCalledWith(doctorId)
+    expect(mockGetQueueState).toHaveBeenCalledWith(doctorId, { includePatientDetails: true })
     expect(ack).toHaveBeenCalledWith(
       expect.objectContaining({ ok: true, queue: [] })
     )

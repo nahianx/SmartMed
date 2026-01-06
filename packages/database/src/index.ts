@@ -257,3 +257,19 @@ export const AllergySeverity = {
 } as const
 // eslint-disable-next-line no-redeclare
 export type AllergySeverity = (typeof AllergySeverity)[keyof typeof AllergySeverity]
+
+// =============================================================================
+// Permission-related enums
+// =============================================================================
+
+// eslint-disable-next-line no-redeclare
+export const PermissionAction = {
+  CREATE: 'CREATE',
+  READ: 'READ',
+  UPDATE: 'UPDATE',
+  DELETE: 'DELETE',
+  MANAGE: 'MANAGE',
+  EXECUTE: 'EXECUTE',
+} as const
+// eslint-disable-next-line no-redeclare
+export type PermissionAction = (typeof PermissionAction)[keyof typeof PermissionAction]

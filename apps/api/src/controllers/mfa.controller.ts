@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { MfaService } from '../services/mfa.service'
 import { AuditService } from '../services/audit.service'
 import { prisma } from '@smartmed/database'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 
 export class MfaController {
   /**
