@@ -79,15 +79,15 @@ export default function PatientRegisterPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
-        <h1 className="text-2xl font-semibold mb-2 text-center">Create Patient Account</h1>
-        <p className="text-sm text-slate-600 text-center mb-6">
+    <main className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="w-full max-w-md bg-card shadow-lg rounded-2xl p-8 border border-border">
+        <h1 className="text-2xl font-semibold mb-2 text-center text-foreground">Create Patient Account</h1>
+        <p className="text-sm text-muted-foreground text-center mb-6">
           Sign up as a patient to manage your SmartMed appointments.
         </p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="fullName">
+            <label className="block text-sm font-medium mb-1 text-foreground" htmlFor="fullName">
               Full name
             </label>
             <input
@@ -97,12 +97,12 @@ export default function PatientRegisterPage() {
               required
               aria-invalid={!!nameError}
               aria-describedby={nameError ? "fullName-error" : undefined}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-md border border-border bg-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
-            {nameError && <p id="fullName-error" role="alert" className="mt-1 text-xs text-red-600">{nameError}</p>}
+            {nameError && <p id="fullName-error" role="alert" className="mt-1 text-xs text-destructive">{nameError}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="email">
+            <label className="block text-sm font-medium mb-1 text-foreground" htmlFor="email">
               Email
             </label>
             <input
@@ -113,15 +113,15 @@ export default function PatientRegisterPage() {
               required
               aria-invalid={!!emailError}
               aria-describedby={emailError ? "email-error" : undefined}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-md border border-border bg-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
-            {emailError && <p id="email-error" role="alert" className="mt-1 text-xs text-red-600">{emailError}</p>}
+            {emailError && <p id="email-error" role="alert" className="mt-1 text-xs text-destructive">{emailError}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="password">
+            <label className="block text-sm font-medium mb-1 text-foreground" htmlFor="password">
               Password
             </label>
-            {passwordError && <p id="password-error" role="alert" className="mb-1 text-xs text-red-600">{passwordError}</p>}
+            {passwordError && <p id="password-error" role="alert" className="mb-1 text-xs text-destructive">{passwordError}</p>}
             <input
               id="password"
               type="password"
@@ -130,14 +130,14 @@ export default function PatientRegisterPage() {
               required
               aria-invalid={!!passwordError}
               aria-describedby={passwordError ? "password-error" : undefined}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-md border border-border bg-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
-            <p className="mt-1 text-xs text-slate-600">
-              Strength: <span className={strength === "weak" ? "text-red-600" : strength === "medium" ? "text-amber-500" : "text-emerald-600"}>{strength}</span>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Strength: <span className={strength === "weak" ? "text-destructive" : strength === "medium" ? "text-amber-500" : "text-emerald-600"}>{strength}</span>
             </p>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="confirm">
+            <label className="block text-sm font-medium mb-1 text-foreground" htmlFor="confirm">
               Confirm password
             </label>
             <input
@@ -148,22 +148,22 @@ export default function PatientRegisterPage() {
               required
               aria-invalid={!!error}
               aria-describedby={error ? "form-error" : undefined}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-md border border-border bg-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
-          <div className="flex items-center gap-2 text-sm">
+          <div className="flex items-center gap-2 text-sm text-foreground">
             <input
               type="checkbox"
               checked={terms}
               onChange={(e) => setTerms(e.target.checked)}
-              className="h-4 w-4 rounded border-slate-300"
+              className="h-4 w-4 rounded border-border accent-primary"
             />
             <span>
-              I agree to the <span className="text-blue-600">terms and conditions</span>.
+              I agree to the <span className="text-primary cursor-pointer hover:underline">terms and conditions</span>
             </span>
           </div>
           {error && (
-            <p id="form-error" role="alert" aria-live="assertive" className="text-sm text-red-600">
+            <p id="form-error" role="alert" aria-live="assertive" className="text-sm text-destructive">
               {error}
             </p>
           )}
@@ -176,9 +176,9 @@ export default function PatientRegisterPage() {
           </button>
         </form>
         <GoogleSignInButton role="PATIENT" />
-        <div className="mt-4 text-center text-sm text-slate-600">
+        <div className="mt-4 text-center text-sm text-muted-foreground">
           Already registered?{" "}
-          <Link href="/auth/login" className="text-blue-600 hover:underline">
+          <Link href="/auth/login" className="text-primary hover:underline">
             Login
           </Link>
         </div>

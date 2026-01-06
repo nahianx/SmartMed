@@ -27,7 +27,7 @@ export function TopAppBar({
   hideUploadButton = false,
 }: TopAppBarProps) {
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white">
+    <header className="sticky top-0 z-50 w-full border-b bg-card">
       <div className="flex h-16 items-center gap-4 px-4">
         {showMenuButton && (
           <Button
@@ -62,7 +62,7 @@ export function TopAppBar({
         </div>
 
         <div className="relative ml-auto flex-1 max-w-md hidden sm:block">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
             placeholder="Search records, doctors, medications..."
@@ -84,7 +84,7 @@ export function TopAppBar({
           >
             {uploading ? (
               <svg
-                className="h-4 w-4 mr-2 animate-spin text-gray-600"
+                className="h-4 w-4 mr-2 animate-spin text-muted-foreground"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -102,7 +102,7 @@ export function TopAppBar({
 
         <button
           type="button"
-          className="relative inline-flex items-center justify-center rounded-full p-2 text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-ring/50"
+          className="relative inline-flex items-center justify-center rounded-full p-2 text-muted-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring/50"
           aria-label="Notifications"
           onClick={onNotificationsClick}
         >

@@ -19,15 +19,20 @@ export interface AuditLogEntry {
   errorMessage?: string
 }
 
+// HIPAA-compliant retention period: 6 years (2190 days)
+// Healthcare records must be retained for minimum 6 years per HIPAA regulations
+const HIPAA_RETENTION_DAYS = 2190
+
 export class AuditService {
   /**
    * Log an audit event
+   * Retention: 6 years per HIPAA 45 CFR § 164.530(j)
    */
   static async log(entry: AuditLogEntry): Promise<void> {
     try {
-      // Calculate retention date (90 days from now for most logs)
+      // Calculate retention date (6 years / 2190 days for HIPAA compliance)
       const retentionDate = new Date()
-      retentionDate.setDate(retentionDate.getDate() + 90)
+      retentionDate.setDate(retentionDate.getDate() + HIPAA_RETENTION_DAYS)
 
       await prisma.auditLog.create({
         data: {

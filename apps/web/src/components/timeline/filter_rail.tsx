@@ -54,7 +54,7 @@ export function FilterRail({ filters, onFiltersChange, lockedRole }: FilterRailP
   }
 
   return (
-    <aside className="w-full lg:w-64 lg:border-r bg-gray-50 p-4 space-y-6 overflow-y-auto">
+    <aside className="w-full lg:w-64 lg:border-r bg-muted/30 p-4 space-y-6 overflow-y-auto">
       <div className="space-y-3">
         <span className="text-sm font-medium">Date Range</span>
 
@@ -95,7 +95,7 @@ export function FilterRail({ filters, onFiltersChange, lockedRole }: FilterRailP
                 {filters.dateRange.from ? format(filters.dateRange.from, 'MMM dd, yyyy') : 'From date'}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 z-50 shadow-lg border bg-white" align="start" side="bottom">
+            <PopoverContent className="w-auto p-0 z-50 shadow-lg border bg-card" align="start" side="bottom">
               <div className="p-3">
                 <DayPicker
                   mode="single"
@@ -121,7 +121,7 @@ export function FilterRail({ filters, onFiltersChange, lockedRole }: FilterRailP
                 {filters.dateRange.to ? format(filters.dateRange.to, 'MMM dd, yyyy') : 'To date'}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 z-50 shadow-lg border bg-white" align="start" side="bottom">
+            <PopoverContent className="w-auto p-0 z-50 shadow-lg border bg-card" align="start" side="bottom">
               <div className="p-3">
                 <DayPicker
                   mode="single"
@@ -213,7 +213,7 @@ export function FilterRail({ filters, onFiltersChange, lockedRole }: FilterRailP
       <div className="space-y-2">
         <span className="text-sm font-medium">Search</span>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Doctor, specialty, file..."
             value={filters.searchText}

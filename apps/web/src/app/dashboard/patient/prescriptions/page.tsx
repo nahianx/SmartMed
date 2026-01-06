@@ -81,8 +81,8 @@ export default function PrescriptionsPage() {
 
   if (loading || !user) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-slate-600">Loading...</div>
+      <main className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-muted-foreground">Loading...</div>
       </main>
     )
   }
@@ -97,23 +97,23 @@ export default function PrescriptionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="bg-white border-b border-slate-200">
+    <div className="min-h-screen bg-background">
+      <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => router.push('/dashboard/patient')}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-muted rounded-lg transition-colors"
                 aria-label="Back to dashboard"
               >
-                <ArrowLeft className="h-5 w-5 text-slate-600" />
+                <ArrowLeft className="h-5 w-5 text-muted-foreground" />
               </button>
               <div>
-                <h1 className="text-xl font-semibold text-slate-900">
+                <h1 className="text-xl font-semibold text-foreground">
                   My Prescriptions
                 </h1>
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-muted-foreground">
                   View your medical prescriptions
                 </p>
               </div>
@@ -129,30 +129,30 @@ export default function PrescriptionsPage() {
           </div>
         )}
 
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
+        <div className="bg-card rounded-xl shadow-sm border border-border p-4 mb-6">
           <div className="flex items-center gap-3">
-            <Search className="h-5 w-5 text-slate-400" />
+            <Search className="h-5 w-5 text-muted-foreground" />
             <input
               type="text"
               placeholder="Search by diagnosis, medication, or doctor..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1 outline-none text-slate-900 placeholder-slate-400"
+              className="flex-1 outline-none text-foreground placeholder-muted-foreground"
             />
           </div>
         </div>
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="text-slate-600">Loading prescriptions...</div>
+            <div className="text-muted-foreground">Loading prescriptions...</div>
           </div>
         ) : filteredPrescriptions.length === 0 ? (
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-12 text-center">
-            <Pill className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">
+          <div className="bg-card rounded-xl border border-border shadow-sm p-12 text-center">
+            <Pill className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">
               {searchTerm ? 'No prescriptions found' : 'No prescriptions yet'}
             </h3>
-            <p className="text-slate-600">
+            <p className="text-muted-foreground">
               {searchTerm
                 ? 'Try adjusting your search terms'
                 : 'Your prescriptions from doctor visits will appear here'}
@@ -164,7 +164,7 @@ export default function PrescriptionsPage() {
               {filteredPrescriptions.map((prescription) => (
                 <div
                   key={prescription.id}
-                  className="bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                  className="bg-card rounded-lg border border-border shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                   onClick={() =>
                     router.push(
                       `/dashboard/patient/prescriptions/${prescription.id}`
@@ -176,11 +176,11 @@ export default function PrescriptionsPage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <FileText className="h-5 w-5 text-blue-600" />
-                          <h3 className="text-lg font-semibold text-slate-900">
+                          <h3 className="text-lg font-semibold text-foreground">
                             {prescription.diagnosis}
                           </h3>
                         </div>
-                        <div className="flex flex-wrap gap-4 text-sm text-slate-600">
+                        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                           <div className="flex items-center gap-1">
                             <Calendar className="h-4 w-4" />
                             <span>{formatDate(prescription.createdAt)}</span>
@@ -198,8 +198,8 @@ export default function PrescriptionsPage() {
                       </div>
                     </div>
 
-                    <div className="border-t border-slate-200 pt-4">
-                      <h4 className="text-sm font-medium text-slate-700 mb-2">
+                    <div className="border-t border-border pt-4">
+                      <h4 className="text-sm font-medium text-foreground mb-2">
                         Medications ({prescription.medications.length})
                       </h4>
                       <div className="flex flex-wrap gap-2">
@@ -214,7 +214,7 @@ export default function PrescriptionsPage() {
                             </span>
                           ))}
                         {prescription.medications.length > 3 && (
-                          <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-sm">
+                          <span className="px-3 py-1 bg-muted text-muted-foreground rounded-full text-sm">
                             +{prescription.medications.length - 3} more
                           </span>
                         )}
@@ -230,17 +230,17 @@ export default function PrescriptionsPage() {
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="px-4 py-2 border border-slate-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50"
+                  className="px-4 py-2 border border-border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted"
                 >
                   Previous
                 </button>
-                <span className="text-sm text-slate-600">
+                <span className="text-sm text-muted-foreground">
                   Page {page} of {totalPages}
                 </span>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="px-4 py-2 border border-slate-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50"
+                  className="px-4 py-2 border border-border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted"
                 >
                   Next
                 </button>

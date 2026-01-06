@@ -89,7 +89,7 @@ export function SecuritySection({ userId }: { userId?: string }) {
     <div className="space-y-8">
       <div>
         <h3 className="text-lg font-medium">Security Settings</h3>
-        <p className="text-slate-600 mt-1">
+        <p className="text-muted-foreground mt-1">
           Manage your password, two-factor authentication, and account security
         </p>
       </div>
@@ -102,7 +102,7 @@ export function SecuritySection({ userId }: { userId?: string }) {
           </div>
           <div className="flex-1">
             <h4 className="font-medium">Change Password</h4>
-            <p className="text-slate-600 mt-1">
+            <p className="text-muted-foreground mt-1">
               Update your password regularly to keep your account secure
             </p>
           </div>
@@ -159,23 +159,23 @@ export function SecuritySection({ userId }: { userId?: string }) {
                       passwordStrength.score < 4 ? 'bg-yellow-500' : 'bg-green-500'
                     }`} style={{ width: `${(passwordStrength.score / 5) * 100}%` }}></div>
                   </div>
-                  <span className="text-sm text-slate-600">
+                  <span className="text-sm text-muted-foreground">
                     {passwordStrength.score < 3 ? 'Weak' :
                      passwordStrength.score < 4 ? 'Medium' : 'Strong'}
                   </span>
                 </div>
                 
                 <div className="text-xs space-y-1">
-                  <div className={passwordStrength.checks.length ? 'text-green-600' : 'text-slate-400'}>
+                  <div className={passwordStrength.checks.length ? 'text-green-600' : 'text-muted-foreground'}>
                     ✓ At least 8 characters
                   </div>
-                  <div className={passwordStrength.checks.uppercase ? 'text-green-600' : 'text-slate-400'}>
+                  <div className={passwordStrength.checks.uppercase ? 'text-green-600' : 'text-muted-foreground'}>
                     ✓ One uppercase letter
                   </div>
-                  <div className={passwordStrength.checks.lowercase ? 'text-green-600' : 'text-slate-400'}>
+                  <div className={passwordStrength.checks.lowercase ? 'text-green-600' : 'text-muted-foreground'}>
                     ✓ One lowercase letter
                   </div>
-                  <div className={passwordStrength.checks.number ? 'text-green-600' : 'text-slate-400'}>
+                  <div className={passwordStrength.checks.number ? 'text-green-600' : 'text-muted-foreground'}>
                     ✓ One number
                   </div>
                 </div>

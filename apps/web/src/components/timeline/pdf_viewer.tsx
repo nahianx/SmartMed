@@ -40,8 +40,8 @@ export function PDFViewer({ reportId, fileName }: PDFViewerProps) {
 
   if (!documentFile) {
     return (
-      <div className="aspect-[8.5/11] rounded-lg border bg-gray-100 flex items-center justify-center">
-        <div className="text-center text-gray-500">
+      <div className="aspect-[8.5/11] rounded-lg border bg-muted flex items-center justify-center">
+        <div className="text-center text-muted-foreground">
           <FileText className="h-8 w-8 mx-auto mb-2" />
           <p className="text-sm">Login is required to view this report.</p>
         </div>
@@ -51,7 +51,7 @@ export function PDFViewer({ reportId, fileName }: PDFViewerProps) {
 
   if (error) {
     return (
-      <div className="aspect-[8.5/11] rounded-lg border bg-gray-100 flex items-center justify-center">
+      <div className="aspect-[8.5/11] rounded-lg border bg-muted flex items-center justify-center">
         <div className="text-center text-red-500">
           <AlertTriangle className="h-8 w-8 mx-auto mb-2" />
           <p className="text-sm">{error}</p>
@@ -83,7 +83,7 @@ export function PDFViewer({ reportId, fileName }: PDFViewerProps) {
           >
             <ZoomOut className="h-4 w-4" />
           </Button>
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-muted-foreground">
             {Math.round(scale * 100)}%
           </span>
           <Button
@@ -105,7 +105,7 @@ export function PDFViewer({ reportId, fileName }: PDFViewerProps) {
             >
               Previous
             </Button>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-muted-foreground">
               {pageNumber} of {numPages}
             </span>
             <Button
@@ -121,8 +121,8 @@ export function PDFViewer({ reportId, fileName }: PDFViewerProps) {
       </div>
 
       {/* PDF Document */}
-      <div className="rounded-lg border bg-white overflow-hidden">
-        <div className="flex justify-center p-4 bg-gray-50">
+      <div className="rounded-lg border bg-card overflow-hidden">
+        <div className="flex justify-center p-4 bg-muted">
           <Document
             file={documentFile}
             onLoadSuccess={onDocumentLoadSuccess}

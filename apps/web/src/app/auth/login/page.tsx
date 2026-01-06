@@ -29,15 +29,15 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
-        <h1 className="text-2xl font-semibold mb-2 text-center">Login</h1>
-        <p className="text-sm text-slate-600 text-center mb-6">
+    <main className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="w-full max-w-md bg-card shadow-lg rounded-2xl p-8 border border-border">
+        <h1 className="text-2xl font-semibold mb-2 text-center text-foreground">Login</h1>
+        <p className="text-sm text-muted-foreground text-center mb-6">
           Access your SmartMed dashboard.
         </p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="email">
+            <label className="block text-sm font-medium mb-1 text-foreground" htmlFor="email">
               Email
             </label>
             <input
@@ -48,12 +48,12 @@ export default function LoginPage() {
               required
               aria-invalid={!!error}
               aria-describedby={error ? 'login-error' : undefined}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-md border border-border bg-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
           <div>
             <label
-              className="block text-sm font-medium mb-1"
+              className="block text-sm font-medium mb-1 text-foreground"
               htmlFor="password"
             >
               Password
@@ -66,28 +66,28 @@ export default function LoginPage() {
               required
               aria-invalid={!!error}
               aria-describedby={error ? 'login-error' : undefined}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-md border border-border bg-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
           <div className="flex items-center justify-between text-sm">
-            <label className="inline-flex items-center gap-2">
+            <label className="inline-flex items-center gap-2 text-foreground">
               <input
                 type="checkbox"
                 checked={remember}
                 onChange={(e) => setRemember(e.target.checked)}
-                className="h-4 w-4 rounded border-slate-300"
+                className="h-4 w-4 rounded border-border accent-primary"
               />
               <span>Remember me</span>
             </label>
             <Link
               href="/auth/forgot-password"
-              className="text-blue-600 hover:underline"
+              className="text-primary hover:underline"
             >
               Forgot password?
             </Link>
           </div>
           {error && (
-            <p id="login-error" role="alert" aria-live="assertive" className="text-sm text-red-600">
+            <p id="login-error" role="alert" aria-live="assertive" className="text-sm text-destructive">
               {error}
             </p>
           )}
@@ -100,9 +100,9 @@ export default function LoginPage() {
           </button>
         </form>
         <GoogleSignInButton />
-        <div className="mt-4 text-center text-sm text-slate-600">
+        <div className="mt-4 text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{' '}
-          <Link href="/auth" className="text-blue-600 hover:underline">
+          <Link href="/auth" className="text-primary hover:underline">
             Sign up
           </Link>
         </div>

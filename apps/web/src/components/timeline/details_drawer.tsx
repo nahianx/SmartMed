@@ -80,15 +80,15 @@ function ImageViewer({ reportId, fileName }: { reportId: string; fileName?: stri
 
   if (loading) {
     return (
-      <div className="aspect-[8.5/11] rounded-lg border bg-gray-100 flex items-center justify-center">
-        <p className="text-sm text-gray-500">Loading image preview...</p>
+      <div className="aspect-[8.5/11] rounded-lg border bg-muted flex items-center justify-center">
+        <p className="text-sm text-muted-foreground">Loading image preview...</p>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="aspect-[8.5/11] rounded-lg border bg-gray-100 flex items-center justify-center">
+      <div className="aspect-[8.5/11] rounded-lg border bg-muted flex items-center justify-center">
         <div className="text-center text-red-500">
           <AlertTriangle className="h-8 w-8 mx-auto mb-2" />
           <p className="text-sm">{error}</p>
@@ -99,8 +99,8 @@ function ImageViewer({ reportId, fileName }: { reportId: string; fileName?: stri
 
   if (!imageUrl) {
     return (
-      <div className="aspect-[8.5/11] rounded-lg border bg-gray-100 flex items-center justify-center">
-        <div className="text-center text-gray-500">
+      <div className="aspect-[8.5/11] rounded-lg border bg-muted flex items-center justify-center">
+        <div className="text-center text-muted-foreground">
           <FileText className="h-12 w-12 mx-auto mb-2" />
           <p className="text-sm">Image Preview Unavailable</p>
         </div>
@@ -109,7 +109,7 @@ function ImageViewer({ reportId, fileName }: { reportId: string; fileName?: stri
   }
 
   return (
-    <div className="rounded-lg border bg-white overflow-hidden">
+    <div className="rounded-lg border bg-card overflow-hidden">
       <img
         src={imageUrl}
         alt={fileName || 'Report image'}
@@ -160,22 +160,22 @@ export function DetailsDrawer({ activity, open, onClose }: DetailsDrawerProps) {
             <>
               <div>
                 <h3 className="mb-2">Visit Information</h3>
-                <div className="space-y-2 rounded-lg bg-gray-50 p-4">
+                <div className="space-y-2 rounded-lg bg-muted/50 p-4">
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-gray-600 min-w-[100px]">
+                    <span className="text-sm text-muted-foreground min-w-[100px]">
                       Doctor:
                     </span>
                     <span className="text-sm">{activity.doctorName}</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-gray-600 min-w-[100px]">
+                    <span className="text-sm text-muted-foreground min-w-[100px]">
                       Specialty:
                     </span>
                     <span className="text-sm">{activity.specialty}</span>
                   </div>
                   {activity.clinic && (
                     <div className="flex items-start gap-2">
-                      <MapPin className="h-4 w-4 text-gray-600 mt-0.5" />
+                      <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
                       <span className="text-sm">{activity.clinic}</span>
                     </div>
                   )}
@@ -188,7 +188,7 @@ export function DetailsDrawer({ activity, open, onClose }: DetailsDrawerProps) {
                   <div className="grid grid-cols-2 gap-3">
                     {activity.vitals.bloodPressure && (
                       <div className="rounded-lg border p-3">
-                        <div className="text-xs text-gray-600">
+                        <div className="text-xs text-muted-foreground">
                           Blood Pressure
                         </div>
                         <div className="mt-1">
@@ -198,13 +198,13 @@ export function DetailsDrawer({ activity, open, onClose }: DetailsDrawerProps) {
                     )}
                     {activity.vitals.heartRate && (
                       <div className="rounded-lg border p-3">
-                        <div className="text-xs text-gray-600">Heart Rate</div>
+                        <div className="text-xs text-muted-foreground">Heart Rate</div>
                         <div className="mt-1">{activity.vitals.heartRate}</div>
                       </div>
                     )}
                     {activity.vitals.temperature && (
                       <div className="rounded-lg border p-3">
-                        <div className="text-xs text-gray-600">Temperature</div>
+                        <div className="text-xs text-muted-foreground">Temperature</div>
                         <div className="mt-1">
                           {activity.vitals.temperature}
                         </div>
@@ -212,7 +212,7 @@ export function DetailsDrawer({ activity, open, onClose }: DetailsDrawerProps) {
                     )}
                     {activity.vitals.weight && (
                       <div className="rounded-lg border p-3">
-                        <div className="text-xs text-gray-600">Weight</div>
+                        <div className="text-xs text-muted-foreground">Weight</div>
                         <div className="mt-1">{activity.vitals.weight}</div>
                       </div>
                     )}
@@ -223,8 +223,8 @@ export function DetailsDrawer({ activity, open, onClose }: DetailsDrawerProps) {
               {activity.notes && (
                 <div>
                   <h3 className="mb-2">Visit Notes</h3>
-                  <div className="rounded-lg bg-gray-50 p-4">
-                    <p className="text-sm text-gray-700">{activity.notes}</p>
+                  <div className="rounded-lg bg-muted/50 p-4">
+                    <p className="text-sm text-foreground/80">{activity.notes}</p>
                   </div>
                 </div>
               )}
@@ -271,7 +271,7 @@ export function DetailsDrawer({ activity, open, onClose }: DetailsDrawerProps) {
             <>
               <div>
                 <h3 className="mb-2">Prescribed by</h3>
-                <div className="rounded-lg bg-gray-50 p-4">
+                <div className="rounded-lg bg-muted/50 p-4">
                   <p className="text-sm">{activity.doctorName}</p>
                 </div>
               </div>
@@ -283,7 +283,7 @@ export function DetailsDrawer({ activity, open, onClose }: DetailsDrawerProps) {
                     {activity.medications.map((med, index) => (
                       <div key={index} className="rounded-lg border p-4">
                         <div className="font-medium">{med.name}</div>
-                        <div className="mt-2 space-y-1 text-sm text-gray-600">
+                        <div className="mt-2 space-y-1 text-sm text-muted-foreground">
                           <div className="flex gap-2">
                             <span className="min-w-[80px]">Dose:</span>
                             <span>{med.dose}</span>
@@ -338,16 +338,16 @@ export function DetailsDrawer({ activity, open, onClose }: DetailsDrawerProps) {
             <>
               <div>
                 <h3 className="mb-2">File Information</h3>
-                <div className="space-y-2 rounded-lg bg-gray-50 p-4">
+                <div className="space-y-2 rounded-lg bg-muted/50 p-4">
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-gray-600 min-w-[80px]">
+                    <span className="text-sm text-muted-foreground min-w-[80px]">
                       File name:
                     </span>
                     <span className="text-sm">{activity.fileName}</span>
                   </div>
                   {activity.fileSize && (
                     <div className="flex items-start gap-2">
-                      <span className="text-sm text-gray-600 min-w-[80px]">
+                      <span className="text-sm text-muted-foreground min-w-[80px]">
                         File size:
                       </span>
                       <span className="text-sm">{activity.fileSize}</span>
@@ -370,16 +370,16 @@ export function DetailsDrawer({ activity, open, onClose }: DetailsDrawerProps) {
                       fileName={activity.fileName}
                     />
                   ) : (
-                    <div className="aspect-[8.5/11] rounded-lg border bg-gray-100 flex items-center justify-center">
-                      <div className="text-center text-gray-500">
+                    <div className="aspect-[8.5/11] rounded-lg border bg-muted flex items-center justify-center">
+                      <div className="text-center text-muted-foreground">
                         <FileText className="h-12 w-12 mx-auto mb-2" />
                         <p className="text-sm">Preview Unavailable</p>
                       </div>
                     </div>
                   )
                 ) : (
-                  <div className="aspect-[8.5/11] rounded-lg border bg-gray-100 flex items-center justify-center">
-                    <div className="text-center text-gray-500">
+                  <div className="aspect-[8.5/11] rounded-lg border bg-muted flex items-center justify-center">
+                    <div className="text-center text-muted-foreground">
                       <FileText className="h-12 w-12 mx-auto mb-2" />
                       <p className="text-sm">PDF Preview Unavailable</p>
                       <p className="text-xs mt-1">Report ID not found</p>
@@ -391,8 +391,8 @@ export function DetailsDrawer({ activity, open, onClose }: DetailsDrawerProps) {
               {activity.notes && (
                 <div>
                   <h3 className="mb-2">Notes</h3>
-                  <div className="rounded-lg bg-gray-50 p-4">
-                    <p className="text-sm text-gray-700">{activity.notes}</p>
+                  <div className="rounded-lg bg-muted/50 p-4">
+                    <p className="text-sm text-foreground/80">{activity.notes}</p>
                   </div>
                 </div>
               )}

@@ -59,7 +59,7 @@ export default function PrescriptionView() {
   if (loading || isLoading) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-cyan-50">
-        <div className="text-gray-600">Loading...</div>
+        <div className="text-muted-foreground">Loading...</div>
       </main>
     )
   }
@@ -76,29 +76,29 @@ export default function PrescriptionView() {
   }
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 shadow-sm prescription-container" ref={printRef}>
+    <div className="bg-card rounded-lg border border-border shadow-sm prescription-container" ref={printRef}>
       {/* Print-only header */}
       <div className="hidden print:block prescription-print-header">
         <h1>Medical Prescription</h1>
         <p className="subtitle">SmartMed Healthcare System</p>
       </div>
       
-      <div className="bg-white border-b border-slate-200 no-print">
+      <div className="bg-card border-b border-border no-print">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => router.push('/dashboard/patient/prescriptions')}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-muted rounded-lg transition-colors"
                 aria-label="Back to dashboard"
               >
-                <ArrowLeft className="h-5 w-5 text-slate-600" />
+                <ArrowLeft className="h-5 w-5 text-muted-foreground" />
               </button>
               <div>
-                <h1 className="text-xl font-semibold text-slate-900">
+                <h1 className="text-xl font-semibold text-foreground">
                   My Prescriptions
                 </h1>
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-muted-foreground">
                   View your medical prescriptions
                 </p>
               </div>
@@ -113,14 +113,14 @@ export default function PrescriptionView() {
           </div>
         </div>
       </div>
-      <div className="border-b border-slate-200 px-6 py-4 bg-slate-50 max-w-7xl mx-auto">
+      <div className="border-b border-border px-6 py-4 bg-muted max-w-7xl mx-auto">
         <div className="flex items-center gap-2 mb-2">
           <Pill className="h-5 w-5 text-blue-600" />
-          <h3 className="text-lg font-semibold text-slate-900">
+          <h3 className="text-lg font-semibold text-foreground">
             Prescription Details
           </h3>
         </div>
-        <div className="flex items-center gap-4 text-sm text-slate-600">
+        <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
             <Calendar className="h-4 w-4" />
             <span>{formatDate(prescription.createdAt)}</span>
@@ -139,15 +139,15 @@ export default function PrescriptionView() {
 
       <div className="p-6 space-y-6 max-w-7xl mx-auto">
         <div>
-          <h4 className="text-sm font-medium text-slate-700 mb-2 flex items-center gap-2">
+          <h4 className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
             <FileText className="h-4 w-4" />
             Diagnosis
           </h4>
-          <p className="text-slate-900">{prescription.diagnosis}</p>
+          <p className="text-foreground">{prescription.diagnosis}</p>
         </div>
 
         <div>
-          <h4 className="text-sm font-medium text-slate-700 mb-3 flex items-center gap-2">
+          <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
             <Pill className="h-4 w-4" />
             Medications
           </h4>
@@ -155,10 +155,10 @@ export default function PrescriptionView() {
             {prescription.medications.map((medication, index) => (
               <div
                 key={index}
-                className="border border-slate-200 rounded-lg p-4 bg-slate-50"
+                className="border border-border rounded-lg p-4 bg-muted"
               >
                 <div className="flex items-start justify-between mb-2">
-                  <h5 className="font-semibold text-slate-900">
+                  <h5 className="font-semibold text-foreground">
                     {medication.medicineName}
                   </h5>
                   <span className="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">
@@ -167,20 +167,20 @@ export default function PrescriptionView() {
                 </div>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <span className="text-slate-600">Frequency:</span>
-                    <span className="ml-2 font-medium text-slate-900">
+                    <span className="text-muted-foreground">Frequency:</span>
+                    <span className="ml-2 font-medium text-foreground">
                       {medication.frequency}
                     </span>
                   </div>
                   <div>
-                    <span className="text-slate-600">Duration:</span>
-                    <span className="ml-2 font-medium text-slate-900">
+                    <span className="text-muted-foreground">Duration:</span>
+                    <span className="ml-2 font-medium text-foreground">
                       {medication.duration}
                     </span>
                   </div>
                 </div>
                 {medication.instructions && (
-                  <div className="mt-2 text-sm text-slate-700 bg-blue-50 border border-blue-100 rounded px-3 py-2">
+                  <div className="mt-2 text-sm text-foreground bg-blue-50 border border-blue-100 rounded px-3 py-2">
                     <span className="font-medium">Instructions:</span>{' '}
                     {medication.instructions}
                   </div>
@@ -192,21 +192,21 @@ export default function PrescriptionView() {
 
         {prescription.notes && (
           <div>
-            <h4 className="text-sm font-medium text-slate-700 mb-2">
+            <h4 className="text-sm font-medium text-foreground mb-2">
               Additional Notes
             </h4>
-            <p className="text-slate-700 bg-slate-50 border border-slate-200 rounded-lg p-3">
+            <p className="text-foreground bg-muted border border-border rounded-lg p-3">
               {prescription.notes}
             </p>
           </div>
         )}
 
         {prescription.appointment && (
-          <div className="border-t border-slate-200 pt-4">
-            <h4 className="text-sm font-medium text-slate-700 mb-2">
+          <div className="border-t border-border pt-4">
+            <h4 className="text-sm font-medium text-foreground mb-2">
               Related Appointment
             </h4>
-            <div className="text-sm text-slate-600">
+            <div className="text-sm text-muted-foreground">
               <p>
                 <span className="font-medium">Date:</span>{' '}
                 {formatDate(prescription.appointment.dateTime)}

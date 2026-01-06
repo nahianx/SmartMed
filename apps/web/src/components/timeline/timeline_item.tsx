@@ -122,7 +122,7 @@ export function TimelineItem({
 
   return (
     <div
-      className="group relative flex gap-4 rounded-lg border bg-white p-4 transition-all hover:shadow-md cursor-pointer"
+      className="group relative flex gap-4 rounded-lg border bg-card p-4 transition-all hover:shadow-md cursor-pointer"
       onClick={() => onOpenDetails(activity)}
     >
       <div
@@ -150,7 +150,7 @@ export function TimelineItem({
 
             {/* Show highlighted subtitle if available */}
             {activity.subtitle && (
-              <p className="text-sm text-gray-600 mt-0.5">
+              <p className="text-sm text-muted-foreground mt-0.5">
                 {hasHighlights && activity.highlightedSubtitle ? (
                   <SearchHighlight 
                     text={activity.highlightedSubtitle} 
@@ -162,7 +162,7 @@ export function TimelineItem({
               </p>
             )}
 
-            <div className="mt-1 flex items-center gap-3 text-sm text-gray-600 flex-wrap">
+            <div className="mt-1 flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
               <span className="flex items-center gap-1">
                 <Calendar className="h-3.5 w-3.5" />
                 {format(activity.date, 'MMM dd, yyyy at h:mm a')}
@@ -258,7 +258,7 @@ export function TimelineItem({
           </div>
         </div>
 
-        <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-gray-500">
+        <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-muted-foreground">
           Click to view details in drawer.
         </div>
       </div>

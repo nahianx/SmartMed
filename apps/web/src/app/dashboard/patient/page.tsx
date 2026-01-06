@@ -94,8 +94,8 @@ export default function PatientDashboardPage() {
   const firstName = user.fullName?.split(' ')[0] || 'Patient'
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <div className="border-b bg-white">
+    <main className="min-h-screen bg-background">
+      <div className="border-b bg-card">
         <div className="mx-auto max-w-6xl flex flex-wrap items-center justify-between gap-4 px-6 py-8">
           <div className="space-y-2">
             <div className="flex items-center gap-3">
@@ -107,7 +107,7 @@ export default function PatientDashboardPage() {
                 Secure by default
               </Badge>
             </div>
-            <p className="text-slate-600">
+            <p className="text-muted-foreground">
               Welcome back, {firstName}. Track your upcoming visits, history,
               and preferred doctors.
             </p>
@@ -191,10 +191,10 @@ export default function PatientDashboardPage() {
 
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2 space-y-4">
-            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-slate-600" />
+                  <Clock className="h-5 w-5 text-muted-foreground" />
                   <h2 className="text-lg font-semibold">
                     Upcoming appointments
                   </h2>
@@ -208,7 +208,7 @@ export default function PatientDashboardPage() {
                 </Button>
               </div>
               {upcoming.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-slate-200 p-6 text-center text-slate-600">
+                <div className="rounded-lg border border-dashed border-border p-6 text-center text-muted-foreground">
                   No appointments scheduled. Book a visit to get started.
                 </div>
               ) : (
@@ -216,16 +216,16 @@ export default function PatientDashboardPage() {
                   {upcoming.slice(0, 4).map((apt) => (
                     <div
                       key={apt.id}
-                      className="rounded-lg border border-slate-200 bg-slate-50 p-4 flex items-center justify-between"
+                      className="rounded-lg border border-border bg-muted p-4 flex items-center justify-between"
                     >
                       <div className="space-y-1">
-                        <p className="font-semibold text-slate-900">
+                        <p className="font-semibold text-foreground">
                           {apt.doctorName || 'Doctor visit'}
                         </p>
-                        <p className="text-sm text-slate-600">
+                        <p className="text-sm text-muted-foreground">
                           {apt.reason || 'General consultation'}
                         </p>
-                        <p className="text-xs text-slate-500 flex items-center gap-1">
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
                           <Calendar className="h-3.5 w-3.5" />
                           {new Date(apt.dateTime).toLocaleString()}
                         </p>
@@ -239,10 +239,10 @@ export default function PatientDashboardPage() {
               )}
             </div>
 
-            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <ClipboardList className="h-5 w-5 text-slate-600" />
+                  <ClipboardList className="h-5 w-5 text-muted-foreground" />
                   <h2 className="text-lg font-semibold">
                     Recent prescriptions
                   </h2>
@@ -258,7 +258,7 @@ export default function PatientDashboardPage() {
                 </Button>
               </div>
               {prescriptions.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-slate-200 p-6 text-center text-slate-600">
+                <div className="rounded-lg border border-dashed border-border p-6 text-center text-muted-foreground">
                   No prescriptions on file.
                 </div>
               ) : (
@@ -266,12 +266,12 @@ export default function PatientDashboardPage() {
                   {prescriptions.slice(0, 4).map((rx) => (
                     <div
                       key={rx.id}
-                      className="rounded-lg border border-slate-200 p-3"
+                      className="rounded-lg border border-border p-3"
                     >
-                      <p className="font-medium text-slate-900">
+                      <p className="font-medium text-foreground">
                         {rx.diagnosis || 'Prescription'}
                       </p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-muted-foreground">
                         {rx.createdAt
                           ? new Date(rx.createdAt).toLocaleDateString()
                           : 'Recent'}
@@ -284,9 +284,9 @@ export default function PatientDashboardPage() {
           </div>
 
           <div className="space-y-4">
-            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
               <div className="flex items-center gap-2 mb-2">
-                <Activity className="h-5 w-5 text-slate-600" />
+                <Activity className="h-5 w-5 text-muted-foreground" />
                 <h2 className="text-lg font-semibold">Quick actions</h2>
               </div>
               <div className="space-y-2">
@@ -319,9 +319,9 @@ export default function PatientDashboardPage() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <section className="rounded-xl border border-border bg-card p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-2">
-            <Stethoscope className="h-5 w-5 text-slate-600" />
+            <Stethoscope className="h-5 w-5 text-muted-foreground" />
             <h2 className="text-lg font-semibold">Recent activity</h2>
           </div>
           <TimelineContainer
@@ -352,7 +352,7 @@ function StatusCard({
   onClick?: () => void
 }) {
   const tones: Record<string, string> = {
-    neutral: 'border-slate-200 bg-white',
+    neutral: 'border-border bg-card',
     info: 'border-blue-100 bg-blue-50',
     success: 'border-emerald-100 bg-emerald-50',
     warning: 'border-amber-100 bg-amber-50',
@@ -365,11 +365,11 @@ function StatusCard({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="rounded-lg bg-white/70 p-2 shadow-sm">{icon}</div>
-          <p className="text-sm font-medium text-slate-700">{title}</p>
+          <p className="text-sm font-medium text-foreground">{title}</p>
         </div>
       </div>
-      <div className="mt-3 text-2xl font-semibold text-slate-900">{value}</div>
-      <p className="mt-1 text-sm text-slate-600">{hint}</p>
+      <div className="mt-3 text-2xl font-semibold text-foreground">{value}</div>
+      <p className="mt-1 text-sm text-muted-foreground">{hint}</p>
     </div>
   )
 
@@ -395,10 +395,10 @@ function QuickLink({
   return (
     <button
       onClick={onClick}
-      className="w-full text-left rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50 transition flex flex-col"
+      className="w-full text-left rounded-lg border border-border px-3 py-2 hover:bg-muted transition flex flex-col"
     >
-      <span className="font-medium text-slate-900">{label}</span>
-      <span className="text-sm text-slate-600">{description}</span>
+      <span className="font-medium text-foreground">{label}</span>
+      <span className="text-sm text-muted-foreground">{description}</span>
     </button>
   )
 }

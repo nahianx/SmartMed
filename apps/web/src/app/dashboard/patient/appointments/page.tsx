@@ -74,8 +74,8 @@ export default function PatientAppointmentsPage() {
 
   if (loading || isLoading) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-gray-600">Loading...</div>
+      <main className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-muted-foreground">Loading...</div>
       </main>
     )
   }
@@ -89,7 +89,7 @@ export default function PatientAppointmentsPage() {
       REJECTED: 'bg-rose-100 text-rose-700 border-rose-200',
       SCHEDULED: 'bg-blue-100 text-blue-700 border-blue-200',
       CONFIRMED: 'bg-green-100 text-green-700 border-green-200',
-      COMPLETED: 'bg-gray-100 text-gray-700 border-gray-200',
+      COMPLETED: 'bg-muted text-foreground border-border',
       CANCELLED: 'bg-red-100 text-red-700 border-red-200',
       NO_SHOW: 'bg-orange-100 text-orange-700 border-orange-200',
     }
@@ -149,24 +149,24 @@ export default function PatientAppointmentsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200">
+      <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => router.push('/dashboard/patient')}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-muted rounded-lg transition-colors"
                 aria-label="Back to dashboard"
               >
-                <ArrowLeft className="h-5 w-5 text-slate-600" />
+                <ArrowLeft className="h-5 w-5 text-muted-foreground" />
               </button>
               <div>
-                <h1 className="text-xl font-semibold text-slate-900">
+                <h1 className="text-xl font-semibold text-foreground">
                   My Appointments
                 </h1>
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-muted-foreground">
                   Track requests, confirmations, and visit history
                 </p>
               </div>
@@ -183,7 +183,7 @@ export default function PatientAppointmentsPage() {
         </div>
       </div>
 
-      <div className="bg-slate-50 min-h-[calc(100vh-4rem)]">
+      <div className="bg-background min-h-[calc(100vh-4rem)]">
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
@@ -193,37 +193,37 @@ export default function PatientAppointmentsPage() {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
+            <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
               <div className="text-3xl font-bold text-blue-600 mb-1">
                 {appointments.length}
               </div>
-              <div className="text-sm text-slate-600">Total Appointments</div>
+              <div className="text-sm text-muted-foreground">Total Appointments</div>
             </div>
-            <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
+            <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
               <div className="text-3xl font-bold text-amber-600 mb-1">
                 {pendingCount}
               </div>
-              <div className="text-sm text-slate-600">Pending Requests</div>
+              <div className="text-sm text-muted-foreground">Pending Requests</div>
             </div>
-            <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
+            <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
               <div className="text-3xl font-bold text-emerald-600 mb-1">
                 {upcomingCount}
               </div>
-              <div className="text-sm text-slate-600">Upcoming Accepted</div>
+              <div className="text-sm text-muted-foreground">Upcoming Accepted</div>
             </div>
           </div>
 
           {/* Filter Tabs */}
-          <div className="bg-white rounded-lg border border-slate-200 shadow-sm mb-6">
-            <div className="flex items-center gap-4 px-4 py-3 border-b border-slate-200">
-              <Filter className="h-5 w-5 text-slate-600" />
+          <div className="bg-card rounded-lg border border-border shadow-sm mb-6">
+            <div className="flex items-center gap-4 px-4 py-3 border-b border-border">
+              <Filter className="h-5 w-5 text-muted-foreground" />
               <div className="flex gap-2 flex-wrap">
                 <button
                   onClick={() => setFilter('all')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     filter === 'all'
                       ? 'bg-blue-100 text-blue-700'
-                      : 'text-slate-600 hover:bg-slate-100'
+                      : 'text-muted-foreground hover:bg-muted'
                   }`}
                 >
                   All
@@ -233,7 +233,7 @@ export default function PatientAppointmentsPage() {
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     filter === 'pending'
                       ? 'bg-blue-100 text-blue-700'
-                      : 'text-slate-600 hover:bg-slate-100'
+                      : 'text-muted-foreground hover:bg-muted'
                   }`}
                 >
                   Pending
@@ -243,7 +243,7 @@ export default function PatientAppointmentsPage() {
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     filter === 'accepted'
                       ? 'bg-blue-100 text-blue-700'
-                      : 'text-slate-600 hover:bg-slate-100'
+                      : 'text-muted-foreground hover:bg-muted'
                   }`}
                 >
                   Accepted
@@ -253,7 +253,7 @@ export default function PatientAppointmentsPage() {
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     filter === 'past'
                       ? 'bg-blue-100 text-blue-700'
-                      : 'text-slate-600 hover:bg-slate-100'
+                      : 'text-muted-foreground hover:bg-muted'
                   }`}
                 >
                   Past
@@ -262,11 +262,11 @@ export default function PatientAppointmentsPage() {
             </div>
 
             {/* Appointments List */}
-            <div className="divide-y divide-slate-200">
+            <div className="divide-y divide-border">
               {filteredAppointments.length === 0 ? (
                 <div className="px-6 py-12 text-center">
-                  <Calendar className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-                  <p className="text-slate-600">
+                  <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-muted-foreground">
                     No appointments found for this view
                   </p>
                 </div>
@@ -274,7 +274,7 @@ export default function PatientAppointmentsPage() {
                 filteredAppointments.map((appointment) => (
                   <div
                     key={appointment.id}
-                    className="px-6 py-4 hover:bg-slate-50 transition-colors"
+                    className="px-6 py-4 hover:bg-muted transition-colors"
                   >
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex items-center gap-4 flex-1">
@@ -283,7 +283,7 @@ export default function PatientAppointmentsPage() {
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-1 flex-wrap">
-                            <h3 className="font-semibold text-slate-900">
+                            <h3 className="font-semibold text-foreground">
                               Dr. {appointment.doctor?.firstName}{' '}
                               {appointment.doctor?.lastName}
                             </h3>
@@ -298,7 +298,7 @@ export default function PatientAppointmentsPage() {
                               </Badge>
                             )}
                           </div>
-                          <div className="flex items-center gap-4 text-sm text-slate-600 flex-wrap">
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
                             <div className="flex items-center gap-1">
                               <Calendar className="h-4 w-4" />
                               <span>{formatDate(appointment.dateTime)}</span>
@@ -311,12 +311,12 @@ export default function PatientAppointmentsPage() {
                               </span>
                             </div>
                             {appointment.doctor?.specialization && (
-                              <span className="text-xs text-slate-500">
+                              <span className="text-xs text-muted-foreground">
                                 {appointment.doctor.specialization}
                               </span>
                             )}
                           </div>
-                          <p className="text-sm text-slate-600 mt-1">
+                          <p className="text-sm text-muted-foreground mt-1">
                             <span className="font-medium">Reason:</span>{' '}
                             {appointment.reason}
                           </p>

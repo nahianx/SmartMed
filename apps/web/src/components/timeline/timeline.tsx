@@ -133,9 +133,9 @@ export function Timeline({
 
     return (
       <div className="flex flex-col items-center justify-center p-12 text-center">
-        <div className="rounded-full bg-gray-100 p-6 mb-4">
+        <div className="rounded-full bg-muted p-6 mb-4">
           <svg
-            className="h-12 w-12 text-gray-400"
+            className="h-12 w-12 text-muted-foreground"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -149,7 +149,7 @@ export function Timeline({
           </svg>
         </div>
         <h3 className="mb-2">No activities found</h3>
-        <p className="text-gray-600 mb-4">
+        <p className="text-muted-foreground mb-4">
           {hasFilters
             ? 'Try adjusting your filters to see more results'
             : 'Your activity timeline will appear here'}
@@ -169,7 +169,7 @@ export function Timeline({
     if (row.type === 'date') {
       return (
         <div style={style} className="px-2 py-3 flex items-center gap-4">
-          <div className="shrink-0 rounded-lg bg-gray-100 px-3 py-1">
+          <div className="shrink-0 rounded-lg bg-muted px-3 py-1">
             <span className="text-sm font-medium">
               {format(row.date, 'EEEE, MMMM dd, yyyy')}
             </span>
@@ -209,7 +209,7 @@ export function Timeline({
       {groupedActivities.map((group, groupIndex) => (
         <div key={groupIndex} className="space-y-4">
           <div className="flex items-center gap-4">
-            <div className="shrink-0 rounded-lg bg-gray-100 px-3 py-1">
+            <div className="shrink-0 rounded-lg bg-muted px-3 py-1">
               <span className="text-sm font-medium">
                 {format(group.date, 'EEEE, MMMM dd, yyyy')}
               </span>

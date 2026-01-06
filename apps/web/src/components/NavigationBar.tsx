@@ -16,10 +16,10 @@ export function NavigationBar() {
   if (!user) return null
 
   return (
-    <nav className="bg-white dark:bg-gray-900 border-b border-slate-200 dark:border-gray-800 shadow-sm">
+    <nav className="bg-card border-b border-border shadow-sm">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         <div className="flex items-center gap-8">
-          <Link href="/" className="text-xl font-bold text-blue-600 dark:text-blue-400">
+          <Link href="/" className="text-xl font-bold text-primary">
             SmartMed
           </Link>
 
@@ -28,7 +28,7 @@ export function NavigationBar() {
               <>
                 <Link
                   href="/profile?role=PATIENT"
-                  className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-sm font-medium"
+                  className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
                 >
                   Profile
                 </Link>
@@ -39,7 +39,7 @@ export function NavigationBar() {
               <>
                 <Link
                   href="/profile?role=DOCTOR"
-                  className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-sm font-medium"
+                  className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
                 >
                   Profile
                 </Link>
@@ -50,19 +50,19 @@ export function NavigationBar() {
               <>
                 <Link
                   href="/profile?role=ADMIN"
-                  className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-sm font-medium"
+                  className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
                 >
                   Profile
                 </Link>
                 <Link
                   href="/dashboard/admin"
-                  className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-sm font-medium"
+                  className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
                 >
                   Dashboard
                 </Link>
                 <Link
                   href="/dashboard/admin/users"
-                  className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-sm font-medium"
+                  className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
                 >
                   User Management
                 </Link>
@@ -73,10 +73,10 @@ export function NavigationBar() {
 
         <div className="flex items-center gap-4">
           <ThemeToggle iconOnly />
-          <span className="text-sm text-slate-600 dark:text-slate-300">{user.email}</span>
+          <span className="text-sm text-muted-foreground">{user.email}</span>
           <button
             onClick={handleLogout}
-            className="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition"
+            className="px-4 py-2 text-sm font-medium text-white bg-destructive rounded-lg hover:bg-destructive/90 transition"
           >
             Logout
           </button>

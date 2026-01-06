@@ -207,19 +207,19 @@ export default function DoctorFinderPage() {
 
   if (loading || !user) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-slate-600">Loading...</div>
+      <main className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-muted-foreground">Loading...</div>
       </main>
     )
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="bg-white border-b border-slate-200">
+    <div className="min-h-screen bg-background">
+      <div className="bg-card border-b border-border">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <h1 className="text-xl font-semibold">Find a Doctor</h1>
+              <h1 className="text-xl font-semibold text-foreground">Find a Doctor</h1>
               <Badge variant="outline" className="text-xs">
                 Patient
               </Badge>
@@ -235,10 +235,10 @@ export default function DoctorFinderPage() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
+        <div className="bg-card rounded-xl shadow-sm border border-border p-4 space-y-4">
           <div className="flex flex-wrap items-center gap-3">
             <div className="relative flex-1 min-w-[260px]">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Search by name or keyword"
                 value={query}
@@ -247,12 +247,12 @@ export default function DoctorFinderPage() {
               />
             </div>
             <div className="flex items-center gap-2">
-              <SlidersHorizontal className="h-4 w-4 text-slate-500" />
+              <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
               <select
                 title="select specialities"
                 value={specialization}
                 onChange={(e) => setSpecialization(e.target.value)}
-                className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border border-border bg-background text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="">All specialties</option>
                 {specsLoading
@@ -265,7 +265,7 @@ export default function DoctorFinderPage() {
               </select>
             </div>
             <div className="relative flex-1 min-w-[220px]">
-              <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="City or clinic location"
                 value={location}
@@ -318,9 +318,9 @@ export default function DoctorFinderPage() {
           ) : filtered.length === 0 ? (
             <Card className="p-10 text-center">
               <div className="flex flex-col items-center gap-2">
-                <Search className="h-8 w-8 text-slate-400" />
-                <p className="text-slate-700 font-medium">No doctors found</p>
-                <p className="text-slate-500 text-sm">
+                <Search className="h-8 w-8 text-muted-foreground" />
+                <p className="text-foreground font-medium">No doctors found</p>
+                <p className="text-muted-foreground text-sm">
                   Try another specialty or search term.
                 </p>
               </div>
@@ -334,7 +334,7 @@ export default function DoctorFinderPage() {
                       <h3 className="font-semibold">
                         Dr. {doctor.firstName} {doctor.lastName}
                       </h3>
-                      <p className="text-sm text-slate-600">
+                      <p className="text-sm text-muted-foreground">
                         {doctor.specialization}
                       </p>
                     </div>
@@ -353,7 +353,7 @@ export default function DoctorFinderPage() {
                       </Badge>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <MapPin className="h-4 w-4" />
                     <span>
                       {(doctor as any).clinic?.address ||
@@ -396,10 +396,10 @@ export default function DoctorFinderPage() {
 
       {bookingDoctor && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 space-y-4">
+          <div className="bg-card rounded-lg shadow-xl w-full max-w-lg p-6 space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">Booking</p>
+                <p className="text-sm text-muted-foreground">Booking</p>
                 <h3 className="text-lg font-semibold">
                   Dr. {bookingDoctor.firstName} {bookingDoctor.lastName}
                 </h3>
@@ -407,7 +407,7 @@ export default function DoctorFinderPage() {
               <button
                 onClick={() => setBookingDoctor(null)}
                 aria-label="Close"
-                className="text-slate-500 hover:text-slate-700"
+                className="text-muted-foreground hover:text-foreground"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -432,7 +432,7 @@ export default function DoctorFinderPage() {
                   title="timess"
                   value={bookDuration}
                   onChange={(e) => setBookDuration(Number(e.target.value))}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {[15, 30, 45, 60].map((d) => (
                     <option key={d} value={d}>
@@ -447,13 +447,13 @@ export default function DoctorFinderPage() {
                 Available slots
               </label>
               {availabilityLoading ? (
-                <div className="text-sm text-slate-500">
+                <div className="text-sm text-muted-foreground">
                   Loading availability...
                 </div>
               ) : availabilityError ? (
                 <div className="text-sm text-red-600">{availabilityError}</div>
               ) : availabilitySlots.length === 0 ? (
-                <div className="text-sm text-slate-500">
+                <div className="text-sm text-muted-foreground">
                   No slots available for this date.
                 </div>
               ) : (
@@ -471,8 +471,8 @@ export default function DoctorFinderPage() {
                           slot.isAvailable
                             ? selected
                               ? 'border-blue-500 bg-blue-50 text-blue-700'
-                              : 'border-slate-200 text-slate-600 hover:border-blue-300'
-                            : 'border-slate-100 bg-slate-100 text-slate-400 cursor-not-allowed'
+                              : 'border-border text-muted-foreground hover:border-blue-300'
+                            : 'border-border bg-muted text-muted-foreground cursor-not-allowed'
                         }`}
                       >
                         {slot.startTime}
@@ -499,7 +499,7 @@ export default function DoctorFinderPage() {
                 value={bookReason}
                 onChange={(e) => setBookReason(e.target.value)}
                 rows={3}
-                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Describe your visit reason"
               />
             </div>

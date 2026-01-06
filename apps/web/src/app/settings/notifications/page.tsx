@@ -187,7 +187,7 @@ export default function NotificationPreferencesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     )
@@ -195,7 +195,7 @@ export default function NotificationPreferencesPage() {
 
   if (!preferences) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">Failed to load preferences</p>
           <button
@@ -210,23 +210,23 @@ export default function NotificationPreferencesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="max-w-4xl mx-auto px-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
               <Bell className="h-8 w-8 text-blue-600" />
               Notification Preferences
             </h1>
-            <p className="text-gray-600 mt-2">
+            <p className="text-muted-foreground mt-2">
               Control how and when you receive notifications from SmartMed
             </p>
           </div>
           <button
             onClick={resetToDefaults}
             disabled={saving}
-            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-muted-foreground hover:text-foreground border border-border rounded-lg hover:bg-muted transition-colors"
           >
             <RefreshCw className="h-4 w-4" />
             Reset to Defaults
@@ -247,83 +247,83 @@ export default function NotificationPreferencesPage() {
 
         <div className="space-y-6">
           {/* Delivery Channels */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Smartphone className="h-5 w-5 text-gray-400" />
+          <div className="bg-card rounded-xl shadow-sm border border-border p-6">
+            <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+              <Smartphone className="h-5 w-5 text-muted-foreground" />
               Delivery Channels
             </h2>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               Choose how you want to receive notifications
             </p>
 
             <div className="space-y-4">
-              <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+              <label className="flex items-center justify-between p-4 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors">
                 <div className="flex items-center gap-3">
                   <Mail className="h-5 w-5 text-blue-600" />
                   <div>
-                    <p className="font-medium text-gray-900">Email Notifications</p>
-                    <p className="text-sm text-gray-500">Receive notifications via email</p>
+                    <p className="font-medium text-foreground">Email Notifications</p>
+                    <p className="text-sm text-muted-foreground">Receive notifications via email</p>
                   </div>
                 </div>
                 <input
                   type="checkbox"
                   checked={preferences.emailEnabled}
                   onChange={(e) => updatePreference('emailEnabled', e.target.checked)}
-                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="w-5 h-5 rounded border-border text-blue-600 focus:ring-blue-500"
                 />
               </label>
 
-              <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+              <label className="flex items-center justify-between p-4 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors">
                 <div className="flex items-center gap-3">
                   <Bell className="h-5 w-5 text-green-600" />
                   <div>
-                    <p className="font-medium text-gray-900">Push Notifications</p>
-                    <p className="text-sm text-gray-500">Receive browser push notifications</p>
+                    <p className="font-medium text-foreground">Push Notifications</p>
+                    <p className="text-sm text-muted-foreground">Receive browser push notifications</p>
                   </div>
                 </div>
                 <input
                   type="checkbox"
                   checked={preferences.pushEnabled}
                   onChange={(e) => updatePreference('pushEnabled', e.target.checked)}
-                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="w-5 h-5 rounded border-border text-blue-600 focus:ring-blue-500"
                 />
               </label>
 
-              <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+              <label className="flex items-center justify-between p-4 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors">
                 <div className="flex items-center gap-3">
                   <Smartphone className="h-5 w-5 text-purple-600" />
                   <div>
-                    <p className="font-medium text-gray-900">SMS Notifications</p>
-                    <p className="text-sm text-gray-500">Receive text message notifications</p>
+                    <p className="font-medium text-foreground">SMS Notifications</p>
+                    <p className="text-sm text-muted-foreground">Receive text message notifications</p>
                   </div>
                 </div>
                 <input
                   type="checkbox"
                   checked={preferences.smsEnabled}
                   onChange={(e) => updatePreference('smsEnabled', e.target.checked)}
-                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="w-5 h-5 rounded border-border text-blue-600 focus:ring-blue-500"
                 />
               </label>
             </div>
           </div>
 
           {/* Appointment Notifications */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          <div className="bg-card rounded-xl shadow-sm border border-border p-6">
+            <h2 className="text-xl font-semibold text-foreground mb-4">
               📅 Appointment Notifications
             </h2>
 
             <div className="space-y-4">
-              <label className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+              <label className="flex items-center justify-between p-3 hover:bg-muted rounded-lg cursor-pointer">
                 <div>
-                  <p className="font-medium text-gray-900">Appointment Reminders</p>
-                  <p className="text-sm text-gray-500">Get reminded before your appointments</p>
+                  <p className="font-medium text-foreground">Appointment Reminders</p>
+                  <p className="text-sm text-muted-foreground">Get reminded before your appointments</p>
                 </div>
                 <input
                   type="checkbox"
                   checked={preferences.appointmentReminders}
                   onChange={(e) => updatePreference('appointmentReminders', e.target.checked)}
-                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="w-5 h-5 rounded border-border text-blue-600 focus:ring-blue-500"
                 />
               </label>
 
@@ -338,7 +338,7 @@ export default function NotificationPreferencesPage() {
                           flex items-center justify-center p-2 rounded-lg border cursor-pointer transition-colors
                           ${selectedReminders.includes(option.value)
                             ? 'bg-blue-600 border-blue-600 text-white'
-                            : 'bg-white border-gray-300 text-gray-700 hover:border-blue-400'
+                            : 'bg-card border-border text-foreground hover:border-blue-400'
                           }
                         `}
                       >
@@ -355,64 +355,64 @@ export default function NotificationPreferencesPage() {
                 </div>
               )}
 
-              <label className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+              <label className="flex items-center justify-between p-3 hover:bg-muted rounded-lg cursor-pointer">
                 <div>
-                  <p className="font-medium text-gray-900">Booking Confirmations</p>
-                  <p className="text-sm text-gray-500">Confirm when appointments are booked</p>
+                  <p className="font-medium text-foreground">Booking Confirmations</p>
+                  <p className="text-sm text-muted-foreground">Confirm when appointments are booked</p>
                 </div>
                 <input
                   type="checkbox"
                   checked={preferences.appointmentConfirmation}
                   onChange={(e) => updatePreference('appointmentConfirmation', e.target.checked)}
-                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="w-5 h-5 rounded border-border text-blue-600 focus:ring-blue-500"
                 />
               </label>
 
-              <label className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+              <label className="flex items-center justify-between p-3 hover:bg-muted rounded-lg cursor-pointer">
                 <div>
-                  <p className="font-medium text-gray-900">Cancellation Notices</p>
-                  <p className="text-sm text-gray-500">Alert when appointments are cancelled</p>
+                  <p className="font-medium text-foreground">Cancellation Notices</p>
+                  <p className="text-sm text-muted-foreground">Alert when appointments are cancelled</p>
                 </div>
                 <input
                   type="checkbox"
                   checked={preferences.appointmentCancellation}
                   onChange={(e) => updatePreference('appointmentCancellation', e.target.checked)}
-                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="w-5 h-5 rounded border-border text-blue-600 focus:ring-blue-500"
                 />
               </label>
             </div>
           </div>
 
           {/* Queue Notifications */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          <div className="bg-card rounded-xl shadow-sm border border-border p-6">
+            <h2 className="text-xl font-semibold text-foreground mb-4">
               🔢 Queue Notifications
             </h2>
 
             <div className="space-y-4">
-              <label className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+              <label className="flex items-center justify-between p-3 hover:bg-muted rounded-lg cursor-pointer">
                 <div>
-                  <p className="font-medium text-gray-900">Queue Updates</p>
-                  <p className="text-sm text-gray-500">Get notified when your position changes</p>
+                  <p className="font-medium text-foreground">Queue Updates</p>
+                  <p className="text-sm text-muted-foreground">Get notified when your position changes</p>
                 </div>
                 <input
                   type="checkbox"
                   checked={preferences.queueUpdates}
                   onChange={(e) => updatePreference('queueUpdates', e.target.checked)}
-                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="w-5 h-5 rounded border-border text-blue-600 focus:ring-blue-500"
                 />
               </label>
 
               {preferences.queueUpdates && (
-                <div className="ml-4 p-4 bg-gray-50 rounded-lg">
+                <div className="ml-4 p-4 bg-muted rounded-lg">
                   <label className="block">
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium text-foreground">
                       Notify me when position reaches:
                     </span>
                     <select
                       value={preferences.queuePositionThreshold}
                       onChange={(e) => updatePreference('queuePositionThreshold', Number(e.target.value))}
-                      className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      className="mt-2 block w-full rounded-lg border-border shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     >
                       {[1, 2, 3, 5, 10].map(n => (
                         <option key={n} value={n}>
@@ -427,33 +427,33 @@ export default function NotificationPreferencesPage() {
           </div>
 
           {/* Health Tips Notifications */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          <div className="bg-card rounded-xl shadow-sm border border-border p-6">
+            <h2 className="text-xl font-semibold text-foreground mb-4">
               💊 Health Tips
             </h2>
 
             <div className="space-y-4">
-              <label className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+              <label className="flex items-center justify-between p-3 hover:bg-muted rounded-lg cursor-pointer">
                 <div>
-                  <p className="font-medium text-gray-900">Health Tips</p>
-                  <p className="text-sm text-gray-500">Receive personalized health tips</p>
+                  <p className="font-medium text-foreground">Health Tips</p>
+                  <p className="text-sm text-muted-foreground">Receive personalized health tips</p>
                 </div>
                 <input
                   type="checkbox"
                   checked={preferences.healthTipsEnabled}
                   onChange={(e) => updatePreference('healthTipsEnabled', e.target.checked)}
-                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="w-5 h-5 rounded border-border text-blue-600 focus:ring-blue-500"
                 />
               </label>
 
               {preferences.healthTipsEnabled && (
-                <div className="ml-4 p-4 bg-gray-50 rounded-lg">
+                <div className="ml-4 p-4 bg-muted rounded-lg">
                   <label className="block">
-                    <span className="text-sm font-medium text-gray-700">Frequency:</span>
+                    <span className="text-sm font-medium text-foreground">Frequency:</span>
                     <select
                       value={preferences.healthTipsFrequency}
                       onChange={(e) => updatePreference('healthTipsFrequency', e.target.value as 'DAILY' | 'WEEKLY' | 'MONTHLY')}
-                      className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      className="mt-2 block w-full rounded-lg border-border shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     >
                       <option value="DAILY">Daily</option>
                       <option value="WEEKLY">Weekly</option>
@@ -466,58 +466,58 @@ export default function NotificationPreferencesPage() {
           </div>
 
           {/* Prescription Notifications */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          <div className="bg-card rounded-xl shadow-sm border border-border p-6">
+            <h2 className="text-xl font-semibold text-foreground mb-4">
               📋 Prescription Notifications
             </h2>
 
-            <label className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+            <label className="flex items-center justify-between p-3 hover:bg-muted rounded-lg cursor-pointer">
               <div>
-                <p className="font-medium text-gray-900">Prescription Ready</p>
-                <p className="text-sm text-gray-500">Get notified when prescriptions are available</p>
+                <p className="font-medium text-foreground">Prescription Ready</p>
+                <p className="text-sm text-muted-foreground">Get notified when prescriptions are available</p>
               </div>
               <input
                 type="checkbox"
                 checked={preferences.prescriptionReady}
                 onChange={(e) => updatePreference('prescriptionReady', e.target.checked)}
-                className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="w-5 h-5 rounded border-border text-blue-600 focus:ring-blue-500"
               />
             </label>
           </div>
 
           {/* Quiet Hours */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <div className="bg-card rounded-xl shadow-sm border border-border p-6">
+            <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
               {preferences.quietHoursEnabled ? (
-                <VolumeX className="h-5 w-5 text-gray-400" />
+                <VolumeX className="h-5 w-5 text-muted-foreground" />
               ) : (
-                <Volume2 className="h-5 w-5 text-gray-400" />
+                <Volume2 className="h-5 w-5 text-muted-foreground" />
               )}
               Quiet Hours
             </h2>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               Pause notifications during specific hours
             </p>
 
             <div className="space-y-4">
-              <label className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+              <label className="flex items-center justify-between p-3 hover:bg-muted rounded-lg cursor-pointer">
                 <div>
-                  <p className="font-medium text-gray-900">Enable Quiet Hours</p>
-                  <p className="text-sm text-gray-500">No notifications during this time</p>
+                  <p className="font-medium text-foreground">Enable Quiet Hours</p>
+                  <p className="text-sm text-muted-foreground">No notifications during this time</p>
                 </div>
                 <input
                   type="checkbox"
                   checked={preferences.quietHoursEnabled}
                   onChange={(e) => updatePreference('quietHoursEnabled', e.target.checked)}
-                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="w-5 h-5 rounded border-border text-blue-600 focus:ring-blue-500"
                 />
               </label>
 
               {preferences.quietHoursEnabled && (
-                <div className="p-4 bg-gray-50 rounded-lg space-y-4">
+                <div className="p-4 bg-muted rounded-lg space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <label className="block">
-                      <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                      <span className="text-sm font-medium text-foreground flex items-center gap-1">
                         <Clock className="h-4 w-4" />
                         Start Time
                       </span>
@@ -525,11 +525,11 @@ export default function NotificationPreferencesPage() {
                         type="time"
                         value={preferences.quietHoursStart || '22:00'}
                         onChange={(e) => updatePreference('quietHoursStart', e.target.value)}
-                        className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        className="mt-2 block w-full rounded-lg border-border shadow-sm focus:border-blue-500 focus:ring-blue-500"
                       />
                     </label>
                     <label className="block">
-                      <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                      <span className="text-sm font-medium text-foreground flex items-center gap-1">
                         <Clock className="h-4 w-4" />
                         End Time
                       </span>
@@ -537,17 +537,17 @@ export default function NotificationPreferencesPage() {
                         type="time"
                         value={preferences.quietHoursEnd || '08:00'}
                         onChange={(e) => updatePreference('quietHoursEnd', e.target.value)}
-                        className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        className="mt-2 block w-full rounded-lg border-border shadow-sm focus:border-blue-500 focus:ring-blue-500"
                       />
                     </label>
                   </div>
 
                   <label className="block">
-                    <span className="text-sm font-medium text-gray-700">Timezone</span>
+                    <span className="text-sm font-medium text-foreground">Timezone</span>
                     <select
                       value={preferences.timezone}
                       onChange={(e) => updatePreference('timezone', e.target.value)}
-                      className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      className="mt-2 block w-full rounded-lg border-border shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     >
                       {TIMEZONES.map(tz => (
                         <option key={tz} value={tz}>

@@ -231,9 +231,9 @@ export default function UserManagementPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200">
+      <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
@@ -255,10 +255,10 @@ export default function UserManagementPage() {
       <div className="bg-gradient-to-br from-red-50 via-white to-orange-50 min-h-[calc(100vh-4rem)]">
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">
+            <h2 className="text-2xl font-bold text-foreground mb-1">
               User Management
             </h2>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Manage user roles, permissions, and access control
             </p>
           </div>
@@ -275,13 +275,13 @@ export default function UserManagementPage() {
             </div>
           )}
 
-          <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          <div className="bg-card rounded-xl shadow-md border border-border p-6 mb-6">
+            <h3 className="text-lg font-semibold text-foreground mb-4">
               Search & Filters
             </h3>
             <div className="flex gap-4 flex-wrap items-end">
               <div className="flex-1 min-w-64">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Search by name or email
                 </label>
                 <input
@@ -289,18 +289,18 @@ export default function UserManagementPage() {
                   value={searchTerm}
                   onChange={handleSearch}
                   placeholder="John Doe, john@example.com"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-shadow"
+                  className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-shadow"
                 />
               </div>
               <div className="w-48">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Filter by role
                 </label>
                 <select
                   title="Select Role"
                   value={roleFilter}
                   onChange={handleRoleFilter}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-shadow"
+                  className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-shadow"
                 >
                   <option value="">All Roles</option>
                   <option value="ADMIN">Admin</option>
@@ -318,9 +318,9 @@ export default function UserManagementPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-              <h3 className="text-lg font-semibold text-gray-900">
+          <div className="bg-card rounded-xl shadow-md border border-border overflow-hidden">
+            <div className="px-6 py-4 border-b border-border flex justify-between items-center bg-muted">
+              <h3 className="text-lg font-semibold text-foreground">
                 All Users ({stats.total})
               </h3>
               <div className="flex items-center gap-3 flex-wrap">
@@ -338,7 +338,7 @@ export default function UserManagementPage() {
                 >
                   Deactivate selected
                 </button>
-                <span className="text-sm text-gray-600 font-medium">
+                <span className="text-sm text-muted-foreground font-medium">
                   Page {stats.page} of {stats.totalPages}
                 </span>
               </div>
@@ -346,20 +346,20 @@ export default function UserManagementPage() {
 
             {pageLoading ? (
               <div className="flex items-center justify-center h-96">
-                <div className="text-gray-600 font-medium">
+                <div className="text-muted-foreground font-medium">
                   Loading users...
                 </div>
               </div>
             ) : users.length === 0 ? (
               <div className="flex items-center justify-center h-96">
-                <div className="text-gray-600 font-medium">No users found</div>
+                <div className="text-muted-foreground font-medium">No users found</div>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-slate-50 border-b border-slate-200">
+                  <thead className="bg-muted border-b border-border">
                     <tr>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-slate-900">
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">
                         <input
                           type="checkbox"
                           aria-label="Select all"
@@ -370,22 +370,22 @@ export default function UserManagementPage() {
                           onChange={(e) => selectAll(e.target.checked)}
                         />
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
                         Name
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
                         Email
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
                         Role
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
                         Status
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
                         Joined
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
                         Actions
                       </th>
                     </tr>
@@ -394,7 +394,7 @@ export default function UserManagementPage() {
                     {users.map((u) => (
                       <tr
                         key={u.id}
-                        className="border-b border-slate-200 hover:bg-slate-50"
+                        className="border-b border-border hover:bg-muted"
                       >
                         <td className="px-4 py-4">
                           <input
@@ -404,10 +404,10 @@ export default function UserManagementPage() {
                             onChange={() => toggleSelect(u.id)}
                           />
                         </td>
-                        <td className="px-6 py-4 text-sm text-slate-900 font-medium">
+                        <td className="px-6 py-4 text-sm text-foreground font-medium">
                           {u.fullName || 'N/A'}
                         </td>
-                        <td className="px-6 py-4 text-sm text-slate-600">
+                        <td className="px-6 py-4 text-sm text-muted-foreground">
                           {u.email}
                         </td>
                         <td className="px-6 py-4 text-sm">
@@ -419,7 +419,7 @@ export default function UserManagementPage() {
                                   ? 'bg-green-100 text-green-800'
                                   : u.role === 'PATIENT'
                                     ? 'bg-blue-100 text-blue-800'
-                                    : 'bg-slate-100 text-slate-800'
+                                    : 'bg-muted text-foreground'
                             }`}
                           >
                             {u.role}
@@ -436,7 +436,7 @@ export default function UserManagementPage() {
                             {u.isActive ? 'Active' : 'Inactive'}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-sm text-slate-600">
+                        <td className="px-6 py-4 text-sm text-muted-foreground">
                           {new Date(u.createdAt).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 text-sm">
@@ -447,7 +447,7 @@ export default function UserManagementPage() {
                             Details
                           </button>
                           {u.id === user.id ? (
-                            <span className="text-slate-500 text-xs bg-slate-100 px-2 py-1 rounded">
+                            <span className="text-muted-foreground text-xs bg-muted px-2 py-1 rounded">
                               You
                             </span>
                           ) : (
@@ -493,18 +493,18 @@ export default function UserManagementPage() {
             )}
 
             {!pageLoading && users.length > 0 && (
-              <div className="px-6 py-4 border-t border-slate-200 flex justify-between items-center bg-slate-50">
+              <div className="px-6 py-4 border-t border-border flex justify-between items-center bg-muted">
                 <button
                   onClick={() =>
                     stats.page > 1 &&
                     loadUsers(stats.page - 1, searchTerm, roleFilter)
                   }
                   disabled={stats.page === 1}
-                  className="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50"
+                  className="px-4 py-2 border border-border rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted"
                 >
                   Previous
                 </button>
-                <span className="text-sm text-slate-600">
+                <span className="text-sm text-muted-foreground">
                   Page {stats.page} of {stats.totalPages}
                 </span>
                 <button
@@ -513,7 +513,7 @@ export default function UserManagementPage() {
                     loadUsers(stats.page + 1, searchTerm, roleFilter)
                   }
                   disabled={stats.page >= stats.totalPages}
-                  className="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50"
+                  className="px-4 py-2 border border-border rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted"
                 >
                   Next
                 </button>
@@ -613,13 +613,13 @@ function UserDetailsModal({
         role="dialog"
         aria-modal="true"
         onKeyDown={handleKeyDown}
-        className="bg-white rounded-lg max-w-md w-full p-6"
+        className="bg-card rounded-lg max-w-md w-full p-6"
       >
         <div className="flex justify-between items-start mb-4">
           <h2 className="text-2xl font-bold">User Details</h2>
           <button
             onClick={onClose}
-            className="text-slate-500 hover:text-slate-700 text-2xl"
+            className="text-muted-foreground hover:text-foreground text-2xl"
           >
             ✕
           </button>
@@ -627,36 +627,36 @@ function UserDetailsModal({
 
         <div className="space-y-4 mb-6">
           <div>
-            <p className="text-sm text-slate-600">Full Name</p>
+            <p className="text-sm text-muted-foreground">Full Name</p>
             <p className="font-medium">{user.fullName || 'N/A'}</p>
           </div>
           <div>
-            <p className="text-sm text-slate-600">Email</p>
+            <p className="text-sm text-muted-foreground">Email</p>
             <p className="font-medium">{user.email}</p>
           </div>
           <div>
-            <p className="text-sm text-slate-600">Current Role</p>
+            <p className="text-sm text-muted-foreground">Current Role</p>
             <p className="font-medium">{user.role}</p>
           </div>
           <div>
-            <p className="text-sm text-slate-600">Status</p>
+            <p className="text-sm text-muted-foreground">Status</p>
             <p className="font-medium">
               {user.isActive ? 'Active' : 'Inactive'}
             </p>
           </div>
           <div>
-            <p className="text-sm text-slate-600">Email Verified</p>
+            <p className="text-sm text-muted-foreground">Email Verified</p>
             <p className="font-medium">{user.emailVerified ? 'Yes' : 'No'}</p>
           </div>
           <div>
-            <p className="text-sm text-slate-600">Member Since</p>
+            <p className="text-sm text-muted-foreground">Member Since</p>
             <p className="font-medium">
               {new Date(user.createdAt).toLocaleDateString()}
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Change Role
             </label>
             <select
@@ -667,7 +667,7 @@ function UserDetailsModal({
                   e.target.value as 'ADMIN' | 'DOCTOR' | 'PATIENT' | 'NURSE'
                 )
               }
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="ADMIN">Admin</option>
               <option value="DOCTOR">Doctor</option>
@@ -681,13 +681,13 @@ function UserDetailsModal({
           <button
             onClick={() => onRoleChange(newRole)}
             disabled={newRole === user.role}
-            className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
             Update Role
           </button>
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 border border-slate-300 text-slate-900 rounded-lg hover:bg-slate-50 transition"
+            className="flex-1 px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted transition"
           >
             Close
           </button>

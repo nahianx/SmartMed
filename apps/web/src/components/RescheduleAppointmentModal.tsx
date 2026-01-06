@@ -224,7 +224,7 @@ export default function RescheduleAppointmentModal({
       <div 
         ref={dialogRef}
         onKeyDown={handleKeyDown}
-        className="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
+        className="relative bg-card rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b">

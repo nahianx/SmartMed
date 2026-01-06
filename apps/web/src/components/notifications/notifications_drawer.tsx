@@ -39,16 +39,16 @@ function getNotificationIcon(type: NotificationItem['type']) {
 }
 
 function getNotificationStyle(type: NotificationItem['type'], isUnread: boolean) {
-  if (!isUnread) return 'border-gray-200 bg-white'
+  if (!isUnread) return 'border-border bg-card'
   
   switch (type) {
     case 'HEALTH_TIP_GENERATED':
-      return 'border-amber-300 bg-amber-50'
+      return 'border-amber-300 bg-amber-50 dark:bg-amber-950/30'
     case 'APPOINTMENT_REMINDER_24H':
     case 'APPOINTMENT_REMINDER_1H':
-      return 'border-blue-300 bg-blue-50'
+      return 'border-blue-300 bg-blue-50 dark:bg-blue-950/30'
     default:
-      return 'border-blue-500 bg-white'
+      return 'border-primary bg-card'
   }
 }
 

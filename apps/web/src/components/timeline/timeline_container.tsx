@@ -335,7 +335,7 @@ export function TimelineContainer({
             <h3 className="text-lg font-semibold">{heading}</h3>
             <Badge variant="outline">Linked to {roleLabel} profile</Badge>
           </div>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-muted-foreground">
             {subheading ||
               'See appointments, prescriptions, and reports directly inside the profile.'}
           </p>
@@ -391,7 +391,7 @@ export function TimelineContainer({
 
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="relative w-full md:max-w-md">
-          <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
             placeholder="Search doctors, meds, or files"
@@ -403,13 +403,13 @@ export function TimelineContainer({
           />
         </div>
         {lockedRole && (
-          <span className="text-xs text-slate-600">
+          <span className="text-xs text-muted-foreground">
             Timeline is pinned to the {lockedRole} profile.
           </span>
         )}
       </div>
 
-      <div className="flex flex-wrap gap-2 text-xs text-slate-600">
+      <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
         <Badge variant="secondary">Total {stats.total}</Badge>
         <Badge variant="secondary">Appts {stats.appointments}</Badge>
         <Badge variant="secondary">Rx {stats.prescriptions}</Badge>
@@ -418,11 +418,11 @@ export function TimelineContainer({
 
       <div className="grid gap-4 lg:grid-cols-[280px,1fr]">
         <div className="hidden lg:block">
-          <div className="rounded-lg border bg-white shadow-sm">
+          <div className="rounded-lg border bg-card shadow-sm">
             {filterRail}
           </div>
         </div>
-        <div className="rounded-lg border bg-white shadow-sm">
+        <div className="rounded-lg border bg-card shadow-sm">
           <ScrollArea className="h-[32rem]">{timelineBody}</ScrollArea>
         </div>
       </div>
@@ -472,7 +472,7 @@ export function TimelineContainer({
   )
 
   const renderStandalone = () => (
-    <div className="flex h-screen flex-col bg-gray-50">
+    <div className="flex h-screen flex-col bg-background">
       <TopAppBar
         onMenuClick={() => setMobileFiltersOpen(true)}
         showMenuButton
@@ -502,7 +502,7 @@ export function TimelineContainer({
 
       <div className="flex flex-1 overflow-hidden">
         <div className="hidden lg:block">
-          <ScrollArea className="h-full w-72 border-r bg-gray-50">
+          <ScrollArea className="h-full w-72 border-r bg-muted/30">
             {filterRail}
           </ScrollArea>
         </div>
