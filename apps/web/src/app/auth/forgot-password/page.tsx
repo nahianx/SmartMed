@@ -25,20 +25,20 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
+    <main className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="w-full max-w-md bg-card shadow-lg rounded-2xl p-8">
         <h1 className="text-2xl font-semibold mb-2 text-center">Reset your password</h1>
-        <p className="text-sm text-slate-600 text-center mb-6">
+        <p className="text-sm text-muted-foreground text-center mb-6">
           Enter your email address and we&apos;ll send you a reset link.
         </p>
         {submitted ? (
-          <div className="space-y-4 text-sm text-slate-700">
+          <div className="space-y-4 text-sm text-foreground">
             <p>
               If an account exists for <span className="font-medium">{email}</span>, we&apos;ve sent
               a password reset link.
             </p>
             <p>Please check your email inbox and follow the instructions.</p>
-            <Link href="/auth/login" className="text-blue-600 hover:underline">
+            <Link href="/auth/login" className="text-blue-600 dark:text-blue-400 hover:underline">
               Back to login
             </Link>
           </div>
@@ -54,10 +54,10 @@ export default function ForgotPasswordPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
             <button
               type="submit"
               disabled={loading}

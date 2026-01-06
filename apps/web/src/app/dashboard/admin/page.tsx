@@ -115,12 +115,12 @@ export default function AdminDashboardPage() {
 
           {/* Quick Stats */}
           <div className="mb-4 flex justify-between items-center">
-            <h3 className="text-gray-900 text-lg font-semibold">
+            <h3 className="text-foreground text-lg font-semibold">
               System Statistics
             </h3>
             <button
               onClick={loadStats}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-white rounded-lg transition-all"
+              className="flex items-center gap-2 px-4 py-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-all"
             >
               <RefreshCw className="w-4 h-4" />
               Refresh
@@ -129,39 +129,39 @@ export default function AdminDashboardPage() {
 
           {stats ? (
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
-              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
-                <p className="text-gray-600 mb-1">Total Users</p>
-                <p className="text-gray-900 text-2xl font-semibold">
+              <div className="bg-card rounded-xl p-6 shadow-md border border-border">
+                <p className="text-muted-foreground mb-1">Total Users</p>
+                <p className="text-foreground text-2xl font-semibold">
                   {stats.totalUsers}
                 </p>
               </div>
-              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
-                <p className="text-gray-600 mb-1">Admins</p>
-                <p className="text-gray-900 text-2xl font-semibold">
+              <div className="bg-card rounded-xl p-6 shadow-md border border-border">
+                <p className="text-muted-foreground mb-1">Admins</p>
+                <p className="text-foreground text-2xl font-semibold">
                   {stats.admins}
                 </p>
               </div>
-              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
-                <p className="text-gray-600 mb-1">Doctors</p>
-                <p className="text-gray-900 text-2xl font-semibold">
+              <div className="bg-card rounded-xl p-6 shadow-md border border-border">
+                <p className="text-muted-foreground mb-1">Doctors</p>
+                <p className="text-foreground text-2xl font-semibold">
                   {stats.doctors}
                 </p>
               </div>
-              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
-                <p className="text-gray-600 mb-1">Patients</p>
-                <p className="text-gray-900 text-2xl font-semibold">
+              <div className="bg-card rounded-xl p-6 shadow-md border border-border">
+                <p className="text-muted-foreground mb-1">Patients</p>
+                <p className="text-foreground text-2xl font-semibold">
                   {stats.patients}
                 </p>
               </div>
-              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
-                <p className="text-gray-600 mb-1">Active Users</p>
-                <p className="text-gray-900 text-2xl font-semibold">
+              <div className="bg-card rounded-xl p-6 shadow-md border border-border">
+                <p className="text-muted-foreground mb-1">Active Users</p>
+                <p className="text-foreground text-2xl font-semibold">
                   {stats.activeUsers}
                 </p>
               </div>
-              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
-                <p className="text-gray-600 mb-1">Inactive</p>
-                <p className="text-gray-900 text-2xl font-semibold">
+              <div className="bg-card rounded-xl p-6 shadow-md border border-border">
+                <p className="text-muted-foreground mb-1">Inactive</p>
+                <p className="text-foreground text-2xl font-semibold">
                   {stats.inactiveUsers}
                 </p>
               </div>
@@ -171,7 +171,7 @@ export default function AdminDashboardPage() {
               {[...Array(6)].map((_, i) => (
                 <div
                   key={i}
-                  className="h-28 bg-white rounded-xl shadow-md border border-gray-100 animate-pulse"
+                  className="h-28 bg-card rounded-xl shadow-md border border-border animate-pulse"
                 />
               ))}
             </div>

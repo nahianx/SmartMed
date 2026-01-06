@@ -262,20 +262,20 @@ export default function AdminAppointmentsPage() {
                         `/dashboard/admin/appointments/${appointment.id}`
                       )
                     }
-                    className="px-6 py-4 hover:bg-slate-50 cursor-pointer transition-colors"
+                    className="px-6 py-4 hover:bg-muted cursor-pointer transition-colors"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4 flex-1">
-                        <div className="bg-red-100 rounded-full p-3">
-                          <User className="h-6 w-6 text-red-600" />
+                        <div className="bg-red-100 dark:bg-red-950/50 rounded-full p-3">
+                          <User className="h-6 w-6 text-red-600 dark:text-red-400" />
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-1">
-                            <h3 className="font-semibold text-slate-900">
+                            <h3 className="font-semibold text-foreground">
                               {appointment.patient?.firstName}{' '}
                               {appointment.patient?.lastName}
                             </h3>
-                            <span className="text-sm text-slate-600">
+                            <span className="text-sm text-muted-foreground">
                               - Dr. {appointment.doctor?.firstName}{' '}
                               {appointment.doctor?.lastName}
                             </span>
@@ -285,7 +285,7 @@ export default function AdminAppointmentsPage() {
                               {appointment.status.replace('_', ' ')}
                             </span>
                           </div>
-                          <div className="flex items-center gap-4 text-sm text-slate-600">
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
                             <div className="flex items-center gap-1">
                               <Calendar className="h-4 w-4" />
                               <span>{formatDate(appointment.dateTime)}</span>
@@ -298,13 +298,13 @@ export default function AdminAppointmentsPage() {
                               </span>
                             </div>
                           </div>
-                          <p className="text-sm text-slate-600 mt-1">
+                          <p className="text-sm text-muted-foreground mt-1">
                             <span className="font-medium">Reason:</span>{' '}
                             {appointment.reason}
                           </p>
                         </div>
                       </div>
-                      <div className="text-red-600 font-medium text-sm">
+                      <div className="text-red-600 dark:text-red-400 font-medium text-sm">
                         View Details</div>
                     </div>
                   </div>

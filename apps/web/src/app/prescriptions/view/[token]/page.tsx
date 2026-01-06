@@ -165,23 +165,23 @@ export default function PrescriptionViewPage() {
   // Error states
   if (status === 'expired' || status === 'invalid' || status === 'error') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-card rounded-xl shadow-lg p-8 text-center">
           <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
-            status === 'expired' ? 'bg-amber-100' : 'bg-red-100'
+            status === 'expired' ? 'bg-amber-100 dark:bg-amber-950/50' : 'bg-red-100 dark:bg-red-950/50'
           }`}>
             <AlertCircle className={`h-8 w-8 ${
-              status === 'expired' ? 'text-amber-600' : 'text-red-600'
+              status === 'expired' ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'
             }`} />
           </div>
           <h1 className={`text-xl font-semibold mb-2 ${
-            status === 'expired' ? 'text-amber-800' : 'text-red-800'
+            status === 'expired' ? 'text-amber-800 dark:text-amber-300' : 'text-red-800 dark:text-red-300'
           }`}>
             {status === 'expired' ? 'Link Expired' : status === 'invalid' ? 'Invalid Link' : 'Error'}
           </h1>
-          <p className="text-gray-600 mb-6">{errorMessage}</p>
+          <p className="text-muted-foreground mb-6">{errorMessage}</p>
           {status === 'expired' && (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               Please contact your healthcare provider to request a new prescription link.
             </p>
           )}
@@ -196,7 +196,7 @@ export default function PrescriptionViewPage() {
   const prescriptionDate = new Date(prescription.createdAt)
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 print:bg-white print:p-0 print:min-h-0">
+    <div className="min-h-screen bg-background py-8 px-4 print:bg-white print:p-0 print:min-h-0">
       <div className="max-w-3xl mx-auto prescription-container">
         {/* Security Notice - hidden on print */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-start gap-3 no-print">
@@ -215,7 +215,7 @@ export default function PrescriptionViewPage() {
         </div>
 
         {/* Main Prescription Card */}
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden print:shadow-none print:rounded-none prescription-view">
+        <div className="bg-card rounded-xl shadow-lg overflow-hidden print:shadow-none print:rounded-none prescription-view">
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-5 print:hidden">
             <div className="flex items-center justify-between">
