@@ -223,7 +223,7 @@ export function SecuritySection({ userId }: { userId?: string }) {
           </div>
           <div className="flex-1">
             <h4 className="font-medium">Two-Factor Authentication</h4>
-            <p className="text-slate-600 mt-1">
+            <p className="text-muted-foreground mt-1">
               Add an extra layer of security to your account
             </p>
           </div>
@@ -262,7 +262,7 @@ export function SecuritySection({ userId }: { userId?: string }) {
           )}
           
           {toggleMFAMutation.isPending && (
-            <div className="flex items-center gap-2 text-slate-600">
+            <div className="flex items-center gap-2 text-muted-foreground">
               <Loader2 className="w-4 h-4 animate-spin" />
               <span>Updating MFA settings...</span>
             </div>
@@ -273,32 +273,32 @@ export function SecuritySection({ userId }: { userId?: string }) {
       {/* Account Information */}
       <Card className="p-6">
         <div className="flex items-start gap-4 mb-6">
-          <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
-            <CheckCircle className="w-5 h-5 text-slate-600" />
+          <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
+            <CheckCircle className="w-5 h-5 text-muted-foreground" />
           </div>
           <div className="flex-1">
             <h4 className="font-medium">Account Information</h4>
-            <p className="text-slate-600 mt-1">
+            <p className="text-muted-foreground mt-1">
               Your account status and verification details
             </p>
           </div>
         </div>
 
         <div className="space-y-4">
-          <div className="flex items-center justify-between py-3 border-b border-slate-100">
+          <div className="flex items-center justify-between py-3 border-b border-border">
             <div>
               <p className="font-medium">Email Address</p>
-              <p className="text-sm text-slate-600">{profile?.email}</p>
+              <p className="text-sm text-muted-foreground">{profile?.email}</p>
             </div>
             <Badge variant="default" className="bg-green-100 text-green-800">
               Verified
             </Badge>
           </div>
 
-          <div className="flex items-center justify-between py-3 border-b border-slate-100">
+          <div className="flex items-center justify-between py-3 border-b border-border">
             <div>
               <p className="font-medium">Account Type</p>
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-muted-foreground">
                 {profile?.role === 'DOCTOR' ? 'Healthcare Provider' : 
                  profile?.role === 'PATIENT' ? 'Patient' : 
                  profile?.role}
@@ -312,7 +312,7 @@ export function SecuritySection({ userId }: { userId?: string }) {
           <div className="flex items-center justify-between py-3">
             <div>
               <p className="font-medium">Account Created</p>
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-muted-foreground">
                 {profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString() : 'N/A'}
               </p>
             </div>
@@ -321,7 +321,7 @@ export function SecuritySection({ userId }: { userId?: string }) {
       </Card>
 
       {/* Security Tips */}
-      <Card className="p-6 bg-slate-50">
+      <Card className="p-6 bg-muted/50">
         <h4 className="font-medium mb-4">Security Tips</h4>
         <div className="space-y-3 text-sm">
           <div className="flex items-start gap-2">

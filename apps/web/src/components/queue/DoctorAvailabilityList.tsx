@@ -60,25 +60,25 @@ export function DoctorAvailabilityList() {
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
         Loading available doctors...
       </div>
     )
   }
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm space-y-3">
+    <section className="rounded-xl border border-border bg-card p-5 shadow-sm space-y-3">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold">Available doctors</h2>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-muted-foreground">
             Live availability and queue estimates.
           </p>
         </div>
         <button
           type="button"
           onClick={loadAvailable}
-          className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
+          className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm text-muted-foreground hover:bg-muted"
         >
           <RefreshCw className="h-4 w-4" />
           Refresh
@@ -86,7 +86,7 @@ export function DoctorAvailabilityList() {
       </div>
 
       {doctors.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-slate-200 p-4 text-sm text-slate-600">
+        <div className="rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
           No doctors are available right now.
         </div>
       ) : (
@@ -94,22 +94,22 @@ export function DoctorAvailabilityList() {
           {doctors.slice(0, 6).map((doctor) => (
             <div
               key={doctor.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3"
+              className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-muted/50 p-3"
             >
               <div>
-                <p className="font-semibold text-slate-900">
+                <p className="font-semibold text-foreground">
                   Dr. {doctor.firstName} {doctor.lastName}
                 </p>
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-muted-foreground">
                   {doctor.specialization || 'General'}
                 </p>
               </div>
-              <div className="text-right text-sm text-slate-600">
+              <div className="text-right text-sm text-muted-foreground">
                 <div className="flex items-center justify-end gap-1">
                   <Activity className="h-4 w-4" />
                   <span>{doctor.availabilityStatus || 'UNKNOWN'}</span>
                 </div>
-                <div className="text-xs text-slate-500">
+                <div className="text-xs text-muted-foreground">
                   Queue {doctor.queueLength ?? 0} · Est {doctor.estimatedWaitTime ?? '--'} min
                 </div>
               </div>

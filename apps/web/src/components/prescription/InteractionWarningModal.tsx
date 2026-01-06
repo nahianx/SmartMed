@@ -307,7 +307,7 @@ export default function InteractionWarningModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
-      <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+      <div className="bg-card rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="sticky top-0 bg-amber-50 border-b border-amber-200 px-6 py-4 flex items-center gap-3 rounded-t-xl">
           <AlertTriangle className="h-6 w-6 text-amber-600" />
@@ -337,10 +337,10 @@ export default function InteractionWarningModal({
               {warnings.map((warning, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg"
+                  className="flex items-center gap-2 p-3 bg-muted/50 border border-border rounded-lg"
                 >
-                  <Info className="h-4 w-4 text-slate-500" />
-                  <span className="text-sm text-slate-700">{warning}</span>
+                  <Info className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-foreground">{warning}</span>
                 </div>
               ))}
             </div>
@@ -349,7 +349,7 @@ export default function InteractionWarningModal({
           {/* Allergy conflicts */}
           {allergyConflicts.length > 0 && (
             <div className="space-y-3">
-              <h3 className="font-medium text-slate-900 flex items-center gap-2">
+              <h3 className="font-medium text-foreground flex items-center gap-2">
                 <ShieldAlert className="h-5 w-5 text-red-500" />
                 Allergy Conflicts ({allergyConflicts.length})
               </h3>
@@ -406,11 +406,11 @@ export default function InteractionWarningModal({
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-white border-t border-slate-200 px-6 py-4 flex items-center gap-3 rounded-b-xl">
+        <div className="sticky bottom-0 bg-card border-t border-border px-6 py-4 flex items-center gap-3 rounded-b-xl">
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+            className="flex-1 px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted transition-colors"
           >
             Go Back & Modify
           </button>
@@ -422,7 +422,7 @@ export default function InteractionWarningModal({
               flex-1 px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2
               ${hasAnySevere 
                 ? 'bg-amber-500 hover:bg-amber-600 text-white disabled:opacity-50 disabled:cursor-not-allowed' 
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
+                : 'bg-primary hover:bg-primary/90 text-primary-foreground'
               }
             `}
           >

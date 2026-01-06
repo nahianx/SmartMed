@@ -161,18 +161,18 @@ export function DoctorQueuePanel({ doctorId }: { doctorId: string }) {
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
         Loading queue...
       </div>
     )
   }
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
+    <section className="rounded-xl border border-border bg-card p-5 shadow-sm space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold">Live Queue</h2>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-muted-foreground">
             Manage walk-ins and checked-in appointments in real time.
           </p>
         </div>
@@ -180,7 +180,7 @@ export function DoctorQueuePanel({ doctorId }: { doctorId: string }) {
           <select
             value={doctorStatus?.availabilityStatus || 'OFF_DUTY'}
             onChange={(event) => handleStatusChange(event.target.value)}
-            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+            className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
             disabled={updating}
           >
             {STATUS_OPTIONS.map((status) => (
@@ -192,7 +192,7 @@ export function DoctorQueuePanel({ doctorId }: { doctorId: string }) {
           <button
             type="button"
             onClick={fetchState}
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
+            className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm text-muted-foreground hover:bg-muted"
           >
             <RefreshCw className="h-4 w-4" />
             Refresh
@@ -224,7 +224,7 @@ export function DoctorQueuePanel({ doctorId }: { doctorId: string }) {
             <button
               type="button"
               onClick={() => handleNoShow(inProgress.id)}
-              className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-100"
+              className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-card px-3 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-100"
               disabled={updating}
             >
               <AlertTriangle className="h-4 w-4" />
@@ -233,7 +233,7 @@ export function DoctorQueuePanel({ doctorId }: { doctorId: string }) {
           </div>
         </div>
       ) : (
-        <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-slate-600">
+        <div className="rounded-lg border border-border bg-muted/50 p-4 text-muted-foreground">
           No patient currently in progress.
         </div>
       )}
@@ -252,7 +252,7 @@ export function DoctorQueuePanel({ doctorId }: { doctorId: string }) {
       </div>
 
       {waiting.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-slate-200 p-4 text-sm text-slate-500">
+        <div className="rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
           No patients in the waiting queue yet.
         </div>
       ) : (
@@ -260,21 +260,21 @@ export function DoctorQueuePanel({ doctorId }: { doctorId: string }) {
           {waiting.map((entry) => (
             <div
               key={entry.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white p-3"
+              className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-3"
             >
               <div>
-                <p className="font-semibold text-slate-900">
+                <p className="font-semibold text-foreground">
                   {entry.patient?.firstName} {entry.patient?.lastName}
                 </p>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-muted-foreground">
                   {entry.serialNumber} · {entry.queueType.replace('_', ' ')}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-sm font-semibold text-slate-700">
+                <p className="text-sm font-semibold text-foreground">
                   Position {entry.position}
                 </p>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                   Est. wait {entry.estimatedWaitTime ?? '--'} min
                 </p>
               </div>

@@ -119,21 +119,21 @@ export default function PrescriptionModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+      <div className="bg-card rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-card border-b border-border px-6 py-4 flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-slate-900">
+            <h2 className="text-xl font-semibold text-foreground">
               Create Prescription
             </h2>
-            <p className="text-sm text-slate-600 mt-1">For {patientName}</p>
+            <p className="text-sm text-muted-foreground mt-1">For {patientName}</p>
           </div>
           <button
             onClick={onClose}
             type="button"
-            className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-muted rounded-lg transition-colors"
             aria-label="Close modal"
           >
-            <X className="h-5 w-5 text-slate-600" />
+            <X className="h-5 w-5 text-muted-foreground" />
           </button>
         </div>
 
@@ -145,7 +145,7 @@ export default function PrescriptionModal({
           )}
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Diagnosis <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -153,14 +153,14 @@ export default function PrescriptionModal({
               onChange={(e) => setDiagnosis(e.target.value)}
               placeholder="Enter diagnosis"
               rows={3}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
               required
             />
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-3">
-              <label className="block text-sm font-medium text-slate-700">
+              <label className="block text-sm font-medium text-foreground">
                 Medications <span className="text-red-500">*</span>
               </label>
               <button
@@ -177,10 +177,10 @@ export default function PrescriptionModal({
               {medications.map((medication, index) => (
                 <div
                   key={index}
-                  className="border border-slate-200 rounded-lg p-4 bg-slate-50"
+                  className="border border-border rounded-lg p-4 bg-muted/50"
                 >
                   <div className="flex items-start justify-between mb-3">
-                    <h4 className="text-sm font-medium text-slate-700">
+                    <h4 className="text-sm font-medium text-foreground">
                       Medication {index + 1}
                     </h4>
                     {medications.length > 1 && (
@@ -301,7 +301,7 @@ export default function PrescriptionModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Additional Notes (Optional)
             </label>
             <textarea
@@ -309,15 +309,15 @@ export default function PrescriptionModal({
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Any additional notes or instructions"
               rows={3}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
 
-          <div className="flex items-center gap-3 pt-4 border-t border-slate-200">
+          <div className="flex items-center gap-3 pt-4 border-t border-border">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+              className="px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted transition-colors"
               disabled={isSubmitting}
             >
               Cancel
@@ -325,7 +325,7 @@ export default function PrescriptionModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Creating...' : 'Create Prescription'}
             </button>

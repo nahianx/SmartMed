@@ -263,7 +263,7 @@ export default function DrugAutocomplete({
       {isOpen && suggestions.length > 0 && (
         <div
           id="drug-suggestions"
-          className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-64 overflow-y-auto"
+          className="absolute z-50 w-full mt-1 bg-card border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto"
           role="listbox"
         >
           {suggestions.map((drug, index) => (
@@ -274,17 +274,17 @@ export default function DrugAutocomplete({
               onMouseEnter={() => setHighlightedIndex(index)}
               className={`
                 w-full px-4 py-3 text-left flex items-start gap-3
-                hover:bg-blue-50 transition-colors
-                ${highlightedIndex === index ? 'bg-blue-50' : ''}
-                ${index !== suggestions.length - 1 ? 'border-b border-slate-100' : ''}
+                hover:bg-primary/10 transition-colors
+                ${highlightedIndex === index ? 'bg-primary/10' : ''}
+                ${index !== suggestions.length - 1 ? 'border-b border-border' : ''}
               `}
               role="option"
               aria-selected={highlightedIndex === index}
             >
-              <Pill className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
+              <Pill className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-slate-900 truncate">
+                  <span className="font-medium text-foreground truncate">
                     {drug.name}
                   </span>
                   <span className={`px-2 py-0.5 text-xs rounded-full ${getDrugTypeColor(drug.tty)}`}>
@@ -292,7 +292,7 @@ export default function DrugAutocomplete({
                   </span>
                 </div>
                 {drug.synonym && drug.synonym !== drug.name && (
-                  <p className="text-xs text-slate-500 mt-0.5 truncate">
+                  <p className="text-xs text-muted-foreground mt-0.5 truncate">
                     Also known as: {drug.synonym}
                   </p>
                 )}
@@ -304,11 +304,11 @@ export default function DrugAutocomplete({
 
       {/* No results message */}
       {isOpen && suggestions.length === 0 && inputValue.length >= 2 && !isLoading && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg p-4">
-          <p className="text-slate-500 text-sm text-center">
+        <div className="absolute z-50 w-full mt-1 bg-card border border-border rounded-lg shadow-lg p-4">
+          <p className="text-muted-foreground text-sm text-center">
             No medications found for "{inputValue}"
           </p>
-          <p className="text-slate-400 text-xs text-center mt-1">
+          <p className="text-muted-foreground/70 text-xs text-center mt-1">
             You can still enter the name manually
           </p>
         </div>

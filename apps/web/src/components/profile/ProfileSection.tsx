@@ -303,7 +303,7 @@ export function ProfileSection({ onUnsavedChanges, userId }: ProfileSectionProps
         </div>
         <div>
           <h4 className="font-medium">Profile Photo</h4>
-          <p className="text-slate-600 text-sm mt-1">
+          <p className="text-muted-foreground text-sm mt-1">
             Upload a professional photo. JPG or PNG, max 5MB.
           </p>
           {profile.profilePhotoUrl && (
@@ -349,9 +349,9 @@ export function ProfileSection({ onUnsavedChanges, userId }: ProfileSectionProps
               type="email"
               value={profile.email}
               disabled
-              className="bg-slate-50"
+              className="bg-muted"
             />
-            <p className="text-xs text-slate-500">Email cannot be changed</p>
+            <p className="text-xs text-muted-foreground">Email cannot be changed</p>
           </div>
 
           <div className="space-y-2">
@@ -566,7 +566,7 @@ export function ProfileSection({ onUnsavedChanges, userId }: ProfileSectionProps
 
       {/* Action Buttons */}
       {hasChanges && (
-        <div className="flex gap-3 pt-6 border-t border-slate-200">
+        <div className="flex gap-3 pt-6 border-t border-border">
           <Button 
             onClick={handleSave}
             disabled={updateProfileMutation.isPending || updateSpecializationsMutation.isPending || updateClinicInfoMutation.isPending}
