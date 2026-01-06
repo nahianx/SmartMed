@@ -27,3 +27,4 @@ export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor } from './compon
 export { Separator } from './components/Separator'
 export { Skeleton } from './components/Skeleton'
 export { ScrollArea, ScrollBar } from './components/ScrollArea'
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './components/Tooltip'
