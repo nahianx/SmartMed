@@ -7,6 +7,7 @@
 
 import { Router, Request, Response } from 'express'
 import { prescriptionTokenService } from '../services/prescriptionToken.service'
+import { pdfService } from '../services/pdf.service'
 import { rateLimiter } from '../middleware/rateLimiter'
 
 const router = Router()
@@ -178,6 +179,52 @@ router.get(
       console.error('Error accessing prescription print view:', error)
       return res.status(500).json({
         error: 'Failed to retrieve prescription for printing',
+      })
+    }
+  }
+)
+
+/**
+ * GET /api/public/prescriptions/:token/download/pdf
+ * Download prescription as PDF using share token (no auth required)
+ * Rate limited to prevent abuse
+ */
+router.get(
+  '/prescriptions/:token/download/pdf',
+  rateLimiter(5, 60 * 1000), // 5 requests per minute for public endpoint
+  async (req: Request, res: Response) => {
+    try {
+      const { token } = req.params
+
+      if (!token || token.length < 10) {
+        return res.status(400).json({
+          error: 'Invalid token format',
+        })
+      }
+
+      // Generate PDF using token
+      const result = await pdfService.generatePrescriptionPdfByToken(token)
+
+      if (!result) {
+        return res.status(404).json({
+          error: 'Prescription not found or token is invalid/expired',
+        })
+      }
+
+      // Set headers for PDF download
+      res.setHeader('Content-Type', 'application/pdf')
+      res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`)
+      res.setHeader('Content-Length', result.buffer.length)
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+      res.setHeader('Pragma', 'no-cache')
+      res.setHeader('Expires', '0')
+
+      // Send buffer directly
+      return res.send(result.buffer)
+    } catch (error) {
+      console.error('Error generating public prescription PDF:', error)
+      return res.status(500).json({
+        error: 'Failed to generate prescription PDF',
       })
     }
   }

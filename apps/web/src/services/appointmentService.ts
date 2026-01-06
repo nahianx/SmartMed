@@ -250,6 +250,72 @@ class AppointmentService {
     const response = await apiClient.put(`/appointments/${id}`, { notes })
     return response.data.appointment
   }
+
+  /**
+   * Get available slots for rescheduling an appointment
+   */
+  async getRescheduleSlots(
+    appointmentId: string,
+    options?: { startDate?: string; endDate?: string }
+  ): Promise<{
+    appointment: {
+      id: string
+      currentDateTime: string
+      duration: number
+      doctor: { id: string; name: string }
+    }
+    availableSlots: Array<{ date: string; time: string; dateTime: string }>
+    rules: { maxReschedules: number; minHoursBeforeReschedule: number }
+  }> {
+    const response = await apiClient.get(
+      `/appointments/${appointmentId}/reschedule/available-slots`,
+      { params: options }
+    )
+    return response.data
+  }
+
+  /**
+   * Reschedule an appointment to a new date/time
+   */
+  async rescheduleAppointment(
+    appointmentId: string,
+    newDateTime: string,
+    reason?: string
+  ): Promise<{
+    message: string
+    appointment: Appointment
+    rescheduleCount: number
+    remainingReschedules: number
+  }> {
+    const response = await apiClient.post(
+      `/appointments/${appointmentId}/reschedule`,
+      { newDateTime, reason }
+    )
+    return response.data
+  }
+
+  /**
+   * Get reschedule history for an appointment
+   */
+  async getRescheduleHistory(appointmentId: string): Promise<{
+    appointmentId: string
+    currentDateTime: string
+    rescheduleHistory: Array<{
+      previousDateTime: string
+      newDateTime: string
+      rescheduleReason: string | null
+      rescheduledAt: string
+      rescheduledBy: string
+    }>
+    rescheduleCount: number
+    remainingReschedules: number
+    canReschedule: boolean
+  }> {
+    const response = await apiClient.get(
+      `/appointments/${appointmentId}/reschedule/history`
+    )
+    return response.data
+  }
 }
 
 export const appointmentService = new AppointmentService()

@@ -22,6 +22,8 @@ import {
   Shield,
   Calendar,
   FileText,
+  Download,
+  Loader2,
 } from 'lucide-react'
 import { getApiBase } from '@/utils/apiBase'
 import '@/styles/prescription-print.css'
@@ -69,6 +71,7 @@ export default function PrescriptionViewPage() {
   const [prescription, setPrescription] = useState<PrescriptionData | null>(null)
   const [accessInfo, setAccessInfo] = useState<AccessInfo | null>(null)
   const [errorMessage, setErrorMessage] = useState<string>('')
+  const [isDownloading, setIsDownloading] = useState(false)
 
   useEffect(() => {
     async function fetchPrescription() {
@@ -115,6 +118,36 @@ export default function PrescriptionViewPage() {
 
   const handlePrint = () => {
     window.print()
+  }
+
+  const handleDownloadPdf = async () => {
+    if (isDownloading) return
+    
+    setIsDownloading(true)
+    try {
+      const apiUrl = getApiBase()
+      const response = await fetch(`${apiUrl}/api/public/prescriptions/${token}/download/pdf`)
+      
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: 'Download failed' }))
+        throw new Error(error.error || 'Failed to download PDF')
+      }
+      
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `prescription-${prescription?.id?.slice(0, 8) || 'download'}.pdf`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Error downloading PDF:', error)
+      alert(error instanceof Error ? error.message : 'Failed to download PDF. Please try again.')
+    } finally {
+      setIsDownloading(false)
+    }
   }
 
   // Loading state
@@ -193,13 +226,27 @@ export default function PrescriptionViewPage() {
                   <p className="text-blue-100 text-sm">SmartMed Healthcare System</p>
                 </div>
               </div>
-              <button
-                onClick={handlePrint}
-                className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-colors"
-              >
-                <Printer className="h-4 w-4" />
-                Print
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handlePrint}
+                  className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-colors"
+                >
+                  <Printer className="h-4 w-4" />
+                  Print
+                </button>
+                <button
+                  onClick={handleDownloadPdf}
+                  disabled={isDownloading}
+                  className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                {isDownloading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4" />
+                )}
+                {isDownloading ? 'Downloading...' : 'Download PDF'}
               </button>
+              </div>
             </div>
           </div>
 
