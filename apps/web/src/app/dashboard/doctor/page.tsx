@@ -143,7 +143,7 @@ export default function DoctorDashboardPage() {
 
       <div className="mx-auto max-w-6xl px-6 py-8 space-y-6">
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg">
             {error}
           </div>
         )}
@@ -219,7 +219,7 @@ export default function DoctorDashboardPage() {
               </div>
 
               {!profileComplete && (
-                <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+                <div className="mt-4 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 p-4 text-sm text-amber-900 dark:text-amber-300">
                   <div className="flex items-start gap-2">
                     <AlertTriangle className="mt-0.5 h-4 w-4" />
                     <div className="space-y-1">
@@ -239,7 +239,7 @@ export default function DoctorDashboardPage() {
                         <button
                           type="button"
                           onClick={fetchDashboard}
-                          className="inline-flex items-center gap-2 rounded-md border border-amber-200 bg-white px-3 py-1.5 text-xs font-semibold text-amber-800 hover:bg-amber-100"
+                          className="inline-flex items-center gap-2 rounded-md border border-amber-200 dark:border-amber-700 bg-card px-3 py-1.5 text-xs font-semibold text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/30"
                         >
                           Recheck status
                         </button>
@@ -366,16 +366,16 @@ function StatusCard({
       bg: variant === 'soft' ? 'bg-muted' : 'bg-card',
     },
     info: {
-      border: 'border-blue-100',
-      bg: variant === 'soft' ? 'bg-blue-50' : 'bg-card',
+      border: 'border-blue-100 dark:border-blue-800',
+      bg: variant === 'soft' ? 'bg-blue-50 dark:bg-blue-950/30' : 'bg-card',
     },
     success: {
-      border: 'border-emerald-100',
-      bg: variant === 'soft' ? 'bg-emerald-50' : 'bg-card',
+      border: 'border-emerald-100 dark:border-emerald-800',
+      bg: variant === 'soft' ? 'bg-emerald-50 dark:bg-emerald-950/30' : 'bg-card',
     },
     warning: {
-      border: 'border-amber-100',
-      bg: variant === 'soft' ? 'bg-amber-50' : 'bg-card',
+      border: 'border-amber-100 dark:border-amber-800',
+      bg: variant === 'soft' ? 'bg-amber-50 dark:bg-amber-950/30' : 'bg-card',
     },
   }
 
@@ -385,7 +385,7 @@ function StatusCard({
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="rounded-lg bg-white/70 p-2 shadow-sm">{icon}</div>
+          <div className="rounded-lg bg-card/70 dark:bg-card/50 p-2 shadow-sm">{icon}</div>
           <p className="text-sm font-medium text-foreground">{title}</p>
         </div>
       </div>

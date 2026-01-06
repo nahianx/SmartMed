@@ -301,31 +301,31 @@ export default function PermissionManagementPage() {
 
   if (loading || !user) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-gray-600">Loading...</div>
+      <main className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-muted-foreground">Loading...</div>
       </main>
     )
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
+      <div className="bg-card border-b border-border sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => router.push('/dashboard/admin')}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-muted rounded-lg transition-colors"
                 aria-label="Back to admin dashboard"
               >
-                <ArrowLeft className="h-5 w-5 text-slate-600" />
+                <ArrowLeft className="h-5 w-5 text-muted-foreground" />
               </button>
               <div className="flex items-center gap-3">
                 <Shield className="h-6 w-6 text-blue-600" />
                 <div>
-                  <h1 className="text-xl font-semibold text-slate-900">Permission Management</h1>
-                  <p className="text-sm text-slate-600">Manage role-based access control</p>
+                  <h1 className="text-xl font-semibold text-foreground">Permission Management</h1>
+                  <p className="text-sm text-muted-foreground">Manage role-based access control</p>
                 </div>
               </div>
             </div>
@@ -361,11 +361,11 @@ export default function PermissionManagementPage() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Filters */}
-        <div className="bg-white rounded-lg border border-slate-200 p-4 mb-6">
+        <div className="bg-card rounded-lg border border-border p-4 mb-6">
           <div className="flex flex-wrap gap-4">
             <div className="flex-1 min-w-[200px]">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search permissions..."
                   value={searchTerm}
@@ -426,20 +426,20 @@ export default function PermissionManagementPage() {
         {!isLoading && (
           <div className="space-y-4">
             {Object.entries(permissionsByResource).map(([resource, perms]) => (
-              <div key={resource} className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+              <div key={resource} className="bg-card rounded-lg border border-border overflow-hidden">
                 {/* Resource Header */}
                 <button
-                  className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 hover:bg-slate-100 transition-colors"
+                  className="w-full flex items-center justify-between px-4 py-3 bg-muted hover:bg-muted/80 transition-colors"
                   onClick={() => toggleResource(resource)}
                   aria-label={`Toggle ${resource} permissions`}
                 >
                   <div className="flex items-center gap-3">
                     {expandedResources.has(resource) ? (
-                      <ChevronDown className="h-5 w-5 text-slate-500" />
+                      <ChevronDown className="h-5 w-5 text-muted-foreground" />
                     ) : (
-                      <ChevronRight className="h-5 w-5 text-slate-500" />
+                      <ChevronRight className="h-5 w-5 text-muted-foreground" />
                     )}
-                    <span className="font-medium text-slate-900 capitalize">{resource}</span>
+                    <span className="font-medium text-foreground capitalize">{resource}</span>
                     <Badge variant="outline">{perms.length} permission{perms.length !== 1 ? 's' : ''}</Badge>
                   </div>
                 </button>
@@ -449,8 +449,8 @@ export default function PermissionManagementPage() {
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="border-b border-slate-200 bg-slate-50/50">
-                          <th className="px-4 py-3 text-left text-sm font-medium text-slate-600 min-w-[250px]">
+                        <tr className="border-b border-border bg-muted/50">
+                          <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground min-w-[250px]">
                             Permission
                           </th>
                           {displayRoles.map(role => (
@@ -458,24 +458,24 @@ export default function PermissionManagementPage() {
                               <Badge className={ROLE_COLORS[role]}>{role}</Badge>
                             </th>
                           ))}
-                          <th className="px-4 py-3 text-right text-sm font-medium text-slate-600 w-[100px]">
+                          <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground w-[100px]">
                             Actions
                           </th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100">
+                      <tbody className="divide-y divide-border">
                         {perms.map(permission => (
-                          <tr key={permission.id} className="hover:bg-slate-50">
+                          <tr key={permission.id} className="hover:bg-muted/50">
                             <td className="px-4 py-3">
                               <div>
                                 <div className="flex items-center gap-2">
-                                  <span className="font-medium text-slate-900">{permission.name}</span>
+                                  <span className="font-medium text-foreground">{permission.name}</span>
                                   {permission.isSystem && (
                                     <Badge variant="outline" className="text-xs">System</Badge>
                                   )}
                                 </div>
                                 {permission.description && (
-                                  <p className="text-sm text-slate-500 mt-0.5">{permission.description}</p>
+                                  <p className="text-sm text-muted-foreground mt-0.5">{permission.description}</p>
                                 )}
                                 <Badge variant="outline" className="text-xs mt-1">
                                   {permission.action}
@@ -520,9 +520,9 @@ export default function PermissionManagementPage() {
             ))}
 
             {Object.keys(permissionsByResource).length === 0 && (
-              <div className="bg-white rounded-lg border border-slate-200 p-8 text-center">
-                <Shield className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-                <p className="text-slate-600">No permissions found matching your filters.</p>
+              <div className="bg-card rounded-lg border border-border p-8 text-center">
+                <Shield className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
+                <p className="text-muted-foreground">No permissions found matching your filters.</p>
               </div>
             )}
           </div>
@@ -541,18 +541,18 @@ export default function PermissionManagementPage() {
           
           <div className="space-y-4 py-4">
             <div>
-              <label className="text-sm font-medium text-slate-700">Permission Name</label>
+              <label className="text-sm font-medium text-foreground">Permission Name</label>
               <Input
                 placeholder="e.g., reports:export"
                 value={createForm.name}
                 onChange={(e) => setCreateForm(prev => ({ ...prev, name: e.target.value }))}
                 className="mt-1"
               />
-              <p className="text-xs text-slate-500 mt-1">Use format: resource:action</p>
+              <p className="text-xs text-muted-foreground mt-1">Use format: resource:action</p>
             </div>
             
             <div>
-              <label className="text-sm font-medium text-slate-700">Description</label>
+              <label className="text-sm font-medium text-foreground">Description</label>
               <Input
                 placeholder="Optional description"
                 value={createForm.description}
@@ -562,7 +562,7 @@ export default function PermissionManagementPage() {
             </div>
             
             <div>
-              <label className="text-sm font-medium text-slate-700">Resource</label>
+              <label className="text-sm font-medium text-foreground">Resource</label>
               <Select
                 value={createForm.resource}
                 onValueChange={(v) => setCreateForm(prev => ({ ...prev, resource: v }))}
@@ -585,7 +585,7 @@ export default function PermissionManagementPage() {
             </div>
             
             <div>
-              <label className="text-sm font-medium text-slate-700">Action</label>
+              <label className="text-sm font-medium text-foreground">Action</label>
               <Select
                 value={createForm.action}
                 onValueChange={(v) => setCreateForm(prev => ({ ...prev, action: v as PermissionAction }))}

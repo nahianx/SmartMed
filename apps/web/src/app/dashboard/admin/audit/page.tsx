@@ -42,15 +42,15 @@ export default function AdminAuditLogPage() {
 
   if (loading || !user) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-orange-50">
-        <div className="text-gray-600">Loading...</div>
+      <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-background to-orange-50 dark:from-red-950/20 dark:via-background dark:to-orange-950/20">
+        <div className="text-muted-foreground">Loading...</div>
       </main>
     )
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="bg-white border-b border-slate-200">
+    <div className="min-h-screen bg-background">
+      <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
@@ -68,14 +68,14 @@ export default function AdminAuditLogPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
 
-        <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6 mb-4">
+        <div className="bg-card rounded-xl shadow-md border border-border p-6 mb-4">
           <div className="flex items-center gap-3 mb-4">
-            <Filter className="h-5 w-5 text-slate-600" />
+            <Filter className="h-5 w-5 text-muted-foreground" />
             <h2 className="text-lg font-semibold">Filters</h2>
           </div>
           <div className="flex flex-wrap gap-3 items-center">
@@ -83,7 +83,7 @@ export default function AdminAuditLogPage() {
               value={actionFilter}
               onChange={(e) => setActionFilter(e.target.value)}
               placeholder="Filter by action (activate, demote, etc)"
-              className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="px-4 py-2 border border-border bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             />
             <Button variant="outline" onClick={() => setActionFilter('')}>
               Clear
@@ -92,40 +92,40 @@ export default function AdminAuditLogPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div className="bg-card rounded-xl shadow-md border border-border overflow-hidden">
+          <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-muted">
             <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-slate-600" />
-              <h3 className="text-lg font-semibold text-slate-900">Recent Actions</h3>
+              <FileText className="h-5 w-5 text-muted-foreground" />
+              <h3 className="text-lg font-semibold text-foreground">Recent Actions</h3>
             </div>
-            <span className="text-sm text-slate-600">Total: {filtered.length}</span>
+            <span className="text-sm text-muted-foreground">Total: {filtered.length}</span>
           </div>
 
           {isLoading ? (
-            <div className="h-80 flex items-center justify-center text-slate-600">Loading audit log...</div>
+            <div className="h-80 flex items-center justify-center text-muted-foreground">Loading audit log...</div>
           ) : filtered.length === 0 ? (
-            <div className="h-80 flex items-center justify-center text-slate-500">No audit entries found</div>
+            <div className="h-80 flex items-center justify-center text-muted-foreground">No audit entries found</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-slate-50 border-b border-slate-200">
+                <thead className="bg-muted border-b border-border">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Action</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Resource</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Actor</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Reason</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Time</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Action</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Resource</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Actor</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Reason</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Time</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.map((entry) => (
-                    <tr key={entry.id} className="border-b border-slate-200 hover:bg-slate-50">
-                      <td className="px-6 py-3 text-sm text-slate-900">{entry.action}</td>
-                      <td className="px-6 py-3 text-sm text-slate-700">{entry.resource}</td>
-                      <td className="px-6 py-3 text-sm text-slate-700">{entry.actorEmail}</td>
-                      <td className="px-6 py-3 text-sm text-slate-600">{entry.reason || '—'}</td>
-                      <td className="px-6 py-3 text-sm text-slate-600 flex items-center gap-2">
-                        <Clock3 className="h-4 w-4 text-slate-400" />
+                    <tr key={entry.id} className="border-b border-border hover:bg-muted/50">
+                      <td className="px-6 py-3 text-sm text-foreground">{entry.action}</td>
+                      <td className="px-6 py-3 text-sm text-muted-foreground">{entry.resource}</td>
+                      <td className="px-6 py-3 text-sm text-muted-foreground">{entry.actorEmail}</td>
+                      <td className="px-6 py-3 text-sm text-muted-foreground">{entry.reason || '—'}</td>
+                      <td className="px-6 py-3 text-sm text-muted-foreground flex items-center gap-2">
+                        <Clock3 className="h-4 w-4 text-muted-foreground" />
                         {new Date(entry.createdAt).toLocaleString()}
                       </td>
                     </tr>

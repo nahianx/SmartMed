@@ -139,8 +139,8 @@ export default function AppointmentDetailPage() {
 
   if (loading || isLoading) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-cyan-50">
-        <div className="text-gray-600">Loading...</div>
+      <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-background to-cyan-50 dark:from-blue-950/20 dark:via-background dark:to-cyan-950/20">
+        <div className="text-muted-foreground">Loading...</div>
       </main>
     )
   }
@@ -182,24 +182,24 @@ export default function AppointmentDetailPage() {
     appointment.status === 'CONFIRMED'
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200">
+      <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => router.push('/dashboard/doctor/appointments')}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-muted rounded-lg transition-colors"
                 aria-label="Back to appointments"
               >
-                <ArrowLeft className="h-5 w-5 text-slate-600" />
+                <ArrowLeft className="h-5 w-5 text-muted-foreground" />
               </button>
               <div>
-                <h1 className="text-xl font-semibold text-slate-900">
+                <h1 className="text-xl font-semibold text-foreground">
                   Appointments
                 </h1>
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-muted-foreground">
                   View patient context and manage appointment
                 </p>
               </div>
@@ -208,16 +208,16 @@ export default function AppointmentDetailPage() {
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-blue-50 via-white to-cyan-50 min-h-[calc(100vh-4rem)]">
+      <div className="bg-gradient-to-br from-blue-50 via-background to-cyan-50 dark:from-blue-950/20 dark:via-background dark:to-cyan-950/20 min-h-[calc(100vh-4rem)]">
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+            <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg mb-6">
               {error}
             </div>
           )}
           {success && (
             <div
-              className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6"
+              className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-400 px-4 py-3 rounded-lg mb-6"
               role="status"
               aria-live="polite"
             >
@@ -229,16 +229,16 @@ export default function AppointmentDetailPage() {
             {/* Left Column - Patient Info & Actions */}
             <div className="lg:col-span-1 space-y-6">
               {/* Patient Information */}
-              <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
-                <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-200">
-                  <div className="bg-blue-100 rounded-full p-3">
-                    <User className="h-6 w-6 text-blue-600" />
+              <div className="bg-card rounded-lg border border-border shadow-sm p-6">
+                <div className="flex items-center gap-3 mb-4 pb-4 border-b border-border">
+                  <div className="bg-blue-100 dark:bg-blue-950/50 rounded-full p-3">
+                    <User className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-semibold text-slate-900">
+                    <h2 className="text-lg font-semibold text-foreground">
                       {patient?.firstName} {patient?.lastName}
                     </h2>
-                    <p className="text-sm text-slate-600">
+                    <p className="text-sm text-muted-foreground">
                       {formatTime(appointment.dateTime)}
                     </p>
                   </div>
@@ -246,10 +246,10 @@ export default function AppointmentDetailPage() {
 
                 <div className="space-y-3">
                   <div>
-                    <label className="text-xs font-medium text-slate-500 uppercase">
+                    <label className="text-xs font-medium text-muted-foreground uppercase">
                       Name
                     </label>
-                    <p className="text-sm text-slate-900">
+                    <p className="text-sm text-foreground">
                       {patient?.firstName} {patient?.lastName}
                     </p>
                   </div>
@@ -257,18 +257,18 @@ export default function AppointmentDetailPage() {
                   {patient?.dateOfBirth && (
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="text-xs font-medium text-slate-500 uppercase">
+                        <label className="text-xs font-medium text-muted-foreground uppercase">
                           Age
                         </label>
-                        <p className="text-sm text-slate-900">
+                        <p className="text-sm text-foreground">
                           {calculateAge(patient.dateOfBirth)} years
                         </p>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-slate-500 uppercase">
+                        <label className="text-xs font-medium text-muted-foreground uppercase">
                           Gender
                         </label>
-                        <p className="text-sm text-slate-900 capitalize">
+                        <p className="text-sm text-foreground capitalize">
                           {patient?.gender?.toLowerCase() || 'N/A'}
                         </p>
                       </div>
@@ -277,10 +277,10 @@ export default function AppointmentDetailPage() {
 
                   {patient?.phoneNumber && (
                     <div>
-                      <label className="text-xs font-medium text-slate-500 uppercase flex items-center gap-1">
+                      <label className="text-xs font-medium text-muted-foreground uppercase flex items-center gap-1">
                         <Phone className="h-3 w-3" /> Phone
                       </label>
-                      <p className="text-sm text-slate-900">
+                      <p className="text-sm text-foreground">
                         {patient.phoneNumber}
                       </p>
                     </div>
@@ -288,21 +288,21 @@ export default function AppointmentDetailPage() {
 
                   {appointment.patient?.address && (
                     <div>
-                      <label className="text-xs font-medium text-slate-500 uppercase">
+                      <label className="text-xs font-medium text-muted-foreground uppercase">
                         Address
                       </label>
-                      <p className="text-sm text-slate-900">
+                      <p className="text-sm text-foreground">
                         {appointment.patient.address}
                       </p>
                     </div>
                   )}
 
                   {patient?.allergies && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                      <label className="text-xs font-medium text-red-700 uppercase flex items-center gap-1">
+                    <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                      <label className="text-xs font-medium text-red-700 dark:text-red-400 uppercase flex items-center gap-1">
                         <AlertTriangle className="h-3 w-3" /> Allergies
                       </label>
-                      <p className="text-sm text-red-900 mt-1">
+                      <p className="text-sm text-red-900 dark:text-red-300 mt-1">
                         {typeof patient.allergies === 'string'
                           ? patient.allergies
                           : JSON.stringify(patient.allergies)}
@@ -314,8 +314,8 @@ export default function AppointmentDetailPage() {
 
               {/* Action Buttons */}
               {canUpdateStatus && (
-                <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
-                  <h3 className="font-semibold text-slate-900 mb-4">
+                <div className="bg-card rounded-lg border border-border shadow-sm p-6">
+                  <h3 className="font-semibold text-foreground mb-4">
                     Update Status
                   </h3>
                   <div className="space-y-3">
@@ -344,57 +344,57 @@ export default function AppointmentDetailPage() {
             {/* Right Column - Medical Info */}
             <div className="lg:col-span-2 space-y-6">
               {/* Appointment Details */}
-              <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
-                <h2 className="text-lg font-semibold text-slate-900 mb-4">
+              <div className="bg-card rounded-lg border border-border shadow-sm p-6">
+                <h2 className="text-lg font-semibold text-foreground mb-4">
                   Appointment Details
                 </h2>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs font-medium text-slate-500 uppercase flex items-center gap-1">
+                    <label className="text-xs font-medium text-muted-foreground uppercase flex items-center gap-1">
                       <Calendar className="h-3 w-3" /> Date
                     </label>
-                    <p className="text-sm text-slate-900">
+                    <p className="text-sm text-foreground">
                       {formatDate(appointment.dateTime)}
                     </p>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-slate-500 uppercase flex items-center gap-1">
+                    <label className="text-xs font-medium text-muted-foreground uppercase flex items-center gap-1">
                       <Clock className="h-3 w-3" /> Time
                     </label>
-                    <p className="text-sm text-slate-900">
+                    <p className="text-sm text-foreground">
                       {formatTime(appointment.dateTime)}
                     </p>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-slate-500 uppercase">
+                    <label className="text-xs font-medium text-muted-foreground uppercase">
                       Duration
                     </label>
-                    <p className="text-sm text-slate-900">
+                    <p className="text-sm text-foreground">
                       {appointment.duration} minutes
                     </p>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-slate-500 uppercase">
+                    <label className="text-xs font-medium text-muted-foreground uppercase">
                       Status
                     </label>
-                    <p className="text-sm text-slate-900 capitalize">
+                    <p className="text-sm text-foreground capitalize">
                       {appointment.status.replace('_', ' ')}
                     </p>
                   </div>
                   <div className="col-span-2">
-                    <label className="text-xs font-medium text-slate-500 uppercase">
+                    <label className="text-xs font-medium text-muted-foreground uppercase">
                       Reason
                     </label>
-                    <p className="text-sm text-slate-900">
+                    <p className="text-sm text-foreground">
                       {appointment.reason}
                     </p>
                   </div>
                   {appointment.notes && (
                     <div className="col-span-2">
-                      <label className="text-xs font-medium text-slate-500 uppercase">
+                      <label className="text-xs font-medium text-muted-foreground uppercase">
                         Notes
                       </label>
-                      <p className="text-sm text-slate-900">
+                      <p className="text-sm text-foreground">
                         {appointment.notes || '—'}
                       </p>
                       <div className="mt-2 space-y-2">
@@ -402,7 +402,7 @@ export default function AppointmentDetailPage() {
                           value={notesDraft}
                           onChange={(e) => setNotesDraft(e.target.value)}
                           placeholder="Add or update appointment notes"
-                          className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full border border-border bg-background rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                           rows={3}
                         />
                         <button
@@ -419,11 +419,11 @@ export default function AppointmentDetailPage() {
               </div>
 
               {/* Active Prescriptions */}
-              <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+              <div className="bg-card rounded-lg border border-border shadow-sm p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <Pill className="h-5 w-5 text-blue-600" />
-                    <h2 className="text-lg font-semibold text-slate-900">
+                    <Pill className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    <h2 className="text-lg font-semibold text-foreground">
                       Active Prescriptions
                     </h2>
                   </div>
@@ -439,16 +439,16 @@ export default function AppointmentDetailPage() {
                     {activePrescriptions.map((prescription) => (
                       <div
                         key={prescription.id}
-                        className="border border-slate-200 rounded-lg p-3"
+                        className="border border-border rounded-lg p-3"
                       >
-                        <p className="font-medium text-slate-900 mb-1">
+                        <p className="font-medium text-foreground mb-1">
                           {prescription.diagnosis}
                         </p>
-                        <p className="text-sm text-slate-600">
+                        <p className="text-sm text-muted-foreground">
                           {formatDate(prescription.createdAt)}
                         </p>
                         {prescription.notes && (
-                          <p className="text-sm text-slate-600 mt-2">
+                          <p className="text-sm text-muted-foreground mt-2">
                             {prescription.notes}
                           </p>
                         )}
@@ -456,17 +456,17 @@ export default function AppointmentDetailPage() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-slate-600 italic">
+                  <p className="text-sm text-muted-foreground italic">
                     No active prescriptions
                   </p>
                 )}
               </div>
 
               {/* Previous Visits */}
-              <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+              <div className="bg-card rounded-lg border border-border shadow-sm p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <Activity className="h-5 w-5 text-blue-600" />
-                  <h2 className="text-lg font-semibold text-slate-900">
+                  <Activity className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  <h2 className="text-lg font-semibold text-foreground">
                     Previous Visits
                   </h2>
                 </div>
@@ -475,18 +475,18 @@ export default function AppointmentDetailPage() {
                     {previousVisits.slice(0, 3).map((visit) => (
                       <div
                         key={visit.id}
-                        className="border border-slate-200 rounded-lg p-3"
+                        className="border border-border rounded-lg p-3"
                       >
                         <div className="flex justify-between items-start mb-1">
-                          <p className="font-medium text-slate-900">
+                          <p className="font-medium text-foreground">
                             {visit.diagnosis || visit.reason}
                           </p>
-                          <span className="text-xs text-slate-500">
+                          <span className="text-xs text-muted-foreground">
                             {formatDate(visit.dateTime)}
                           </span>
                         </div>
                         {visit.notes && (
-                          <p className="text-sm text-slate-600">
+                          <p className="text-sm text-muted-foreground">
                             {visit.notes}
                           </p>
                         )}
@@ -494,17 +494,17 @@ export default function AppointmentDetailPage() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-slate-600 italic">
+                  <p className="text-sm text-muted-foreground italic">
                     No previous visits
                   </p>
                 )}
               </div>
 
               {/* Medical Records */}
-              <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+              <div className="bg-card rounded-lg border border-border shadow-sm p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <FileText className="h-5 w-5 text-blue-600" />
-                  <h2 className="text-lg font-semibold text-slate-900">
+                  <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  <h2 className="text-lg font-semibold text-foreground">
                     Medical Records
                   </h2>
                 </div>
@@ -513,13 +513,13 @@ export default function AppointmentDetailPage() {
                     {medicalReports.map((report) => (
                       <div
                         key={report.id}
-                        className="flex items-center justify-between border border-slate-200 rounded-lg p-3"
+                        className="flex items-center justify-between border border-border rounded-lg p-3"
                       >
                         <div>
-                          <p className="font-medium text-slate-900">
+                          <p className="font-medium text-foreground">
                             {report.fileName}
                           </p>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-muted-foreground">
                             {formatDate(report.uploadedAt)} •{' '}
                             {(report.fileSize / 1024).toFixed(2)} KB
                           </p>
@@ -528,19 +528,19 @@ export default function AppointmentDetailPage() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-slate-600 italic">
+                  <p className="text-sm text-muted-foreground italic">
                     No medical records
                   </p>
                 )}
 
                 {patient?.bloodGroup && (
-                  <div className="mt-4 pt-4 border-t border-slate-200">
+                  <div className="mt-4 pt-4 border-t border-border">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-xs font-medium text-slate-500 uppercase">
+                        <label className="text-xs font-medium text-muted-foreground uppercase">
                           Blood Type
                         </label>
-                        <p className="text-sm font-semibold text-slate-900">
+                        <p className="text-sm font-semibold text-foreground">
                           {patient.bloodGroup}
                         </p>
                       </div>
