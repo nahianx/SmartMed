@@ -104,18 +104,18 @@ export default function AppointmentsPage() {
 
   const getStatusBadge = (status: string) => {
     const statusStyles = {
-      PENDING: 'bg-amber-100 text-amber-700 border-amber-200',
-      ACCEPTED: 'bg-green-100 text-green-700 border-green-200',
-      REJECTED: 'bg-rose-100 text-rose-700 border-rose-200',
-      SCHEDULED: 'bg-blue-100 text-blue-700 border-blue-200',
-      CONFIRMED: 'bg-green-100 text-green-700 border-green-200',
-      COMPLETED: 'bg-gray-100 text-gray-700 border-gray-200',
-      CANCELLED: 'bg-red-100 text-red-700 border-red-200',
-      NO_SHOW: 'bg-orange-100 text-orange-700 border-orange-200',
+      PENDING: 'bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+      ACCEPTED: 'bg-green-100 dark:bg-green-950/50 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800',
+      REJECTED: 'bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800',
+      SCHEDULED: 'bg-blue-100 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+      CONFIRMED: 'bg-green-100 dark:bg-green-950/50 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800',
+      COMPLETED: 'bg-muted text-muted-foreground border-border',
+      CANCELLED: 'bg-red-100 dark:bg-red-950/50 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800',
+      NO_SHOW: 'bg-orange-100 dark:bg-orange-950/50 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800',
     }
     return (
       statusStyles[status as keyof typeof statusStyles] ||
-      'bg-gray-100 text-gray-700'
+      'bg-muted text-muted-foreground'
     )
   }
 
