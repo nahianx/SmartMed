@@ -230,9 +230,9 @@ export default function DrugAutocomplete({
           className={`
             w-full pl-10 pr-10 py-2 border rounded-lg
             focus:outline-none focus:ring-2 focus:ring-blue-500
-            disabled:bg-slate-100 disabled:cursor-not-allowed
-            ${(error || externalError) ? 'border-red-300 focus:ring-red-500' : 'border-slate-300'}
-            text-sm
+            disabled:bg-muted disabled:cursor-not-allowed
+            ${(error || externalError) ? 'border-red-300 focus:ring-red-500' : 'border-border'}
+            text-sm bg-background text-foreground
           `}
           aria-autocomplete="list"
           aria-controls="drug-suggestions"

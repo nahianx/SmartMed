@@ -47,7 +47,7 @@ export function HealthTipsList({
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="h-32 rounded-xl border border-gray-200 bg-gray-50 animate-pulse"
+            className="h-32 rounded-xl border border-border bg-muted animate-pulse"
           />
         ))}
       </div>
@@ -219,7 +219,7 @@ export function HealthTipsDrawerContent() {
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="h-20 rounded-lg border border-gray-200 bg-gray-50 animate-pulse"
+            className="h-20 rounded-lg border border-border bg-muted animate-pulse"
           />
         ))}
       </div>

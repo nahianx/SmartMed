@@ -18,11 +18,11 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
         <input
           {...props}
           ref={ref}
-          className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            error ? "border-red-500" : "border-slate-300"
+          className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-background text-foreground ${
+            error ? "border-red-500" : "border-border"
           } ${className}`}
         />
-        {hint && !error && <p className="text-slate-500 text-xs mt-1">{hint}</p>}
+        {hint && !error && <p className="text-muted-foreground text-xs mt-1">{hint}</p>}
         {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
       </div>
     )

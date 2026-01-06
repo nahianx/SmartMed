@@ -428,7 +428,7 @@ export function AvailabilitySection({ onUnsavedChanges }: AvailabilitySectionPro
       
       {/* Save/Cancel buttons */}
       {hasChanges && (
-        <div className="flex gap-3 pt-6 border-t border-slate-200">
+        <div className="flex gap-3 pt-6 border-t border-border">
           <Button 
             onClick={handleSave}
             disabled={updateAvailabilityMutation.isPending}
