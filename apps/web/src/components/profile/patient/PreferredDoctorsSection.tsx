@@ -78,12 +78,12 @@ export function PreferredDoctorsSection() {
                     <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                   )}
                 </h4>
-                <p className="text-slate-600 mt-1">{doctor.specialization}</p>
+                <p className="text-muted-foreground mt-1">{doctor.specialization}</p>
               </div>
             </div>
 
             {/* Clinic information */}
-            <div className="flex items-center gap-2 mt-2 text-sm text-slate-600">
+            <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
               <MapPin className="w-4 h-4" />
               <span>
                 {/* Note: Clinic info structure may need adjustment based on actual data model */}
@@ -109,7 +109,7 @@ export function PreferredDoctorsSection() {
 
             {/* Consultation fee */}
             {doctor.consultationFee && (
-              <p className="text-sm text-slate-600 mt-2">
+              <p className="text-sm text-muted-foreground mt-2">
                 Consultation fee: ${doctor.consultationFee}
               </p>
             )}
@@ -144,14 +144,14 @@ export function PreferredDoctorsSection() {
     <div className="space-y-8">
       <div>
         <h3 className="text-lg font-medium">Preferred Doctors</h3>
-        <p className="text-slate-600 mt-1">
+        <p className="text-muted-foreground mt-1">
           Manage your list of preferred doctors for quick booking (max 20)
         </p>
       </div>
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
         <Input
           type="search"
           placeholder="Search by name or specialty..."
@@ -195,11 +195,11 @@ export function PreferredDoctorsSection() {
       {!preferredLoading && preferredDoctors.length === 0 && !searchQuery && (
         <Card className="p-12 text-center">
           <div className="flex flex-col items-center max-w-md mx-auto">
-            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-              <Star className="w-8 h-8 text-slate-400" />
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+              <Star className="w-8 h-8 text-muted-foreground" />
             </div>
             <h4 className="font-medium mb-2">No Preferred Doctors Yet</h4>
-            <p className="text-slate-600 mb-4">
+            <p className="text-muted-foreground mb-4">
               Add doctors to your preferred list for quick access and easy booking
             </p>
             <Button onClick={() => setSearchQuery("general")}>
@@ -236,11 +236,11 @@ export function PreferredDoctorsSection() {
           ) : (
             <Card className="p-12 text-center">
               <div className="flex flex-col items-center max-w-md mx-auto">
-                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-                  <Search className="w-8 h-8 text-slate-400" />
+                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                  <Search className="w-8 h-8 text-muted-foreground" />
                 </div>
                 <h4 className="font-medium mb-2">No doctors found</h4>
-                <p className="text-slate-600">
+                <p className="text-muted-foreground">
                   Try searching with different keywords or specialty
                 </p>
               </div>

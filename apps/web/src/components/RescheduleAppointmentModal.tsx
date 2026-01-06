@@ -226,26 +226,25 @@ export default function RescheduleAppointmentModal({
         onKeyDown={handleKeyDown}
         className="relative bg-card rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-3">
-            <RefreshCw className="h-5 w-5 text-blue-600" />
+            <RefreshCw className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             <h2 id="reschedule-modal-title" className="text-lg font-semibold">
               {step === 1 ? 'Reschedule Appointment' : 'Confirm Reschedule'}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-muted rounded-lg transition-colors"
             aria-label="Close modal"
           >
-            <X className="h-5 w-5 text-gray-500" />
+            <X className="h-5 w-5 text-muted-foreground" />
           </button>
         </div>
 
         {/* Current Appointment Info */}
-        <div className="px-6 py-3 bg-blue-50 border-b border-blue-100">
-          <div className="flex items-center gap-2 text-sm text-blue-700">
+        <div className="px-6 py-3 bg-blue-50 dark:bg-blue-950/30 border-b border-blue-100 dark:border-blue-800">
+          <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300">
             <Info className="h-4 w-4" />
             <span>
               Current appointment: <strong>{format(new Date(appointment.dateTime), 'MMMM d, yyyy')} at {format(new Date(appointment.dateTime), 'h:mm a')}</strong>
@@ -255,7 +254,7 @@ export default function RescheduleAppointmentModal({
             </span>
           </div>
           {rescheduleInfo && (
-            <div className="mt-1 text-xs text-blue-600">
+            <div className="mt-1 text-xs text-blue-600 dark:text-blue-400">
               {rescheduleInfo.remainingReschedules} reschedule{rescheduleInfo.remainingReschedules !== 1 ? 's' : ''} remaining
             </div>
           )}
@@ -263,9 +262,9 @@ export default function RescheduleAppointmentModal({
 
         {/* Error Message */}
         {error && (
-          <div className="mx-6 mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
-            <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-red-700">{error}</p>
+          <div className="mx-6 mt-4 p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-2">
+            <AlertCircle className="h-5 w-5 text-red-500 dark:text-red-400 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
           </div>
         )}
 
@@ -273,8 +272,8 @@ export default function RescheduleAppointmentModal({
         <div className="flex-1 overflow-y-auto p-6">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 text-blue-600 animate-spin mb-3" />
-              <p className="text-gray-600">Loading available slots...</p>
+              <Loader2 className="h-8 w-8 text-blue-600 dark:text-blue-400 animate-spin mb-3" />
+              <p className="text-muted-foreground">Loading available slots...</p>
             </div>
           ) : step === 1 ? (
             <>
@@ -283,7 +282,7 @@ export default function RescheduleAppointmentModal({
                 <button
                   onClick={() => navigateWeek('prev')}
                   disabled={startOfDay(startDate) <= startOfDay(new Date())}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-2 hover:bg-muted rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ChevronLeft className="h-5 w-5" />
                 </button>
@@ -292,7 +291,7 @@ export default function RescheduleAppointmentModal({
                 </span>
                 <button
                   onClick={() => navigateWeek('next')}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-muted rounded-lg transition-colors"
                 >
                   <ChevronRight className="h-5 w-5" />
                 </button>
@@ -316,8 +315,8 @@ export default function RescheduleAppointmentModal({
                         ${isSelected 
                           ? 'bg-blue-600 text-white' 
                           : hasSlots && !isPast
-                            ? 'hover:bg-blue-50 text-gray-900'
-                            : 'text-gray-300 cursor-not-allowed'
+                            ? 'hover:bg-blue-50 dark:hover:bg-blue-950/30 text-foreground'
+                            : 'text-muted-foreground/30 cursor-not-allowed'
                         }
                       `}
                     >
@@ -357,7 +356,7 @@ export default function RescheduleAppointmentModal({
                       ))}
                     </div>
                   ) : (
-                    <p className="text-gray-500 text-center py-4">
+                    <p className="text-muted-foreground text-center py-4">
                       No available slots for this date
                     </p>
                   )}
@@ -366,9 +365,9 @@ export default function RescheduleAppointmentModal({
 
               {!selectedDate && availableDates.length === 0 && !isLoading && (
                 <div className="text-center py-8">
-                  <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-600">No available slots found</p>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <Calendar className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
+                  <p className="text-muted-foreground">No available slots found</p>
+                  <p className="text-sm text-muted-foreground mt-1">
                     Try selecting a different date range
                   </p>
                 </div>
@@ -379,24 +378,24 @@ export default function RescheduleAppointmentModal({
             <div className="space-y-6">
               {/* Comparison */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <h4 className="text-sm font-medium text-gray-500 mb-2">Current</h4>
-                  <div className="flex items-center gap-2 text-gray-900">
-                    <Calendar className="h-4 w-4 text-gray-400" />
+                <div className="p-4 bg-muted rounded-lg">
+                  <h4 className="text-sm font-medium text-muted-foreground mb-2">Current</h4>
+                  <div className="flex items-center gap-2 text-foreground">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
                     {format(new Date(appointment.dateTime), 'MMM d, yyyy')}
                   </div>
-                  <div className="flex items-center gap-2 text-gray-900 mt-1">
-                    <Clock className="h-4 w-4 text-gray-400" />
+                  <div className="flex items-center gap-2 text-foreground mt-1">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
                     {format(new Date(appointment.dateTime), 'h:mm a')}
                   </div>
                 </div>
-                <div className="p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
-                  <h4 className="text-sm font-medium text-blue-600 mb-2">New</h4>
-                  <div className="flex items-center gap-2 text-blue-900">
+                <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg border-2 border-blue-200 dark:border-blue-800">
+                  <h4 className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-2">New</h4>
+                  <div className="flex items-center gap-2 text-blue-900 dark:text-blue-200">
                     <Calendar className="h-4 w-4 text-blue-400" />
                     {selectedSlot && format(parseISO(selectedSlot.dateTime), 'MMM d, yyyy')}
                   </div>
-                  <div className="flex items-center gap-2 text-blue-900 mt-1">
+                  <div className="flex items-center gap-2 text-blue-900 dark:text-blue-200 mt-1">
                     <Clock className="h-4 w-4 text-blue-400" />
                     {selectedSlot && format(parseISO(selectedSlot.dateTime), 'h:mm a')}
                   </div>
@@ -405,7 +404,7 @@ export default function RescheduleAppointmentModal({
 
               {/* Reason (optional) */}
               <div>
-                <label htmlFor="reschedule-reason" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="reschedule-reason" className="block text-sm font-medium text-foreground mb-2">
                   Reason for rescheduling (optional)
                 </label>
                 <textarea
@@ -413,18 +412,18 @@ export default function RescheduleAppointmentModal({
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   placeholder="Enter your reason for rescheduling..."
-                  className="w-full px-3 py-2 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-border bg-background rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   rows={3}
                   maxLength={500}
                 />
-                <p className="text-xs text-gray-500 mt-1">{reason.length}/500 characters</p>
+                <p className="text-xs text-muted-foreground mt-1">{reason.length}/500 characters</p>
               </div>
 
               {/* Notice */}
-              <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
                 <div className="flex items-start gap-2">
-                  <AlertCircle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                  <div className="text-sm text-amber-700">
+                  <AlertCircle className="h-5 w-5 text-amber-500 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-amber-700 dark:text-amber-300">
                     <p className="font-medium">Please note:</p>
                     <ul className="mt-1 list-disc list-inside space-y-0.5">
                       <li>Your appointment will be reset to &quot;Pending&quot; status</li>
@@ -439,12 +438,12 @@ export default function RescheduleAppointmentModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-4 border-t bg-gray-50">
+        <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-muted/50">
           {step === 2 ? (
             <>
               <button
                 onClick={handleBack}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors"
               >
                 Back
               </button>
@@ -461,11 +460,11 @@ export default function RescheduleAppointmentModal({
             <>
               <button
                 onClick={onClose}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors"
               >
                 Cancel
               </button>
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-muted-foreground">
                 Select a new time slot
               </div>
             </>
