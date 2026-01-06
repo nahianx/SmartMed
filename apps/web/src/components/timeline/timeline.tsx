@@ -1,10 +1,19 @@
 import { useMemo } from 'react'
-import { format, isSameDay } from 'date-fns'
+import { format, isSameDay, isToday, isYesterday, isThisWeek, isThisMonth } from 'date-fns'
 import type { TimelineActivity, FilterState } from '@/types/timeline'
 import { TimelineItem } from './timeline_item'
 import { Separator, Skeleton } from '@smartmed/ui'
 import { FixedSizeList as VirtualList } from 'react-window'
 import type { CSSProperties } from 'react'
+import { 
+  CalendarDays, 
+  FileSearch, 
+  Sparkles,
+  Clock,
+  CalendarClock,
+  History
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface TimelineProps {
   activities: TimelineActivity[]
@@ -12,6 +21,129 @@ interface TimelineProps {
   onOpenDetails: (activity: TimelineActivity) => void
   isLoading?: boolean
   userRole?: 'patient' | 'doctor' | 'admin'
+}
+
+function getDateLabel(date: Date): { label: string; icon: typeof Clock; highlight?: boolean } {
+  if (isToday(date)) {
+    return { label: 'Today', icon: Clock, highlight: true }
+  }
+  if (isYesterday(date)) {
+    return { label: 'Yesterday', icon: History }
+  }
+  if (isThisWeek(date)) {
+    return { label: format(date, 'EEEE'), icon: CalendarDays }
+  }
+  if (isThisMonth(date)) {
+    return { label: format(date, 'EEEE, MMMM d'), icon: CalendarClock }
+  }
+  return { label: format(date, 'EEEE, MMMM d, yyyy'), icon: CalendarClock }
+}
+
+function LoadingSkeleton() {
+  return (
+    <div className="space-y-8 p-6 animate-pulse">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="space-y-4">
+          {/* Date header skeleton */}
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-6 w-6 rounded-lg" />
+            <Skeleton className="h-5 w-32 rounded" />
+            <div className="flex-1 h-px bg-border" />
+            <Skeleton className="h-5 w-8 rounded" />
+          </div>
+          {/* Card skeletons */}
+          <div className="space-y-3 ml-3">
+            <div className="rounded-xl border bg-card p-4">
+              <div className="flex gap-4">
+                <Skeleton className="h-12 w-12 rounded-xl shrink-0" />
+                <div className="flex-1 space-y-3">
+                  <Skeleton className="h-5 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <div className="flex gap-3">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-20" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            {i < 2 && (
+              <div className="rounded-xl border bg-card p-4">
+                <div className="flex gap-4">
+                  <Skeleton className="h-12 w-12 rounded-xl shrink-0" />
+                  <div className="flex-1 space-y-3">
+                    <Skeleton className="h-5 w-2/3" />
+                    <Skeleton className="h-4 w-2/5" />
+                    <div className="flex gap-3">
+                      <Skeleton className="h-4 w-20" />
+                      <Skeleton className="h-4 w-16" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function EmptyState({ hasFilters }: { hasFilters: boolean }) {
+  return (
+    <div className="flex flex-col items-center justify-center p-12 text-center">
+      <div className="relative mb-6">
+        <div className="h-24 w-24 rounded-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
+          {hasFilters ? (
+            <FileSearch className="h-12 w-12 text-muted-foreground" />
+          ) : (
+            <CalendarDays className="h-12 w-12 text-muted-foreground" />
+          )}
+        </div>
+        <div className="absolute -bottom-1 -right-1 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+          <Sparkles className="h-5 w-5 text-primary" />
+        </div>
+      </div>
+      
+      <h3 className="text-xl font-semibold text-foreground mb-2">
+        {hasFilters ? 'No matching activities' : 'No activities yet'}
+      </h3>
+      <p className="text-muted-foreground max-w-[280px] leading-relaxed">
+        {hasFilters
+          ? 'Try adjusting your filters to see more results, or clear all filters to view everything.'
+          : 'Your activity timeline will appear here. Appointments, prescriptions, and reports will be tracked automatically.'}
+      </p>
+      
+      {hasFilters && (
+        <p className="mt-4 text-sm text-muted-foreground">
+          Tip: Use the search to find specific items by doctor name, specialty, or file name.
+        </p>
+      )}
+    </div>
+  )
+}
+
+function DateGroupHeader({ date, count }: { date: Date; count: number }) {
+  const { label, icon: Icon, highlight } = getDateLabel(date)
+  
+  return (
+    <div className="flex items-center gap-3 py-2">
+      <div className={cn(
+        'flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors',
+        highlight 
+          ? 'bg-primary/10 text-primary' 
+          : 'bg-muted text-foreground'
+      )}>
+        <Icon className="h-4 w-4" />
+        <span className={cn('text-sm font-medium', highlight && 'font-semibold')}>
+          {label}
+        </span>
+      </div>
+      <div className="flex-1 h-px bg-border" />
+      <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+        {count} {count === 1 ? 'item' : 'items'}
+      </span>
+    </div>
+  )
 }
 
 export function Timeline({
@@ -97,11 +229,11 @@ export function Timeline({
 
   const virtualRows = useMemo(() => {
     const rows: Array<
-      | { type: 'date'; date: Date }
+      | { type: 'date'; date: Date; count: number }
       | { type: 'item'; activity: TimelineActivity }
     > = []
     groupedActivities.forEach((group) => {
-      rows.push({ type: 'date', date: group.date })
+      rows.push({ type: 'date', date: group.date, count: group.activities.length })
       group.activities.forEach((activity) =>
         rows.push({ type: 'item', activity })
       )
@@ -110,52 +242,18 @@ export function Timeline({
   }, [groupedActivities])
 
   if (isLoading) {
-    return (
-      <div className="space-y-6 p-6">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="space-y-4">
-            <Skeleton className="h-6 w-32" />
-            <div className="space-y-3">
-              <Skeleton className="h-24 w-full" />
-              <Skeleton className="h-24 w-full" />
-            </div>
-          </div>
-        ))}
-      </div>
-    )
+    return <LoadingSkeleton />
   }
 
-  if (groupedActivities.length === 0) {
-    const hasFilters =
-      !!filters.searchText ||
-      filters.types.length > 0 ||
-      filters.statuses.length > 0
+  const hasFilters =
+    !!filters.searchText ||
+    filters.types.length > 0 ||
+    filters.statuses.length > 0 ||
+    !!filters.dateRange.from ||
+    !!filters.dateRange.to
 
-    return (
-      <div className="flex flex-col items-center justify-center p-12 text-center">
-        <div className="rounded-full bg-muted p-6 mb-4">
-          <svg
-            className="h-12 w-12 text-muted-foreground"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            />
-          </svg>
-        </div>
-        <h3 className="mb-2">No activities found</h3>
-        <p className="text-muted-foreground mb-4">
-          {hasFilters
-            ? 'Try adjusting your filters to see more results'
-            : 'Your activity timeline will appear here'}
-        </p>
-      </div>
-    )
+  if (groupedActivities.length === 0) {
+    return <EmptyState hasFilters={hasFilters} />
   }
 
   const renderRow = ({
@@ -168,18 +266,13 @@ export function Timeline({
     const row = virtualRows[index]
     if (row.type === 'date') {
       return (
-        <div style={style} className="px-2 py-3 flex items-center gap-4">
-          <div className="shrink-0 rounded-lg bg-muted px-3 py-1">
-            <span className="text-sm font-medium">
-              {format(row.date, 'EEEE, MMMM dd, yyyy')}
-            </span>
-          </div>
-          <Separator className="flex-1" />
+        <div style={style} className="px-4 py-2">
+          <DateGroupHeader date={row.date} count={row.count} />
         </div>
       )
     }
     return (
-      <div style={style} className="px-2 pb-3">
+      <div style={style} className="px-4 pb-3">
         <TimelineItem
           activity={row.activity}
           onOpenDetails={onOpenDetails}
@@ -197,7 +290,7 @@ export function Timeline({
       <VirtualList
         height={640}
         itemCount={virtualRows.length}
-        itemSize={110}
+        itemSize={140}
         width="100%"
         className="space-y-0"
       >
@@ -207,28 +300,45 @@ export function Timeline({
   ) : (
     <div className="space-y-6 p-6">
       {groupedActivities.map((group, groupIndex) => (
-        <div key={groupIndex} className="space-y-4">
-          <div className="flex items-center gap-4">
-            <div className="shrink-0 rounded-lg bg-muted px-3 py-1">
-              <span className="text-sm font-medium">
-                {format(group.date, 'EEEE, MMMM dd, yyyy')}
-              </span>
-            </div>
-            <Separator className="flex-1" />
-          </div>
+        <div 
+          key={groupIndex} 
+          className="space-y-3"
+          style={{ 
+            animationDelay: `${groupIndex * 100}ms`,
+            animation: 'fadeInUp 0.3s ease-out forwards'
+          }}
+        >
+          <DateGroupHeader date={group.date} count={group.activities.length} />
 
-          <div className="space-y-3 pl-2">
-            {group.activities.map((activity) => (
-              <TimelineItem
+          <div className="space-y-3 ml-2">
+            {group.activities.map((activity, activityIndex) => (
+              <div
                 key={activity.id}
-                activity={activity}
-                onOpenDetails={onOpenDetails}
-                userRole={userRole}
-              />
+                style={{
+                  animationDelay: `${(groupIndex * 100) + (activityIndex * 50)}ms`,
+                  animation: 'fadeInUp 0.3s ease-out forwards',
+                  opacity: 0
+                }}
+              >
+                <TimelineItem
+                  activity={activity}
+                  onOpenDetails={onOpenDetails}
+                  userRole={userRole}
+                />
+              </div>
             ))}
           </div>
         </div>
       ))}
+      
+      {/* End of timeline indicator */}
+      <div className="flex items-center justify-center py-8">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="h-px w-12 bg-border" />
+          <span>End of timeline</span>
+          <div className="h-px w-12 bg-border" />
+        </div>
+      </div>
     </div>
   )
 }

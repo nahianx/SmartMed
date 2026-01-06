@@ -6,19 +6,94 @@ import {
   Pill,
   FileText,
   Stethoscope,
+  Download,
+  Share2,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  ChevronRight,
+  Loader2,
+  User,
+  Building2,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import type { TimelineActivity } from '@/types/timeline'
 import { Badge, Button } from '@smartmed/ui'
-import { format } from 'date-fns'
+import { format, formatDistanceToNow, isToday, isYesterday } from 'date-fns'
 import { apiClient } from '@/services/apiClient'
-import { handleApiError } from '@/lib/error_utils'
+import { handleApiError, showSuccess } from '@/lib/error_utils'
 import { SearchHighlight, useHasSearchHighlights } from './SearchHighlight'
+import { cn } from '@/lib/utils'
 
 interface TimelineItemProps {
   activity: TimelineActivity
   onOpenDetails: (activity: TimelineActivity) => void
   userRole?: 'patient' | 'doctor' | 'admin'
+}
+
+const typeConfig = {
+  appointment: {
+    icon: Stethoscope,
+    label: 'Appointment',
+    gradient: 'from-blue-500 to-blue-600',
+    bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+    iconBg: 'bg-blue-100 dark:bg-blue-900/40',
+    iconColor: 'text-blue-600 dark:text-blue-400',
+    borderColor: 'border-blue-200 dark:border-blue-800/50',
+    accentColor: 'bg-blue-500',
+  },
+  prescription: {
+    icon: Pill,
+    label: 'Prescription',
+    gradient: 'from-emerald-500 to-emerald-600',
+    bgColor: 'bg-emerald-50 dark:bg-emerald-900/20',
+    iconBg: 'bg-emerald-100 dark:bg-emerald-900/40',
+    iconColor: 'text-emerald-600 dark:text-emerald-400',
+    borderColor: 'border-emerald-200 dark:border-emerald-800/50',
+    accentColor: 'bg-emerald-500',
+  },
+  report: {
+    icon: FileText,
+    label: 'Report',
+    gradient: 'from-violet-500 to-violet-600',
+    bgColor: 'bg-violet-50 dark:bg-violet-900/20',
+    iconBg: 'bg-violet-100 dark:bg-violet-900/40',
+    iconColor: 'text-violet-600 dark:text-violet-400',
+    borderColor: 'border-violet-200 dark:border-violet-800/50',
+    accentColor: 'bg-violet-500',
+  },
+}
+
+const statusConfig = {
+  completed: {
+    icon: CheckCircle2,
+    label: 'Completed',
+    variant: 'default' as const,
+    className: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-800/50',
+  },
+  cancelled: {
+    icon: XCircle,
+    label: 'Cancelled',
+    variant: 'secondary' as const,
+    className: 'bg-gray-100 text-gray-600 dark:bg-gray-800/50 dark:text-gray-400 border-gray-200 dark:border-gray-700/50',
+  },
+  'no-show': {
+    icon: AlertCircle,
+    label: 'No-show',
+    variant: 'destructive' as const,
+    className: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800/50',
+  },
+}
+
+function formatSmartDate(date: Date): string {
+  if (isToday(date)) {
+    return `Today at ${format(date, 'h:mm a')}`
+  }
+  if (isYesterday(date)) {
+    return `Yesterday at ${format(date, 'h:mm a')}`
+  }
+  return format(date, 'MMM d, yyyy • h:mm a')
 }
 
 export function TimelineItem({
@@ -28,52 +103,13 @@ export function TimelineItem({
 }: TimelineItemProps) {
   const router = useRouter()
   const [isDownloading, setIsDownloading] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
   const hasHighlights = useHasSearchHighlights(activity)
 
-  const getIcon = () => {
-    switch (activity.type) {
-      case 'appointment':
-        return <Stethoscope className="h-5 w-5" />
-      case 'prescription':
-        return <Pill className="h-5 w-5" />
-      case 'report':
-      default:
-        return <FileText className="h-5 w-5" />
-    }
-  }
-
-  const getIconBgColor = () => {
-    switch (activity.type) {
-      case 'appointment':
-        return 'bg-blue-100 text-blue-600'
-      case 'prescription':
-        return 'bg-green-100 text-green-600'
-      case 'report':
-      default:
-        return 'bg-purple-100 text-purple-600'
-    }
-  }
-
-  const getStatusBadge = () => {
-    if (!activity.status) return null
-
-    const variants: Record<
-      string,
-      'default' | 'secondary' | 'destructive' | 'outline'
-    > = {
-      completed: 'default',
-      cancelled: 'secondary',
-      'no-show': 'destructive',
-    }
-
-    return (
-      <Badge variant={variants[activity.status] || 'outline'} className="ml-2">
-        {activity.status === 'no-show'
-          ? 'No-show'
-          : activity.status.charAt(0).toUpperCase() + activity.status.slice(1)}
-      </Badge>
-    )
-  }
+  const config = typeConfig[activity.type]
+  const Icon = config.icon
+  const status = activity.status ? statusConfig[activity.status] : null
+  const StatusIcon = status?.icon
 
   const getFilenameFromDisposition = (disposition?: string) => {
     if (!disposition) return null
@@ -113,6 +149,7 @@ export function TimelineItem({
       link.click()
       link.remove()
       window.URL.revokeObjectURL(blobUrl)
+      showSuccess('Download started')
     } catch (error) {
       handleApiError(error, 'Failed to download report')
     } finally {
@@ -120,148 +157,215 @@ export function TimelineItem({
     }
   }
 
+  const handleShare = async (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    if (typeof window === 'undefined') return
+    
+    const shareUrl = `${window.location.origin}/timeline?id=${activity.id}`
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: activity.title,
+          text: activity.subtitle,
+          url: shareUrl,
+        })
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(shareUrl)
+        showSuccess('Link copied to clipboard')
+      } else {
+        window.open(shareUrl, '_blank')
+      }
+    } catch {
+      // User cancelled share
+    }
+  }
+
+  const handleView = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    if (activity.type === 'appointment' && activity.id) {
+      const rolePath = userRole === 'doctor' ? 'doctor' : 'patient'
+      router.push(`/dashboard/${rolePath}/appointments/${activity.id}`)
+    } else {
+      onOpenDetails(activity)
+    }
+  }
+
   return (
     <div
-      className="group relative flex gap-4 rounded-lg border bg-card p-4 transition-all hover:shadow-md cursor-pointer"
+      className={cn(
+        'group relative rounded-xl border transition-all duration-200 cursor-pointer overflow-hidden',
+        'hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/20',
+        'hover:border-primary/30',
+        config.bgColor,
+        config.borderColor
+      )}
       onClick={() => onOpenDetails(activity)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <div
-        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${getIconBgColor()}`}
-      >
-        {getIcon()}
-      </div>
+      {/* Type accent bar */}
+      <div className={cn('absolute left-0 top-0 bottom-0 w-1 rounded-l-xl', config.accentColor)} />
 
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-4">
+      <div className="p-4 pl-5">
+        <div className="flex gap-4">
+          {/* Icon */}
+          <div className={cn(
+            'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-transform duration-200',
+            config.iconBg,
+            isHovered && 'scale-105'
+          )}>
+            <Icon className={cn('h-6 w-6', config.iconColor)} />
+          </div>
+
+          {/* Content */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="font-medium">
-                {hasHighlights && activity.highlightedTitle ? (
-                  <SearchHighlight 
-                    text={activity.highlightedTitle} 
-                    fallback={activity.title} 
-                  />
-                ) : (
-                  activity.title
+            {/* Header row */}
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-semibold text-foreground truncate">
+                    {hasHighlights && activity.highlightedTitle ? (
+                      <SearchHighlight 
+                        text={activity.highlightedTitle} 
+                        fallback={activity.title} 
+                      />
+                    ) : (
+                      activity.title
+                    )}
+                  </h3>
+                  
+                  {status && (
+                    <Badge 
+                      variant="outline"
+                      className={cn('gap-1 font-medium', status.className)}
+                    >
+                      {StatusIcon && <StatusIcon className="h-3 w-3" />}
+                      {status.label}
+                    </Badge>
+                  )}
+                </div>
+
+                {/* Subtitle */}
+                {activity.subtitle && (
+                  <p className="text-sm text-muted-foreground mt-1 line-clamp-1">
+                    {hasHighlights && activity.highlightedSubtitle ? (
+                      <SearchHighlight 
+                        text={activity.highlightedSubtitle} 
+                        fallback={activity.subtitle} 
+                      />
+                    ) : (
+                      activity.subtitle
+                    )}
+                  </p>
                 )}
-              </h3>
-              {getStatusBadge()}
+              </div>
+
+              {/* Quick view button */}
+              <ChevronRight className={cn(
+                'h-5 w-5 text-muted-foreground/50 transition-all duration-200',
+                isHovered && 'text-primary translate-x-0.5'
+              )} />
             </div>
 
-            {/* Show highlighted subtitle if available */}
-            {activity.subtitle && (
-              <p className="text-sm text-muted-foreground mt-0.5">
-                {hasHighlights && activity.highlightedSubtitle ? (
-                  <SearchHighlight 
-                    text={activity.highlightedSubtitle} 
-                    fallback={activity.subtitle} 
-                  />
-                ) : (
-                  activity.subtitle
-                )}
-              </p>
-            )}
-
-            <div className="mt-1 flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
-              <span className="flex items-center gap-1">
-                <Calendar className="h-3.5 w-3.5" />
-                {format(activity.date, 'MMM dd, yyyy at h:mm a')}
+            {/* Meta info */}
+            <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
+              <span className="flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5" />
+                {formatSmartDate(activity.date)}
               </span>
 
+              {activity.doctorName && (
+                <span className="flex items-center gap-1.5">
+                  <User className="h-3.5 w-3.5" />
+                  {activity.doctorName}
+                </span>
+              )}
+
               {activity.clinic && (
-                <span className="flex items-center gap-1">
-                  <MapPin className="h-3.5 w-3.5" />
+                <span className="flex items-center gap-1.5">
+                  <Building2 className="h-3.5 w-3.5" />
                   {activity.clinic}
+                </span>
+              )}
+
+              {activity.fileName && (
+                <span className="flex items-center gap-1.5 text-xs bg-muted/50 px-2 py-0.5 rounded">
+                  <FileText className="h-3 w-3" />
+                  {activity.fileName}
                 </span>
               )}
             </div>
 
+            {/* Tags */}
             {activity.tags && activity.tags.length > 0 && (
-              <div className="mt-2 flex gap-2 flex-wrap">
+              <div className="mt-3 flex gap-1.5 flex-wrap">
                 {activity.tags.map((tag) => (
-                  <Badge key={tag} variant="outline" className="text-xs">
+                  <Badge 
+                    key={tag} 
+                    variant="outline" 
+                    className="text-xs bg-background/50 hover:bg-background"
+                  >
                     {tag}
                   </Badge>
                 ))}
               </div>
             )}
-          </div>
 
-          <div className="flex gap-2 shrink-0">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={(e) => {
-                e.stopPropagation()
-                // Navigate to appointment detail page for appointments
-                if (activity.type === 'appointment' && activity.id) {
-                  const rolePath = userRole === 'doctor' ? 'doctor' : 'patient'
-                  router.push(
-                    `/dashboard/${rolePath}/appointments/${activity.id}`
-                  )
-                } else {
-                  onOpenDetails(activity)
-                }
-              }}
-            >
-              <Eye className="h-4 w-4 mr-1" />
-              {activity.type === 'prescription'
-                ? 'View Rx'
-                : activity.type === 'report'
-                  ? 'Preview'
-                  : 'View'}
-            </Button>
-            {activity.type !== 'appointment' && (
+            {/* Action buttons */}
+            <div className={cn(
+              'mt-3 pt-3 border-t border-border/50 flex items-center gap-2 transition-opacity duration-200',
+              !isHovered && 'lg:opacity-0',
+              isHovered && 'opacity-100'
+            )}>
+              <Button
+                size="sm"
+                variant="default"
+                onClick={handleView}
+                className="h-8 shadow-sm"
+              >
+                <Eye className="h-3.5 w-3.5 mr-1.5" />
+                {activity.type === 'prescription'
+                  ? 'View Rx'
+                  : activity.type === 'report'
+                    ? 'Preview'
+                    : 'View Details'}
+              </Button>
+              
+              {activity.type === 'report' && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleDownload}
+                  disabled={isDownloading}
+                  className="h-8"
+                >
+                  {isDownloading ? (
+                    <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                  ) : (
+                    <Download className="h-3.5 w-3.5 mr-1.5" />
+                  )}
+                  {isDownloading ? 'Downloading...' : 'Download'}
+                </Button>
+              )}
+              
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  if (activity.type === 'report') {
-                    handleDownload(e)
-                  }
-                }}
-                disabled={activity.type === 'report' ? isDownloading : false}
+                onClick={handleShare}
+                className="h-8 ml-auto"
               >
-                <FileText className="h-4 w-4 mr-1" />
-                {isDownloading && activity.type === 'report'
-                  ? 'Downloading...'
-                  : 'Download'}
+                <Share2 className="h-3.5 w-3.5" />
               </Button>
-            )}
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={(e) => {
-                e.stopPropagation()
-                if (typeof window !== 'undefined') {
-                  const shareUrl = `${window.location.origin}/timeline?id=${activity.id}`
-                  if (navigator.share) {
-                    navigator
-                      .share({
-                        title: activity.title,
-                        text: activity.subtitle,
-                        url: shareUrl,
-                      })
-                      .catch(() => {})
-                  } else if (navigator.clipboard) {
-                    navigator.clipboard.writeText(shareUrl).catch(() => {})
-                  } else {
-                    window.open(shareUrl, '_blank')
-                  }
-                }
-              }}
-            >
-              <MapPin className="h-4 w-4 mr-1" />
-              Share
-            </Button>
+            </div>
           </div>
         </div>
-
-        <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-muted-foreground">
-          Click to view details in drawer.
-        </div>
       </div>
+
+      {/* Hover gradient overlay */}
+      <div className={cn(
+        'absolute inset-0 bg-gradient-to-r from-transparent to-primary/5 opacity-0 transition-opacity duration-200 pointer-events-none',
+        isHovered && 'opacity-100'
+      )} />
     </div>
   )
 }
