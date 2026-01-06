@@ -102,16 +102,16 @@ export function HealthTipCard({
       <div
         className={`flex items-start gap-3 p-3 rounded-lg border transition-colors ${
           isUnread
-            ? 'border-blue-300 bg-blue-50/50'
-            : 'border-gray-200 bg-white'
+            ? 'border-blue-300 bg-blue-50/50 dark:bg-blue-950/30 dark:border-blue-800'
+            : 'border-border bg-card'
         }`}
       >
         <div className={`p-2 rounded-full ${config.bgColor} shrink-0`}>
           <Icon className={`h-4 w-4 ${config.color}`} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-gray-800 line-clamp-2">{tip.text}</p>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-sm text-foreground line-clamp-2">{tip.text}</p>
+          <p className="text-xs text-muted-foreground mt-1">
             {formatDistanceToNow(new Date(tip.createdAt), { addSuffix: true })}
           </p>
         </div>
@@ -126,8 +126,8 @@ export function HealthTipCard({
     <div
       className={`rounded-xl border shadow-sm transition-all hover:shadow-md ${
         isUnread
-          ? 'border-blue-300 bg-gradient-to-br from-blue-50 to-white'
-          : 'border-gray-200 bg-white'
+          ? 'border-blue-300 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/30 dark:to-card dark:border-blue-800'
+          : 'border-border bg-card'
       }`}
     >
       <div className="p-4">
@@ -156,12 +156,12 @@ export function HealthTipCard({
 
         {/* Content */}
         <div className="mt-4">
-          <p className="text-gray-800 leading-relaxed">{tip.text}</p>
+          <p className="text-foreground leading-relaxed">{tip.text}</p>
         </div>
 
         {/* Footer */}
         <div className="mt-4 flex items-center justify-between">
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-muted-foreground">
             {formatDistanceToNow(new Date(tip.createdAt), { addSuffix: true })}
           </p>
 
@@ -182,7 +182,7 @@ export function HealthTipCard({
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="text-xs text-gray-500 hover:text-red-600"
+                  className="text-xs text-muted-foreground hover:text-red-600"
                   onClick={() => onArchive(tip.id)}
                 >
                   <X className="h-3.5 w-3.5 mr-1" />
@@ -216,7 +216,7 @@ export function CategoryBadge({
       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
         selected
           ? `${config.bgColor} ${config.color}`
-          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          : 'bg-muted text-muted-foreground hover:bg-muted/80'
       }`}
     >
       <Icon className="h-3.5 w-3.5" />

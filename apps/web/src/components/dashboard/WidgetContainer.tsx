@@ -83,7 +83,7 @@ export function WidgetContainer({
     >
       <div
         className={`
-          bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700
+          bg-card rounded-lg shadow-sm border border-border
           ${isEditing ? 'ring-2 ring-blue-500 ring-opacity-50' : ''}
           ${isDragging ? 'shadow-lg' : ''}
           h-full flex flex-col
@@ -91,13 +91,13 @@ export function WidgetContainer({
         `}
       >
         {/* Widget Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
           <div className="flex items-center gap-2">
             {/* Drag Handle - only show in edit mode */}
             {isEditing && (
               <div
                 {...dragHandleProps}
-                className="cursor-grab active:cursor-grabbing p-1 -ml-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                className="cursor-grab active:cursor-grabbing p-1 -ml-1 text-muted-foreground hover:text-foreground"
               >
                 <GripVertical className="h-4 w-4" />
               </div>
@@ -111,7 +111,7 @@ export function WidgetContainer({
             )}
             
             {/* Widget Title */}
-            <h3 className="font-medium text-gray-900 dark:text-gray-100 text-sm">
+            <h3 className="font-medium text-foreground text-sm">
               {widgetTitle}
             </h3>
           </div>
@@ -122,7 +122,7 @@ export function WidgetContainer({
               {/* Visibility Toggle */}
               <button
                 onClick={() => onToggleVisibility?.(widget.widgetId)}
-                className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="p-1.5 text-muted-foreground hover:text-foreground rounded hover:bg-muted"
                 title={widget.visible ? 'Hide widget' : 'Show widget'}
               >
                 {widget.visible ? (
@@ -135,7 +135,7 @@ export function WidgetContainer({
               {/* Resize Toggle */}
               <button
                 onClick={handleResize}
-                className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="p-1.5 text-muted-foreground hover:text-foreground rounded hover:bg-muted"
                 title="Resize widget"
               >
                 {widget.size === 'full' ? (
@@ -149,7 +149,7 @@ export function WidgetContainer({
               {onSettings && (
                 <button
                   onClick={() => onSettings(widget.widgetId)}
-                  className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="p-1.5 text-muted-foreground hover:text-foreground rounded hover:bg-muted"
                   title="Widget settings"
                 >
                   <Settings className="h-4 w-4" />
@@ -160,7 +160,7 @@ export function WidgetContainer({
               {removable && (
                 <button
                   onClick={() => onRemove?.(widget.widgetId)}
-                  className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="p-1.5 text-muted-foreground hover:text-red-600 dark:hover:text-red-400 rounded hover:bg-muted"
                   title="Remove widget"
                 >
                   <X className="h-4 w-4" />

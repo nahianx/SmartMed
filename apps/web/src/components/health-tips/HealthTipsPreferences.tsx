@@ -135,8 +135,8 @@ export function HealthTipsPreferences({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Settings className="h-5 w-5 text-gray-400" />
-          <h2 className="text-lg font-semibold text-gray-900">
+          <Settings className="h-5 w-5 text-muted-foreground" />
+          <h2 className="text-lg font-semibold text-foreground">
             Health Tips Preferences
           </h2>
         </div>
@@ -163,18 +163,18 @@ export function HealthTipsPreferences({
       </div>
 
       {/* Enable/Disable Toggle */}
-      <div className="flex items-center justify-between p-4 rounded-lg border border-gray-200 bg-white">
+      <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-card">
         <div className="flex items-center gap-3">
           {currentPrefs.enabled ? (
             <ToggleRight className="h-6 w-6 text-green-600" />
           ) : (
-            <ToggleLeft className="h-6 w-6 text-gray-400" />
+            <ToggleLeft className="h-6 w-6 text-muted-foreground" />
           )}
           <div>
             <Label className="text-base font-medium">
               Enable Health Tips
             </Label>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               Receive personalized health tips based on your medical profile
             </p>
           </div>
@@ -187,14 +187,14 @@ export function HealthTipsPreferences({
 
       {/* Categories Selection */}
       <div
-        className={`p-4 rounded-lg border border-gray-200 bg-white ${
+        className={`p-4 rounded-lg border border-border bg-card ${
           !currentPrefs.enabled ? 'opacity-50 pointer-events-none' : ''
         }`}
       >
         <Label className="text-base font-medium block mb-2">
           Tip Categories
         </Label>
-        <p className="text-sm text-gray-500 mb-4">
+        <p className="text-sm text-muted-foreground mb-4">
           Select the types of health tips you want to receive. Leave empty to receive
           tips from all categories.
         </p>
@@ -212,14 +212,14 @@ export function HealthTipsPreferences({
 
       {/* Frequency Selection */}
       <div
-        className={`p-4 rounded-lg border border-gray-200 bg-white ${
+        className={`p-4 rounded-lg border border-border bg-card ${
           !currentPrefs.enabled ? 'opacity-50 pointer-events-none' : ''
         }`}
       >
         <Label className="text-base font-medium block mb-2">
           Tip Frequency
         </Label>
-        <p className="text-sm text-gray-500 mb-4">
+        <p className="text-sm text-muted-foreground mb-4">
           How often would you like to receive new health tips?
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -230,7 +230,7 @@ export function HealthTipsPreferences({
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 currentPrefs.frequency === option.value
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             >
               {option.label}
@@ -241,14 +241,14 @@ export function HealthTipsPreferences({
 
       {/* Delivery Method */}
       <div
-        className={`p-4 rounded-lg border border-gray-200 bg-white ${
+        className={`p-4 rounded-lg border border-border bg-card ${
           !currentPrefs.enabled ? 'opacity-50 pointer-events-none' : ''
         }`}
       >
         <Label className="text-base font-medium block mb-2">
           Delivery Method
         </Label>
-        <p className="text-sm text-gray-500 mb-4">
+        <p className="text-sm text-muted-foreground mb-4">
           How would you like to receive your health tips?
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -262,7 +262,7 @@ export function HealthTipsPreferences({
                 className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
                   isSelected
                     ? 'bg-blue-600 text-white shadow-md'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -275,8 +275,8 @@ export function HealthTipsPreferences({
 
       {/* Last Generated Info */}
       {currentPrefs.lastGeneratedAt && (
-        <div className="text-sm text-gray-500 text-center">
-          Last tips generated:{' '}
+        <div className="text-sm text-muted-foreground text-center">
+          Last tips generated:{' '}}
           {new Date(currentPrefs.lastGeneratedAt).toLocaleDateString('en-US', {
             month: 'long',
             day: 'numeric',

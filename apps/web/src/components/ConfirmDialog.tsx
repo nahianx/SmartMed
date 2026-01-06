@@ -76,21 +76,21 @@ export function ConfirmDialog({
         role="dialog"
         aria-modal="true"
         onKeyDown={handleKeyDown}
-        className="bg-white rounded-lg max-w-sm w-full p-6 shadow-lg"
+        className="bg-card rounded-lg max-w-sm w-full p-6 shadow-lg"
       >
-        <h2 className="text-lg font-bold text-slate-900 mb-2">{title}</h2>
-        <p className="text-slate-600 mb-4">{message}</p>
+        <h2 className="text-lg font-bold text-foreground mb-2">{title}</h2>
+        <p className="text-muted-foreground mb-4">{message}</p>
 
         {requireReason && (
           <div className="space-y-2 mb-4">
-            <label className="text-sm font-medium text-slate-700">
+            <label className="text-sm font-medium text-foreground">
               {reasonLabel || 'Add a reason (required)'}
             </label>
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder={placeholder || 'Provide context for this action'}
-              className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary"
               rows={3}
             />
           </div>
@@ -102,15 +102,15 @@ export function ConfirmDialog({
             disabled={disableConfirm}
             className={`flex-1 px-4 py-2 rounded-lg font-medium text-white transition disabled:opacity-60 ${
               isDangerous
-                ? 'bg-red-600 hover:bg-red-700'
-                : 'bg-blue-600 hover:bg-blue-700'
+                ? 'bg-destructive hover:bg-destructive/90'
+                : 'bg-primary hover:bg-primary/90'
             }`}
           >
             {confirmText}
           </button>
           <button
             onClick={onCancel}
-            className="flex-1 px-4 py-2 border border-slate-300 text-slate-900 rounded-lg hover:bg-slate-50 font-medium transition"
+            className="flex-1 px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted font-medium transition"
           >
             {cancelText}
           </button>

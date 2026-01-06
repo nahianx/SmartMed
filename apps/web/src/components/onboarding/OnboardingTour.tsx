@@ -288,7 +288,7 @@ function TourOverlay({
 
       {/* Tooltip Card */}
       <div
-        className="fixed z-[9999] w-[360px] bg-white rounded-xl shadow-2xl overflow-hidden"
+        className="fixed z-[9999] w-[360px] bg-card rounded-xl shadow-2xl overflow-hidden"
         style={{ top: position.top, left: position.left, transform: position.transform }}
       >
         {/* Header */}
@@ -310,10 +310,10 @@ function TourOverlay({
 
         {/* Content */}
         <div className="p-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <h3 className="text-lg font-semibold text-foreground mb-2">
             {step?.title}
           </h3>
-          <p className="text-gray-600 text-sm leading-relaxed">
+          <p className="text-muted-foreground text-sm leading-relaxed">
             {step?.content}
           </p>
         </div>
@@ -329,10 +329,10 @@ function TourOverlay({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-t">
+        <div className="flex items-center justify-between px-4 py-3 bg-muted border-t border-border">
           <button
             onClick={onSkip}
-            className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <SkipForward className="h-4 w-4" />
             Skip tour
@@ -341,7 +341,7 @@ function TourOverlay({
             {!isFirstStep && (
               <button
                 onClick={onPrev}
-                className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                className="flex items-center gap-1 px-3 py-1.5 text-sm text-foreground hover:bg-muted/80 rounded-lg transition-colors"
               >
                 <ChevronLeft className="h-4 w-4" />
                 Back

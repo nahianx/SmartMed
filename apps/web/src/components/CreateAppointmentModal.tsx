@@ -177,16 +177,16 @@ export default function CreateAppointmentModal({
         role="dialog"
         aria-modal="true"
         onKeyDown={handleKeyDown}
-        className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+        className="bg-card rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
       >
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-900">
+        <div className="sticky top-0 bg-card border-b border-border px-6 py-4 flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-foreground">
             Create New Appointment
           </h2>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-muted-foreground hover:text-foreground"
             aria-label="Close"
           >
             <X className="w-5 h-5" />
@@ -198,19 +198,19 @@ export default function CreateAppointmentModal({
           {/* Step 1: Select Patient */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <User className="w-5 h-5 text-gray-600" />
-              <label className="text-sm font-medium text-gray-700">
+              <User className="w-5 h-5 text-muted-foreground" />
+              <label className="text-sm font-medium text-foreground">
                 1. Select Patient *
               </label>
             </div>
 
             {selectedPatient ? (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
+              <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900">
+                  <p className="font-medium text-foreground">
                     {selectedPatient.firstName} {selectedPatient.lastName}
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-muted-foreground">
                     {selectedPatient.phoneNumber}
                   </p>
                 </div>
@@ -225,17 +225,17 @@ export default function CreateAppointmentModal({
             ) : (
               <div className="space-y-2">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input
                     type="text"
                     value={patientQuery}
                     onChange={(e) => setPatientQuery(e.target.value)}
                     placeholder="Search by name or phone..."
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2 border border-border rounded-lg bg-background focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
                 </div>
                 {patients.length > 0 && (
-                  <div className="border border-gray-200 rounded-lg divide-y max-h-48 overflow-y-auto">
+                  <div className="border border-border rounded-lg divide-y divide-border max-h-48 overflow-y-auto">
                     {patients.map((patient) => (
                       <button
                         key={patient.id}
@@ -245,12 +245,12 @@ export default function CreateAppointmentModal({
                           setPatientQuery('')
                           setPatients([])
                         }}
-                        className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors"
+                        className="w-full text-left px-4 py-3 hover:bg-muted transition-colors"
                       >
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-foreground">
                           {patient.firstName} {patient.lastName}
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-foreground">
                           {patient.phoneNumber}
                           {patient.dateOfBirth && (
                             <span className="ml-2">
@@ -272,19 +272,19 @@ export default function CreateAppointmentModal({
           {/* Step 2: Select Doctor */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Stethoscope className="w-5 h-5 text-gray-600" />
-              <label className="text-sm font-medium text-gray-700">
+              <Stethoscope className="w-5 h-5 text-muted-foreground" />
+              <label className="text-sm font-medium text-foreground">
                 2. Select Doctor *
               </label>
             </div>
 
             {selectedDoctor ? (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center justify-between">
+              <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg p-4 flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900">
+                  <p className="font-medium text-foreground">
                     Dr. {selectedDoctor.firstName} {selectedDoctor.lastName}
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-muted-foreground">
                     {selectedDoctor.specialization}
                   </p>
                 </div>
@@ -299,17 +299,17 @@ export default function CreateAppointmentModal({
             ) : (
               <div className="space-y-2">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input
                     type="text"
                     value={doctorQuery}
                     onChange={(e) => setDoctorQuery(e.target.value)}
                     placeholder="Search by name or specialization..."
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2 border border-border rounded-lg bg-background focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
                 </div>
                 {doctors.length > 0 && (
-                  <div className="border border-gray-200 rounded-lg divide-y max-h-48 overflow-y-auto">
+                  <div className="border border-border rounded-lg divide-y divide-border max-h-48 overflow-y-auto">
                     {doctors.map((doctor) => (
                       <button
                         key={doctor.id}
@@ -319,12 +319,12 @@ export default function CreateAppointmentModal({
                           setDoctorQuery('')
                           setDoctors([])
                         }}
-                        className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors"
+                        className="w-full text-left px-4 py-3 hover:bg-muted transition-colors"
                       >
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-foreground">
                           Dr. {doctor.firstName} {doctor.lastName}
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-foreground">
                           {doctor.specialization}
                         </p>
                       </button>
@@ -338,15 +338,15 @@ export default function CreateAppointmentModal({
           {/* Step 3: Appointment Details */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-3">
-              <Calendar className="w-5 h-5 text-gray-600" />
-              <label className="text-sm font-medium text-gray-700">
+              <Calendar className="w-5 h-5 text-muted-foreground" />
+              <label className="text-sm font-medium text-foreground">
                 3. Appointment Details
               </label>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Date & Time *
                 </label>
                 <input
@@ -356,12 +356,12 @@ export default function CreateAppointmentModal({
                   min={new Date().toISOString().slice(0, 16)}
                   required
                   aria-label="Appointment date and time"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Duration (minutes) *
                 </label>
                 <select
@@ -369,7 +369,7 @@ export default function CreateAppointmentModal({
                   onChange={(e) => setDuration(Number(e.target.value))}
                   required
                   aria-label="Appointment duration"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:ring-2 focus:ring-primary focus:border-transparent"
                 >
                   <option value={15}>15 minutes</option>
                   <option value={30}>30 minutes</option>
@@ -382,7 +382,7 @@ export default function CreateAppointmentModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Reason for Visit *
               </label>
               <input
@@ -391,12 +391,12 @@ export default function CreateAppointmentModal({
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="e.g., Regular checkup, Follow-up visit..."
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Notes (optional)
               </label>
               <textarea
@@ -404,24 +404,24 @@ export default function CreateAppointmentModal({
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Additional notes or instructions..."
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
               />
             </div>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+            <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
               {error}
             </div>
           )}
 
           {/* Actions */}
-          <div className="flex gap-3 pt-4 border-t">
+          <div className="flex gap-3 pt-4 border-t border-border">
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+              className="flex-1 px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted font-medium transition-colors"
             >
               Cancel
             </button>

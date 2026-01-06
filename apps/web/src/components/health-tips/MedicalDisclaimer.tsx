@@ -197,7 +197,7 @@ export function MedicalDisclaimer({
   if (variant === 'card') {
     return (
       <div
-        className={`rounded-xl border-2 border-amber-200 bg-white shadow-sm overflow-hidden ${className}`}
+        className={`rounded-xl border-2 border-amber-200 dark:border-amber-800 bg-card shadow-sm overflow-hidden ${className}`}
         role="alert"
       >
         <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-3">
@@ -216,7 +216,7 @@ export function MedicalDisclaimer({
         <div className="p-4 space-y-4">
           <div className="flex gap-3">
             <Info className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
-            <div className="space-y-2 text-sm text-gray-700">
+            <div className="space-y-2 text-sm text-muted-foreground">
               <p>
                 The health tips provided here are generated using artificial intelligence 
                 and are intended for <strong>general informational purposes only</strong>.
@@ -239,14 +239,14 @@ export function MedicalDisclaimer({
           </div>
           
           {showAcknowledgment && !isAcknowledged && (
-            <div className="border-t border-gray-200 pt-4">
+            <div className="border-t border-border pt-4">
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   onChange={(e) => e.target.checked && handleAcknowledge()}
-                  className="mt-1 h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                  className="mt-1 h-4 w-4 rounded border-border text-amber-600 focus:ring-amber-500"
                 />
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-muted-foreground">
                   I understand that these tips are for informational purposes only and 
                   I will consult a healthcare professional for medical advice.
                 </span>
@@ -272,7 +272,7 @@ export function MedicalDisclaimer({
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
         <div
-          className={`w-full max-w-lg rounded-2xl bg-white shadow-2xl overflow-hidden ${className}`}
+          className={`w-full max-w-lg rounded-2xl bg-card shadow-2xl overflow-hidden ${className}`}
           role="dialog"
           aria-modal="true"
           aria-labelledby="disclaimer-title"
@@ -307,7 +307,7 @@ export function MedicalDisclaimer({
               </div>
             </div>
             
-            <div className="space-y-3 text-sm text-gray-700">
+            <div className="space-y-3 text-sm text-muted-foreground">
               <p>
                 <strong>This information is for educational and informational purposes only</strong> 
                 and is not intended to be a substitute for professional medical advice, 
@@ -319,15 +319,15 @@ export function MedicalDisclaimer({
                 with any questions you may have regarding a medical condition.
               </p>
               
-              <p className="text-red-600 font-medium">
+              <p className="text-red-600 dark:text-red-400 font-medium">
                 Never disregard professional medical advice or delay in seeking it because 
                 of something you have read in these health tips.
               </p>
             </div>
             
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="font-semibold text-gray-800 mb-2">By continuing, you acknowledge:</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
+            <div className="bg-muted rounded-lg p-4">
+              <h4 className="font-semibold text-foreground mb-2">By continuing, you acknowledge:</h4>
+              <ul className="text-sm text-muted-foreground space-y-1">
                 <li className="flex items-start gap-2">
                   <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
                   These tips do not replace professional medical advice
