@@ -795,6 +795,25 @@ model HealthTipPreference {
 }
 
 // ========================
+// Dashboard Configuration
+// ========================
+
+model DashboardConfig {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  role      UserRole
+  widgets   Json     // Array of WidgetConfig objects
+  layout    Json?    // Optional grid layout metadata
+  version   Int      @default(1) // For migration support
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([role])
+  @@map("dashboard_configs")
+}
+
+// ========================
 // RBAC Permission System
 // ========================
 

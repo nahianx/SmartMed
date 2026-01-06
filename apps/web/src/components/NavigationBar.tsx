@@ -3,6 +3,7 @@
 import { useAuthContext } from '../context/AuthContext'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { ThemeToggle } from './theme/ThemeToggle'
 
 export function NavigationBar() {
   const { user, logout } = useAuthContext()
@@ -15,10 +16,10 @@ export function NavigationBar() {
   if (!user) return null
 
   return (
-    <nav className="bg-white border-b border-slate-200 shadow-sm">
+    <nav className="bg-white dark:bg-gray-900 border-b border-slate-200 dark:border-gray-800 shadow-sm">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         <div className="flex items-center gap-8">
-          <Link href="/" className="text-xl font-bold text-blue-600">
+          <Link href="/" className="text-xl font-bold text-blue-600 dark:text-blue-400">
             SmartMed
           </Link>
 
@@ -27,7 +28,7 @@ export function NavigationBar() {
               <>
                 <Link
                   href="/profile?role=PATIENT"
-                  className="text-slate-600 hover:text-slate-900 text-sm font-medium"
+                  className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-sm font-medium"
                 >
                   Profile
                 </Link>
@@ -38,7 +39,7 @@ export function NavigationBar() {
               <>
                 <Link
                   href="/profile?role=DOCTOR"
-                  className="text-slate-600 hover:text-slate-900 text-sm font-medium"
+                  className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-sm font-medium"
                 >
                   Profile
                 </Link>
@@ -49,19 +50,19 @@ export function NavigationBar() {
               <>
                 <Link
                   href="/profile?role=ADMIN"
-                  className="text-slate-600 hover:text-slate-900 text-sm font-medium"
+                  className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-sm font-medium"
                 >
                   Profile
                 </Link>
                 <Link
                   href="/dashboard/admin"
-                  className="text-slate-600 hover:text-slate-900 text-sm font-medium"
+                  className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-sm font-medium"
                 >
                   Dashboard
                 </Link>
                 <Link
                   href="/dashboard/admin/users"
-                  className="text-slate-600 hover:text-slate-900 text-sm font-medium"
+                  className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-sm font-medium"
                 >
                   User Management
                 </Link>
@@ -71,7 +72,8 @@ export function NavigationBar() {
         </div>
 
         <div className="flex items-center gap-4">
-          <span className="text-sm text-slate-600">{user.email}</span>
+          <ThemeToggle iconOnly />
+          <span className="text-sm text-slate-600 dark:text-slate-300">{user.email}</span>
           <button
             onClick={handleLogout}
             className="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition"

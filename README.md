@@ -12,6 +12,8 @@ A modern, scalable healthcare management system built with a monorepo architectu
 - **🔧 [API Setup Guide](./docs/api/backend-setup.md)** - Backend configuration and testing
 - **👨‍💻 [Developer Migration Guide](./docs/profile-management/migration-guide.md)** - Setup and development guide
 - **🧪 [Postman API Collection](./postman/profile-management-api.postman_collection.json)** - 21 endpoints ready for testing
+- **🎨 [Customizable Dashboard Widgets](./docs/CUSTOMIZABLE_WIDGETS.md)** - Dashboard customization guide
+- **🌙 [Dark Mode Support](./docs/DARK_MODE.md)** - Theme switching documentation
 
 ## 📋 Project Overview
 
@@ -22,6 +24,8 @@ SmartMed is a comprehensive healthcare management platform designed to streamlin
 - **Appointment System**: Easy booking and management of medical appointments
 - **Prescription Management**: Digital prescriptions and medication tracking
 - **Admin Dashboard**: System-wide monitoring and configuration
+- **Customizable Dashboards**: Drag-and-drop widget customization for each role
+- **Dark Mode Support**: Toggle between light, dark, and system themes
 
 ## 🏗️ Architecture
 

@@ -41,6 +41,7 @@ import pushRoutes from './routes/push.routes'
 import notificationPreferencesRoutes from './routes/notification-preferences.routes'
 import mfaRoutes from './routes/mfa.routes'
 import consultationRoutes from './routes/consultation.routes'
+import dashboardConfigRoutes from './routes/dashboard-config.routes'
 
 dotenv.config()
 
@@ -132,6 +133,9 @@ app.use('/api/notifications', notificationPreferencesRoutes)
 
 // Consultation routes (patient context for doctors)
 app.use('/api/consultation', consultationRoutes)
+
+// Dashboard configuration routes (customizable widgets)
+app.use('/api/dashboard-config', dashboardConfigRoutes)
 
 // 404 handler
 app.use((_req: Request, res: Response) => {
